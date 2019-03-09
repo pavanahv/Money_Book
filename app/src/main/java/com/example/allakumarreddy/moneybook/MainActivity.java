@@ -1,6 +1,8 @@
 package com.example.allakumarreddy.moneybook;
 
-import android.graphics.Color;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -8,63 +10,70 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Spinner;
+import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.text.ParseException;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveClient;
+import com.google.android.gms.drive.DriveResourceClient;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.example.allakumarreddy.moneybook.R.menu.main;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     final static String TAG = "MainActivity";
-    private TabHost[] host = new TabHost[4];
+    private static final int REQUESTCODE_PICK_JSON = 504;
+    private static final int REQUEST_CODE_SIGN_IN = 200;
+    private TabHost host;
     private String[] addDialogDetails = {"", ""};
-    private RecyclerView[] mRecyclerView;
+    private ListView[] mRecyclerView;
     private List<String>[] des, amount, date;
     private MyAdapter[] mAdapter;
-    private FrameLayout mainLayout;
     private int currentScreen;
-    private int prevScreen = 0;
     private SimpleDateFormat format;
     private DbHandler db;
-    private LinearLayout tables;
-    private int spinnerSelectedItem = 0;
+    private LinearLayout mDashBoard;
+    private ListView dashBoardList;
+    private DashBoardAdapter dashBoardAdapter;
+    private ArrayList<DashBoardRecord> dbr;
+    private TextView totalD;
+    private TextView[] mTextViewTotal;
+    private FrameLayout mainLayout;
     private String tablesDate;
-    private int spinner2SelectedItem = 0;
-    private int spinner3SelectedItem = 0;
-    private ScrollView sv;
-    private LinearLayout gl;
-    private View prevView = null;
-    private int spinner4SelectedItem = 0;
-    private int spinner5SelectedItem;
-    private boolean saveBook=false;
+    private GoogleSignInClient mGoogleSignInClient;
+    private DriveClient mDriveClient;
+    private DriveResourceClient mDriveResourceClient;
+    private PreferencesCus sp;
+    private File mBackupFile;
+    private GoogleDriveBackup gdb;
+    private TextView totalM;
+    private TextView totalY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //startActivity(new Intent(MainActivity.this, GoogleDriveActivity.class));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -72,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AddDialog(MainActivity.this).show();
+                new AddDialog(MainActivity.this, currentScreen).show();
             }
         });
 
@@ -84,6 +93,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        sp = new PreferencesCus(this);
         init();
     }
 
@@ -100,7 +111,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -112,12 +123,67 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_backup) {
+            mBackupFile = new Backup(db, this).send();
+            signIn();
             return true;
+        } else if (id == R.id.action_import) {
+            Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            mediaIntent.setType("*/*"); // Set MIME type as per requirement
+            startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
+            return true;
+        } else if (id == R.id.action_analytics) {
+            goToAnalytics("0");
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUESTCODE_PICK_JSON:
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri uri = data.getData();
+                    StringBuilder s = new StringBuilder();
+                    try {
+                        InputStream inputStream = getContentResolver().openInputStream(uri);
+                        if (inputStream.available() != 0) {
+                            for (int i; (i = inputStream.read()) != -1; ) {
+                                s.append((char) i);
+                            }
+                        }
+                        db.addRecords(s.toString());
+                        Intent intent = getIntent();
+                        finish();
+                        startActivity(intent);
+                    } catch (FileNotFoundException e) {
+                        LoggerCus.d(TAG, e.getMessage());
+                    } catch (IOException e) {
+                        LoggerCus.d(TAG, e.getMessage());
+                    }
+                }
+                break;
+
+            case REQUEST_CODE_SIGN_IN:
+                if (resultCode == RESULT_OK) {
+                    LoggerCus.d(TAG, "Signed in successfully.");
+                    mDriveClient = Drive.getDriveClient(this, GoogleSignIn.getLastSignedInAccount(this));
+                    sp.setData(Utils.getEmail(), GoogleSignIn.getLastSignedInAccount(this).getEmail());
+                    mDriveResourceClient =
+                            Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
+                    gdb = new GoogleDriveBackup(mBackupFile, this, mDriveResourceClient, db.getRecords());
+                    gdb.backup();
+                } else {
+                    LoggerCus.d(TAG, "error in sign in");
+                }
+                break;
+        }
+    }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -125,48 +191,36 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.dash) {
+            currentScreen = 1;
+            dashBoard();
+            switchScreen();
+        } else if (id == R.id.home) {
             currentScreen = 0;
             switchScreen();
-        } else if (id == R.id.nav_gallery) {
-            currentScreen = 1;
-            graphs();
-            switchScreen();
-        } else if (id == R.id.nav_manage) {
-            currentScreen = 2;
-            showTables();
-        }  else if (id == R.id.nav_send) {
-            saveBook=true;
-            selectTorG();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void showTables() {
-        host[prevScreen].setVisibility(View.INVISIBLE);
-        tables.setVisibility(View.VISIBLE);
-    }
-
     private void switchScreen() {
         closeOtherScreens();
-        host[prevScreen].setVisibility(View.INVISIBLE);
-        host[currentScreen].setVisibility(View.VISIBLE);
-        prevScreen = currentScreen;
+        if (currentScreen == 1) {
+            host.setVisibility(View.INVISIBLE);
+            mDashBoard.setVisibility(View.VISIBLE);
+        } else {
+            host.setVisibility(View.VISIBLE);
+            mDashBoard.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void goToAnalytics(String name) {
+        startActivity(new Intent(MainActivity.this, AnalyticsActivity.class).putExtra("name", name));
     }
 
     private void closeOtherScreens() {
-        tables.setVisibility(View.INVISIBLE);
     }
-
-    TabHost.OnTabChangeListener tabChangeListenerGraph = new TabHost.OnTabChangeListener() {
-        @Override
-        public void onTabChanged(String tabId) {
-            LoggerCus.d(TAG, "current tabid is : " + tabId);
-            graphs();
-        }
-    };
 
     private void home() {
         Date curDate = new Date();
@@ -174,22 +228,19 @@ public class MainActivity extends AppCompatActivity
         String curDateStr = format.format(curDate);
         tablesDate = curDateStr;
 
+        mDashBoard = (LinearLayout) findViewById(R.id.dashboard);
         int[] o = {R.id.my_recycler_view1, R.id.my_recycler_view2, R.id.my_recycler_view3, R.id.my_recycler_view4};
-        mRecyclerView = new RecyclerView[4];
+        int[] t = {R.id.homespenttotal, R.id.homeearntotal, R.id.homeduetotal, R.id.homeloantotal};
+        mRecyclerView = new ListView[4];
+        mTextViewTotal = new TextView[4];
+
         des = new ArrayList[4];
         date = new ArrayList[4];
         amount = new ArrayList[4];
         mAdapter = new MyAdapter[4];
         for (int i = 0; i < 4; i++) {
-            mRecyclerView[i] = (RecyclerView) findViewById(o[i]);
-
-            // use this setting to improve performance if you know that changes
-            // in content do not change the layout size of the RecyclerView
-            mRecyclerView[i].setHasFixedSize(true);
-
-            // use a linear layout manager
-            LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-            mRecyclerView[i].setLayoutManager(mLayoutManager);
+            mRecyclerView[i] = (ListView) findViewById(o[i]);
+            mTextViewTotal[i] = (TextView) findViewById(t[i]);
 
             ArrayList<MBRecord> mbr = db.getRecords(curDateStr, i);
             final int len = mbr.size();
@@ -203,351 +254,94 @@ public class MainActivity extends AppCompatActivity
                 date[i].add(mbr.get(j).getDate().toString());
             }
             // specify an adapter
-            mAdapter[i] = new MyAdapter(des[i], amount[i]);
+            mAdapter[i] = new MyAdapter(mbr, this, i);
             mRecyclerView[i].setAdapter(mAdapter[i]);
+            mTextViewTotal[i].setText(Utils.getFormattedNumber(getTotalAmount(i)));
         }
     }
 
-    private void graphs() {
-        final int pos = host[currentScreen].getCurrentTab();
-        String[] s = new String[des[pos].size()], s1 = new String[des[pos].size()];
-        int co = 0;
-        if (des[pos].size() > 0) {
-            for (String i : des[pos]) {
-                s[co] = i;
-                co++;
-            }
-            co = 0;
-            for (String i : amount[pos]) {
-                s1[co] = i;
-                co++;
-            }
-        }
-        int layout = 0;
-        switch (pos) {
-            case 0:
-                layout = R.id.tabg1;
-                break;
+    private int getTotalAmount(int i) {
+        int total = 0;
+        for (String n : amount[i])
+            total += Integer.parseInt(n);
+        return total;
+    }
 
-            case 1:
-                layout = R.id.tabg2;
-                break;
+    private void dashBoard() {
+        dashBoardList = (ListView) findViewById(R.id.dashboardlist);
 
-            case 2:
-                layout = R.id.tabg3;
-                break;
+        totalD = (TextView) findViewById(R.id.dashboardtotald);
+        totalD.setText(Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay()));
 
-            case 3:
-                layout = R.id.tabg4;
-                break;
-        }
-        new GraphCus(this, 0, s, s1, layout);
+        totalM = (TextView) findViewById(R.id.dashboardtotalm);
+        totalM.setText(Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth()));
+
+        totalY = (TextView) findViewById(R.id.dashboardtotaly);
+        totalY.setText(Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear()));
+
+        ((TextView) findViewById(R.id.dashday)).setText(new SimpleDateFormat("dd").format(new Date()));
+        ((TextView) findViewById(R.id.dashmonth)).setText(new SimpleDateFormat("MMM").format(new Date()));
+        ((TextView) findViewById(R.id.dashyear)).setText(new SimpleDateFormat("yyyy").format(new Date()));
+
+        dbr = db.getDashBoardRecords();
+        dashBoardAdapter = new DashBoardAdapter(dbr, this);
+        dashBoardList.setAdapter(dashBoardAdapter);
     }
 
     private void init() {
         db = new DbHandler(this);
         mainLayout = (FrameLayout) findViewById(R.id.main);
         createTabs(R.id.tabHost, R.id.tab1, R.id.tab2, R.id.tab3, R.id.tab4, 0);
-        createTabs(R.id.tabHostg, R.id.tabg1, R.id.tabg2, R.id.tabg3, R.id.tabg4, 1);
-        host[1].setOnTabChangedListener(tabChangeListenerGraph);
-        tables = (LinearLayout) findViewById(R.id.tables);
-        tables.setVisibility(View.INVISIBLE);
         home();
-        createTables();
-        ((Spinner) findViewById(R.id.spinner)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinnerSelectedItem = position;
-                LoggerCus.d(TAG, "spinner value : " + position + "");
-                selectTorG();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        ((Spinner) findViewById(R.id.spinner2)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinner2SelectedItem = position;
-                LoggerCus.d(TAG, "spinner2 value : " + position + "");
-                selectTorG();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        ((Spinner) findViewById(R.id.spinner3)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinner3SelectedItem = position;
-                LoggerCus.d(TAG, "spinner3 value : " + position + "");
-                selectTorG();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        ((Spinner) findViewById(R.id.spinner4)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinner4SelectedItem = position;
-                LoggerCus.d(TAG, "spinner4 value : " + position + "");
-                selectTorG();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        ((Spinner) findViewById(R.id.spinner5)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinner5SelectedItem = position;
-                LoggerCus.d(TAG, "spinner5 value : " + position + "");
-                selectTorG();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        currentScreen = 1;
+        dashBoard();
         switchScreen();
     }
 
-    protected void showDatePicker(View v) {
-        new DatePickerCus(this).show();
-    }
-
-    public void afterDate(String s) {
-        tablesDate = s;
-        selectTorG();
-    }
-
-    private void selectTorG() {
-        String s = "";
-        switch (spinner2SelectedItem) {
-            case 0:
-                try {
-                    s = format.format(format.parse(tablesDate));
-                } catch (ParseException e) {
-                    LoggerCus.d(TAG, e.getMessage());
-                }
-                break;
-
-            case 1:
-                SimpleDateFormat smp = new SimpleDateFormat("yyyy/MM");
-                try {
-                    s = smp.format(format.parse(tablesDate));
-                } catch (ParseException e) {
-                    LoggerCus.d(TAG, e.getMessage());
-                }
-                break;
-
-            case 2:
-                smp = new SimpleDateFormat("yyyy");
-                try {
-                    s = smp.format(format.parse(tablesDate));
-                } catch (ParseException e) {
-                    LoggerCus.d(TAG, e.getMessage());
-                }
-                break;
-
-            case 3:
-                s = "";
-                break;
-
-        }
-        ((EditText) findViewById(R.id.datePicker1)).setText(s);
-        if (spinner3SelectedItem == 0)
-            processTabs(s);
-        else
-            processGraphs(s);
-    }
-
-    private void processGraphs(String s) {
-        tables.removeView(prevView);
-        gl = new LinearLayout(this);
-        prevView = gl;
-        gl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        tables.addView(gl);
-
-        ArrayList<MBRecord> mbr = db.getRecords(s, spinnerSelectedItem);
-        if(saveBook)
-        {
-            saveBook=false;
-            new XLStore("MoneyBook",mbr);
-        }
-        final int len = mbr.size();
-        LoggerCus.d(TAG, "length : " + len);
-        String[] ds = new String[len], s1 = new String[len];
-        for (int j = 0; j < len; j++) {
-            if (spinner5SelectedItem == 0)
-                ds[j] = mbr.get(j).getDescription();
-            else
-                ds[j] = format.format(mbr.get(j).getDate());
-            s1[j] = mbr.get(j).getAmount() + "";
-        }
-        new GraphCus(this, spinner4SelectedItem, ds, s1, gl);
-    }
-
-    private void processTabs(String s) {
-        tables.removeView(prevView);
-        sv = new ScrollView(this);
-        prevView = sv;
-        sv.setLayoutParams(new LinearLayoutCompat.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
-        TableLayout tableView;
-        tableView = new TableLayout(this);
-        tableView.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-        tableView.removeAllViews();
-        sv.addView(tableView);
-        tables.addView(sv);
-
-        TableLayout.LayoutParams tlp = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.FILL_PARENT);
-
-        TableRow tr = new TableRow(this);
-        tr.setLayoutParams(tlp);
-        tr.setOrientation(LinearLayout.HORIZONTAL);
-
-        TableRow.LayoutParams trp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1f);
-
-        TextView des = new TextView(this);
-        des.setLayoutParams(trp);
-        des.setText("Description");
-        des.setTextSize(25f);
-        des.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        des.setTextColor(Color.WHITE);
-
-        TextView am = new TextView(this);
-        am.setLayoutParams(trp);
-        am.setTextSize(25f);
-        am.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        am.setTextColor(Color.WHITE);
-        am.setText("Amount");
-
-        TextView dt = new TextView(this);
-        dt.setLayoutParams(trp);
-        dt.setText("Date");
-        dt.setTextSize(25f);
-        dt.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        dt.setTextColor(Color.WHITE);
-
-        tr.addView(des);
-        tr.addView(am);
-        tr.addView(dt);
-
-        tableView.addView(tr);
-
-        ArrayList<MBRecord> mbr = db.getRecords(s, spinnerSelectedItem);
-        if(saveBook)
-        {
-            saveBook=false;
-            new XLStore("MoneyBook",mbr);
-        }
-        final int len = mbr.size();
-        LoggerCus.d(TAG, "length : " + len);
-        for (int j = 0; j < len; j++) {
-            tr = new TableRow(this);
-            tr.setLayoutParams(tlp);
-            tr.setOrientation(LinearLayout.HORIZONTAL);
-
-            TextView tv = new TextView(this);
-            tv.setLayoutParams(trp);
-            tv.setText(mbr.get(j).getDescription());
-            tv.setTextSize(20f);
-            tv.setBackground(getDrawable(R.drawable.table_border));
-            tr.addView(tv);
-
-            tv = new TextView(this);
-            tv.setLayoutParams(trp);
-            tv.setText(mbr.get(j).getAmount() + "");
-            tv.setTextSize(20f);
-            tv.setBackground(getDrawable(R.drawable.table_border));
-            tr.addView(tv);
-
-            tv = new TextView(this);
-            tv.setLayoutParams(trp);
-            tv.setText(format.format(mbr.get(j).getDate()));
-            tv.setTextSize(20f);
-            tv.setBackground(getDrawable(R.drawable.table_border));
-            tr.addView(tv);
-
-            tableView.addView(tr);
-        }
-    }
-
-    private void createTables() {
-        Spinner dropdown = (Spinner) findViewById(R.id.spinner);
-        String[] items = new String[]{"Spent", "Earn", "Due", "Loan"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        dropdown.setAdapter(adapter);
-
-        dropdown = (Spinner) findViewById(R.id.spinner2);
-        items = new String[]{"Day", "Month", "Year", "All"};
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        dropdown.setAdapter(adapter);
-
-        dropdown = (Spinner) findViewById(R.id.spinner3);
-        items = new String[]{"Table", "Graph"};
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        dropdown.setAdapter(adapter);
-
-        dropdown = (Spinner) findViewById(R.id.spinner4);
-        items = new String[]{"Line", "Bar", "Pie", "Radar", "Scatter", "None"};
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        dropdown.setAdapter(adapter);
-
-        dropdown = (Spinner) findViewById(R.id.spinner5);
-        items = new String[]{"Item", "Date"};
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        dropdown.setAdapter(adapter);
-    }
-
     private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {
-        host[position] = (TabHost) findViewById(hostId);
-        host[position].setup();
+        host = (TabHost) findViewById(hostId);
+        host.setup();
 
         //Tab 1
-        TabHost.TabSpec spec = host[position].newTabSpec("Spent");
+        TabHost.TabSpec spec = host.newTabSpec("Spent");
         spec.setContent(t1);
         spec.setIndicator("Spent");
-        host[position].addTab(spec);
+        host.addTab(spec);
 
         //Tab 2
-        spec = host[position].newTabSpec("Earn");
+        spec = host.newTabSpec("Earn");
         spec.setContent(t2);
         spec.setIndicator("Earn");
-        host[position].addTab(spec);
+        host.addTab(spec);
 
         //Tab 3
-        spec = host[position].newTabSpec("Due");
+        spec = host.newTabSpec("Due");
         spec.setContent(t3);
         spec.setIndicator("Due");
-        host[position].addTab(spec);
+        host.addTab(spec);
 
         //Tab 4
-        spec = host[position].newTabSpec("Loan");
+        spec = host.newTabSpec("Loan");
         spec.setContent(t4);
         spec.setIndicator("Loan");
-        host[position].addTab(spec);
-        host[position].setVisibility(View.INVISIBLE);
+        host.addTab(spec);
+        host.setVisibility(View.INVISIBLE);
     }
 
     public void afterCallingAddDialog() {
         String[] s = this.getAddDialogDetails();
-        if ((s[0] != "") && (s[1] != "")) {
-            final int pos = host[currentScreen].getCurrentTab();
-            MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date());
-            db.addRecord(mbr, pos);
-            addItem(mbr, pos);
+        if (this.currentScreen == 0) {
+            if ((s[0] != "") && (s[1] != "")) {
+                final int pos = host.getCurrentTab();
+                MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date());
+                db.addRecord(mbr, pos);
+                addItem(mbr, pos);
+            }
+        } else {
+            db.addCategory(s[0]);
+            DashBoardRecord temp = db.getDashBoardRecord(s[0]);
+            dbr.add(temp);
+            dashBoardAdapter.notifyDataSetChanged();
         }
     }
 
@@ -555,7 +349,9 @@ public class MainActivity extends AppCompatActivity
         des[position].add(mbr.getDescription());
         amount[position].add(mbr.getAmount() + "");
         date[position].add(format.format(new Date()));
-        mAdapter[position].notifyItemInserted(des[position].size() - 1);
+        mAdapter[position].add(mbr);
+        mAdapter[position].notifyDataSetChanged();
+        mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
     }
 
     public String[] getAddDialogDetails() {
@@ -565,4 +361,23 @@ public class MainActivity extends AppCompatActivity
     public void setAddDialogDetails(String[] s) {
         this.addDialogDetails = s.clone();
     }
+
+    private void signIn() {
+        LoggerCus.d(TAG, "Start sign in");
+        mGoogleSignInClient = buildGoogleSignInClient();
+        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+    }
+
+    /**
+     * Build a Google SignIn client.
+     */
+    private GoogleSignInClient buildGoogleSignInClient() {
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestScopes(Drive.SCOPE_APPFOLDER)
+                        .requestEmail()
+                        .build();
+        return GoogleSignIn.getClient(this, signInOptions);
+    }
+
 }

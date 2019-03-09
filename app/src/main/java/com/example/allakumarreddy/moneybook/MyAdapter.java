@@ -1,68 +1,100 @@
 package com.example.allakumarreddy.moneybook;
 
-import android.support.v7.widget.RecyclerView;
+import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by alla.kumarreddy on 7/19/2017.
  */
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickListener {
 
-    private List<String> mDataset1,mDataset2;
+    private final int type;
+    private ArrayList<MBRecord> dataSet;
+    Context mContext;
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public LinearLayout mTextView;
+    // View lookup cache
+    private static class ViewHolder {
+        TextView txtName;
+        TextView txtRs;
+        ImageView imageView;
+    }
 
-        public ViewHolder(LinearLayout v) {
-            super(v);
-            mTextView = v;
+    public MyAdapter(ArrayList<MBRecord> data, Context context, int type) {
+        super(context, R.layout.record, data);
+        this.dataSet = data;
+        this.mContext = context;
+        this.type = type;
+    }
+
+    @Override
+    public void onClick(View v) {
+        int position = (Integer) v.getTag();
+        Object object = getItem(position);
+        MBRecord dataModel = (MBRecord) object;
+    }
+
+    private int lastPosition = -1;
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        // Get the data item for this position
+        MBRecord dataModel = getItem(position);
+        // Check if an existing view is being reused, otherwise inflate the view
+        ViewHolder viewHolder; // view lookup cache stored in tag
+
+        final View result;
+
+        if (convertView == null) {
+
+            viewHolder = new ViewHolder();
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            convertView = inflater.inflate(R.layout.record, parent, false);
+            viewHolder.txtName = (TextView) convertView.findViewById(R.id.desc);
+            viewHolder.txtRs = (TextView) convertView.findViewById(R.id.price);
+            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.homeiv);
+
+            result = convertView;
+
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+            result = convertView;
         }
-    }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(List<String> myDataset1, List<String> myDataset2) {
-        this.mDataset1=myDataset1;
-        this.mDataset2 = myDataset2;
-    }
+        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        result.startAnimation(animation);
+        lastPosition = position;
 
-    // Create new views (invoked by the layout manager)
-    @Override
-    public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
-        // create a new view
-        LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.record, parent, false);
-        // set the view's size, margins, paddings and layout parameters
+        viewHolder.txtName.setText(dataModel.getDescription());
+        viewHolder.txtRs.setText("Rs. " + dataModel.getAmount());
+        switch (this.type) {
+            case 0:
+                viewHolder.imageView.setImageResource(R.drawable.spent);
+                break;
 
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
-    }
+            case 1:
+                viewHolder.imageView.setImageResource(R.drawable.earn);
+                break;
 
-    // Replace the contents of a view (invoked by the layout manager)
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
-        TextView tv=(TextView) holder.mTextView.getChildAt(0);
-        tv.setText(mDataset1.get(position));
-        tv=(TextView) holder.mTextView.getChildAt(1);
-        tv.setText(mDataset2.get(position));
+            case 2:
+                viewHolder.imageView.setImageResource(R.drawable.due);
+                break;
 
-    }
-
-    // Return the size of your dataset (invoked by the layout manager)
-    @Override
-    public int getItemCount() {
-        return mDataset1.size();
+            case 3:
+                viewHolder.imageView.setImageResource(R.drawable.loan);
+                break;
+        }
+        // Return the completed view to render on screen
+        return convertView;
     }
 }

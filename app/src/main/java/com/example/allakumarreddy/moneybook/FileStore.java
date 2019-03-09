@@ -17,36 +17,35 @@ public class FileStore {
     private String fileName;
 
     public FileStore(int type) {
-        this.fileName=GlobalConstants.type[type];
+        this.fileName = GlobalConstants.type[type];
     }
 
-    public String readFile()
-    {
-        String outs="";
+    public FileStore() {
+        this.fileName = "Backup";
+    }
+
+    public String readFile() {
+        String outs = "";
         try {
-            RandomAccessFile rs=new RandomAccessFile(getMediaFile(),"rw");
-            for (String s="";s!=null;s=rs.readLine())
-                outs+=s;
+            RandomAccessFile rs = new RandomAccessFile(getMediaFile(), "rw");
+            for (String s = ""; s != null; s = rs.readLine())
+                outs += s;
             rs.close();
         } catch (FileNotFoundException e) {
-            LoggerCus.d(TAG,e.getMessage());
+            LoggerCus.d(TAG, e.getMessage());
         } catch (IOException e) {
-            LoggerCus.d(TAG,e.getMessage());
+            LoggerCus.d(TAG, e.getMessage());
         }
         return outs;
     }
 
-    public void writeFile(String s)
-    {
-        try {
-            RandomAccessFile rs=new RandomAccessFile(getMediaFile(),"rw");
-            rs.writeBytes(s);
-            rs.close();
-        } catch (FileNotFoundException e) {
-            LoggerCus.d(TAG,e.getMessage());
-        } catch (IOException e) {
-            LoggerCus.d(TAG,e.getMessage());
-        }
+    public File writeFile(String s) throws IOException {
+        File f=getMediaFile();
+        RandomAccessFile rs = new RandomAccessFile(f, "rw");
+        rs.setLength(0);
+        rs.writeBytes(s);
+        rs.close();
+        return f;
     }
 
     private File getMediaFile() {
@@ -59,8 +58,10 @@ public class FileStore {
         }
 
         File mediaFile;
-        String filename = this.fileName+".JSON";
+        String filename = this.fileName + ".JSON";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
+        if (mediaFile.exists())
+            mediaFile.delete();
         return mediaFile;
     }
 }

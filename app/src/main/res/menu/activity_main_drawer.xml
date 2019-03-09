@@ -3,26 +3,13 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/dash"
             android:icon="@android:drawable/ic_dialog_dialer"
-            android:title="Home" />
+            android:title="DashBoard" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/home"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Graphs" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Analytics" />
+            android:title="Home" />
+
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send As XL" />
-        </menu>
-    </item>
-
 </menu>

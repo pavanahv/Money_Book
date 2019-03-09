@@ -12,11 +12,30 @@ public class MBRecord {
     private int amount;
     private Date date;
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    private int type;
+
     public MBRecord(String description, int amount, Date date) {
         this.Description = description;
         this.amount = amount;
         this.date = date;
-        LoggerCus.d("MBRecord",description+":"+amount+":"+date);
+        this.type=-1;
+        //LoggerCus.d("MBRecord",description+":"+amount+":"+date);
+    }
+
+    public MBRecord(String description, int amount, Date date,int type) {
+        this.Description = description;
+        this.amount = amount;
+        this.date = date;
+        this.type=type;
+        //LoggerCus.d("MBRecord",description+":"+amount+":"+date);
     }
 
     public String getDescription() {

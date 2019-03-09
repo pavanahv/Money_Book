@@ -13,13 +13,16 @@ import android.widget.EditText;
 
 public class AddDialog extends Dialog implements android.view.View.OnClickListener {
 
-    final static String TAG="AddDialog";
+    final static String TAG = "AddDialog";
     private final MainActivity activity;
+    private final int type;
     private Button add, cancel;
+    private EditText desEd;
 
-    public AddDialog(MainActivity activity) {
+    public AddDialog(MainActivity activity, int type) {
         super(activity);
         this.activity = activity;
+        this.type = type;
     }
 
     @Override
@@ -27,6 +30,13 @@ public class AddDialog extends Dialog implements android.view.View.OnClickListen
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_dialog);
+        desEd = (EditText) findViewById(R.id.des);
+        if (type == 0) {
+            desEd.setHint("Description");
+        } else {
+            desEd.setHint("Name Of Category");
+            findViewById(R.id.amount).setVisibility(View.GONE);
+        }
         add = (Button) findViewById(R.id.addCus);
         cancel = (Button) findViewById(R.id.cancel);
         add.setOnClickListener(this);
@@ -37,10 +47,14 @@ public class AddDialog extends Dialog implements android.view.View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.addCus:
-                String des=((EditText)findViewById(R.id.des)).getText().toString();
-                String amount=((EditText)findViewById(R.id.amount)).getText().toString();
-                LoggerCus.d(TAG,des+" : "+amount);
-                activity.setAddDialogDetails(new String[]{des,amount});
+                String des = ((EditText) findViewById(R.id.des)).getText().toString();
+                String amount = ((EditText) findViewById(R.id.amount)).getText().toString();
+                if(amount==null)
+                    amount="0";
+                if(des==null)
+                    des="";
+                LoggerCus.d(TAG, des + " : " + amount);
+                activity.setAddDialogDetails(new String[]{des, amount});
                 activity.afterCallingAddDialog();
                 break;
             default:

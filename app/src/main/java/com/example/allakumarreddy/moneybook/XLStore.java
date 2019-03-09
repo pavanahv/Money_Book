@@ -9,7 +9,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -21,12 +20,12 @@ import java.util.ArrayList;
 
 public class XLStore {
 
-    private final static String TAG="XLStore";
+    private final static String TAG = "XLStore";
     private String fileName;
     private ArrayList<MBRecord> mb;
-    private int count=1;
+    private int count = 1;
 
-    public XLStore(String fileName, ArrayList<MBRecord> mb) {
+    public XLStore(String fileName, ArrayList<MBRecord> mb) throws IOException {
         this.fileName = fileName;
         this.mb = mb;
         write();
@@ -42,17 +41,19 @@ public class XLStore {
         }
 
         File mediaFile;
-        String filename = this.fileName+".xls";
+        String filename = this.fileName + ".xls";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
+        if (mediaFile.exists()) {
+            mediaFile.delete();
+        }
         return mediaFile;
     }
 
-    private void write()
-    {
+    private void write() throws IOException {
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet();
 
-        Row r=sheet.createRow(0);
+        Row r = sheet.createRow(0);
         Cell cell = r.createCell(0);
         cell.setCellValue("S.No");
 
@@ -65,6 +66,9 @@ public class XLStore {
         cell = r.createCell(3);
         cell.setCellValue("Date");
 
+        cell = r.createCell(4);
+        cell.setCellValue("Transaction Type");
+
 
         int rowCount = 0;
 
@@ -72,20 +76,14 @@ public class XLStore {
             Row row = sheet.createRow(++rowCount);
             writeBook(mbr, row);
         }
-
-        try (FileOutputStream outputStream = new FileOutputStream(getMediaFile())) {
-            workbook.write(outputStream);
-        } catch (FileNotFoundException e) {
-            LoggerCus.d(TAG,e.getMessage());
-        } catch (IOException e) {
-            LoggerCus.d(TAG,e.getMessage());
-        }
+        FileOutputStream outputStream = new FileOutputStream(getMediaFile());
+        workbook.write(outputStream);
     }
 
     private void writeBook(MBRecord aBook, Row row) {
-        SimpleDateFormat smp=new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat smp = new SimpleDateFormat("dd / MM / yyyy");
         Cell cell = row.createCell(0);
-        cell.setCellValue((count++)+"");
+        cell.setCellValue((count++) + "");
 
         cell = row.createCell(1);
         cell.setCellValue(aBook.getDescription());
@@ -95,5 +93,21 @@ public class XLStore {
 
         cell = row.createCell(3);
         cell.setCellValue(smp.format(aBook.getDate()));
+
+        cell = row.createCell(4);
+        switch (aBook.getType()) {
+            case 0:
+                cell.setCellValue("Spent");
+                break;
+            case 1:
+                cell.setCellValue("Earn");
+                break;
+            case 2:
+                cell.setCellValue("Due");
+                break;
+            case 3:
+                cell.setCellValue("Loan");
+                break;
+        }
     }
 }

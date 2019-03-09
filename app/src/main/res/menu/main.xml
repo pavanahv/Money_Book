@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_analytics"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Analytics"
+        android:icon="@drawable/icon_analytics"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_backup"
+        android:orderInCategory="100"
+        android:title="@string/action_backup"
+        android:icon="@drawable/icon_backup"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_import"
+        android:orderInCategory="100"
+        android:title="@string/action_import"
+        android:icon="@drawable/icon_import"
         app:showAsAction="never" />
 </menu>
