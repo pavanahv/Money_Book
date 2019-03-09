@@ -14,15 +14,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".LoginSettingsActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
         <activity
             android:name=".AnalyticsActivity"
@@ -37,7 +41,6 @@
             android:name=".AnalyticsItemDetail"
             android:label="@string/title_activity_analytics_item_detail"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <!--
             <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -49,7 +52,7 @@
 
         <activity android:name=".GoogleDriveActivity" />
         <activity android:name=".RestoreActivity" />
-        <activity android:name=".WelcomeActivity"></activity>
+        <activity android:name=".WelcomeActivity" />
     </application>
 
 </manifest>
