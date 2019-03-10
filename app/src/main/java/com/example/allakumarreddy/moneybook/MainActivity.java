@@ -150,24 +150,28 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case REQUESTCODE_PICK_JSON:
                 if (resultCode == Activity.RESULT_OK) {
-                    Uri uri = data.getData();
-                    StringBuilder s = new StringBuilder();
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(uri);
-                        if (inputStream.available() != 0) {
-                            for (int i; (i = inputStream.read()) != -1; ) {
-                                s.append((char) i);
+                    new Thread(() -> {
+                        Uri uri = data.getData();
+                        StringBuilder s = new StringBuilder();
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(uri);
+                            if (inputStream.available() != 0) {
+                                for (int i; (i = inputStream.read()) != -1; ) {
+                                    s.append((char) i);
+                                }
                             }
+                            db.addRecords(s.toString());
+                            MainActivity.this.runOnUiThread(() -> {
+                                Intent intent = getIntent();
+                                finish();
+                                startActivity(intent);
+                            });
+                        } catch (FileNotFoundException e) {
+                            LoggerCus.d(TAG, e.getMessage());
+                        } catch (IOException e) {
+                            LoggerCus.d(TAG, e.getMessage());
                         }
-                        db.addRecords(s.toString());
-                        Intent intent = getIntent();
-                        finish();
-                        startActivity(intent);
-                    } catch (FileNotFoundException e) {
-                        LoggerCus.d(TAG, e.getMessage());
-                    } catch (IOException e) {
-                        LoggerCus.d(TAG, e.getMessage());
-                    }
+                    }).start();
                 }
                 break;
 
