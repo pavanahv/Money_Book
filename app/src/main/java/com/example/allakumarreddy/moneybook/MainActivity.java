@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
     private DriveClient mDriveClient;
     private DriveResourceClient mDriveResourceClient;
     private PreferencesCus sp;
-    private File mBackupFile;
+    public File mBackupFile;
     private GoogleDriveBackup gdb;
     private TextView totalM;
     private TextView totalY;
@@ -127,8 +127,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_backup) {
-            mBackupFile = new Backup(db, this).send();
-            signIn();
+            new Backup(db, this).send();
             return true;
         } else if (id == R.id.action_import) {
             Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -369,7 +368,7 @@ public class MainActivity extends AppCompatActivity
         this.addDialogDetails = s.clone();
     }
 
-    private void signIn() {
+    void signIn() {
         LoggerCus.d(TAG, "Start sign in");
         mGoogleSignInClient = buildGoogleSignInClient();
         startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
