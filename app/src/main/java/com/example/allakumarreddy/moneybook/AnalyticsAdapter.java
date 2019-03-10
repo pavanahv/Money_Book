@@ -24,6 +24,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
 
     // View lookup cache
     private static class ViewHolder {
+        TextView category;
         TextView txtName;
         TextView txtRs;
         TextView txtDate;
@@ -58,6 +59,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.txtRs = (TextView) convertView.findViewById(R.id.aprice);
             viewHolder.txtDate = (TextView) convertView.findViewById(R.id.adate);
             viewHolder.im = (ImageView) convertView.findViewById(R.id.imv);
+            viewHolder.category = (TextView) convertView.findViewById(R.id.acategory);
 
             result = convertView;
 
@@ -81,6 +83,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
         viewHolder.txtName.setText(dataModel.getDescription());
         viewHolder.txtRs.setText("" + dataModel.getAmount());
         viewHolder.txtDate.setText(format.format(dataModel.getDate()));
+        viewHolder.category.setText(dataModel.getCategory());
         switch (dataModel.getType()) {
             case 0:
                 viewHolder.im.setImageResource(R.drawable.spent);

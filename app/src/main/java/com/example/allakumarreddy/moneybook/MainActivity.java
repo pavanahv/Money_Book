@@ -43,13 +43,13 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUESTCODE_PICK_JSON = 504;
     private static final int REQUEST_CODE_SIGN_IN = 200;
     private TabHost host;
-    private String[] addDialogDetails = {"", ""};
+    private String[] addDialogDetails = {"", "", ""};
     private ListView[] mRecyclerView;
     private List<String>[] des, amount, date;
     private MyAdapter[] mAdapter;
     private int currentScreen;
     private SimpleDateFormat format;
-    private DbHandler db;
+    DbHandler db;
     private LinearLayout mDashBoard;
     private ListView dashBoardList;
     private DashBoardAdapter dashBoardAdapter;
@@ -72,7 +72,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //startActivity(new Intent(MainActivity.this, GoogleDriveActivity.class));
+        // To check whether it is launched from login activity or not. if not just finish this.
+        boolean loginCrt = getIntent().getBooleanExtra("login", false);
+        if (!loginCrt)
+            finish();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -331,9 +334,9 @@ public class MainActivity extends AppCompatActivity
     public void afterCallingAddDialog() {
         String[] s = this.getAddDialogDetails();
         if (this.currentScreen == 0) {
-            if ((s[0] != "") && (s[1] != "")) {
+            if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
                 final int pos = host.getCurrentTab();
-                MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date());
+                MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2]);
                 db.addRecord(mbr, pos);
                 addItem(mbr, pos);
             }

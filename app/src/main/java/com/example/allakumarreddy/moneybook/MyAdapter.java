@@ -24,6 +24,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickLis
 
     // View lookup cache
     private static class ViewHolder {
+        TextView catName;
         TextView txtName;
         TextView txtRs;
         ImageView imageView;
@@ -62,6 +63,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickLis
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.desc);
             viewHolder.txtRs = (TextView) convertView.findViewById(R.id.price);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.homeiv);
+            viewHolder.catName = (TextView) convertView.findViewById(R.id.categoryhome);
 
             result = convertView;
 
@@ -77,6 +79,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickLis
 
         viewHolder.txtName.setText(dataModel.getDescription());
         viewHolder.txtRs.setText("Rs. " + dataModel.getAmount());
+        viewHolder.catName.setText(dataModel.getCategory());
         switch (this.type) {
             case 0:
                 viewHolder.imageView.setImageResource(R.drawable.spent);

@@ -217,6 +217,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         intent.putExtra("amount", mbr.getAmount());
         intent.putExtra("date", format.format(mbr.getDate()));
         intent.putExtra("type", mbr.getType());
+        intent.putExtra("category", mbr.getCategory());
         startActivity(intent);
     }
 

@@ -12,6 +12,16 @@ public class MBRecord {
     private int amount;
     private Date date;
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    private String category;
+
     public int getType() {
         return type;
     }
@@ -22,20 +32,22 @@ public class MBRecord {
 
     private int type;
 
-    public MBRecord(String description, int amount, Date date) {
+    public MBRecord(String description, int amount, Date date, String category) {
         this.Description = description;
         this.amount = amount;
         this.date = date;
-        this.type=-1;
+        this.type = -1;
+        this.category = category;
         //LoggerCus.d("MBRecord",description+":"+amount+":"+date);
     }
 
-    public MBRecord(String description, int amount, Date date,int type) {
+    public MBRecord(String description, int amount, Date date, int type, String category) {
         this.Description = description;
         this.amount = amount;
         this.date = date;
-        this.type=type;
-        //LoggerCus.d("MBRecord",description+":"+amount+":"+date);
+        this.type = type;
+        this.category = category;
+        //LoggerCus.d("MBRecord",description+":"+amount+":"+date+":"+category);
     }
 
     public String getDescription() {

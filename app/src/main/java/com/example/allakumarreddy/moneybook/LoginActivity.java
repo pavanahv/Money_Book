@@ -37,24 +37,23 @@ public class LoginActivity extends AppCompatActivity {
         Random randomGenerator = new Random();
         orgResult = randomGenerator.nextInt(10) + 1;
         numberView.setText("" + orgResult);
-        input=orgResult;
-        orgResult=calResult();
+        input = orgResult;
+        orgResult = calResult();
     }
 
     public void login(View view) {
         //2*x+9
         try {
             input = Integer.parseInt(inputText.getText().toString());
-            Log.d(TAG,""+input);
-        }catch (Exception e){
-            Log.e(TAG,e.getMessage()+"  caught exception some error while converting string to input number");
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage() + "  caught exception some error while converting string to input number");
             Toast.makeText(this, "Please Enter Only Number That To In Range", Toast.LENGTH_LONG).show();
             return;
         }
-        Log.d(TAG,""+orgResult);
-        if (orgResult == input)
+        if (orgResult == input) {
             startActivity(new Intent(this, MainActivity.class).putExtra("login", true));
-        else {
+            finish();
+        } else {
             Toast.makeText(this, "Login Failed ! \n Please Enter Correct Code", Toast.LENGTH_LONG).show();
             generateRandNumber();
         }

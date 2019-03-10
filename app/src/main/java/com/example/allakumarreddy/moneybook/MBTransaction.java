@@ -46,7 +46,7 @@ public class MBTransaction {
                 String amount = c.getString(GlobalConstants.fields[1]);
                 String date = c.getString(GlobalConstants.fields[2]);
                 LoggerCus.d(TAG, des + " : " + amount + " : " + date);
-                mbr[i - 1] = new MBRecord(des, Integer.parseInt(amount), new Date(date));
+                mbr[i - 1] = new MBRecord(des, Integer.parseInt(amount), new Date(date),"");
             }
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());

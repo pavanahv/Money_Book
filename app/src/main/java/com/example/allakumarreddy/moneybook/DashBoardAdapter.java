@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
@@ -125,17 +126,26 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         convertView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                popup.show();
+                if (dataModel.getText().compareToIgnoreCase("others") != 0) {
+                    popup.show();
+                } else {
+                    Toast.makeText(mContext, "You Can't Delete Default Category", Toast.LENGTH_LONG).show();
+                }
                 return false;
             }
         });
 
-        viewHolder.imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popup.show(); //showing popup menu
-            }
-        });
+        if (dataModel.getText().compareToIgnoreCase("others") != 0) {
+            viewHolder.imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popup.show(); //showing popup menu
+                }
+            });
+        } else {
+            viewHolder.imageButton.setVisibility(View.GONE);
+        }
+
 
         Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);

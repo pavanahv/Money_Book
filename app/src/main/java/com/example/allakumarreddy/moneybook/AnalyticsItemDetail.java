@@ -24,6 +24,8 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private EditText date;
     private Spinner type;
     private DbHandler db;
+    private Spinner cate;
+    private String[] catArr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +75,9 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private void init() {
         Intent intent = getIntent();
         db = new DbHandler(this);
+        LoggerCus.d("analyticsitemdetail", intent.getStringExtra("category"));
         try {
-            mbrOld = new MBRecord(intent.getStringExtra("desc"), intent.getIntExtra("amount", -1), format.parse(intent.getStringExtra("date")), intent.getIntExtra("type", -1));
+            mbrOld = new MBRecord(intent.getStringExtra("desc"), intent.getIntExtra("amount", -1), format.parse(intent.getStringExtra("date")), intent.getIntExtra("type", -1), intent.getStringExtra("category"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -86,6 +89,23 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         type.setAdapter(aa);
         type.setSelection(mbrOld.getType());
+
+        cate = (Spinner) findViewById(R.id.catitem);
+        catArr = db.getCategeories();
+        int curind=-1;
+        for (int i=0;i<catArr.length;i++)
+        {
+            if(catArr[i].compareToIgnoreCase(intent.getStringExtra("category"))==0)
+            {
+                curind=i;
+                break;
+            }
+        }
+        ArrayAdapter caa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cate.setAdapter(caa);
+        cate.setSelection(curind);
+
         des.setText(mbrOld.getDescription());
         amount.setText(mbrOld.getAmount() + "");
         date.setText(format.format(mbrOld.getDate()));
@@ -96,14 +116,14 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         save();
     }
 
-    private void save()
-    {
+    private void save() {
         try {
-            MBRecord mbrNew = new MBRecord(des.getText().toString(), Integer.parseInt(amount.getText().toString()), format.parse(date.getText().toString()), type.getSelectedItemPosition());
+            MBRecord mbrNew = new MBRecord(des.getText().toString(), Integer.parseInt(amount.getText().toString()), format.parse(date.getText().toString()), type.getSelectedItemPosition(), catArr[cate.getSelectedItemPosition()]);
             LoggerCus.d("analyticsitemdetail", mbrNew.getDescription());
             LoggerCus.d("analyticsitemdetail", mbrNew.getAmount() + "");
             LoggerCus.d("analyticsitemdetail", mbrNew.getDate().toString());
             LoggerCus.d("analyticsitemdetail", mbrNew.getType() + "");
+            LoggerCus.d("analyticsitemdetail", mbrNew.getCategory() + "");
             boolean result = db.updateRecord(mbrOld, mbrNew);
             if (result)
                 Toast.makeText(this, "Updated Successfully !", Toast.LENGTH_SHORT).show();
