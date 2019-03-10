@@ -277,21 +277,26 @@ public class MainActivity extends AppCompatActivity
         dashBoardList = (ListView) findViewById(R.id.dashboardlist);
 
         totalD = (TextView) findViewById(R.id.dashboardtotald);
-        totalD.setText(Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay()));
-
         totalM = (TextView) findViewById(R.id.dashboardtotalm);
-        totalM.setText(Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth()));
-
         totalY = (TextView) findViewById(R.id.dashboardtotaly);
-        totalY.setText(Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear()));
 
         ((TextView) findViewById(R.id.dashday)).setText(new SimpleDateFormat("dd").format(new Date()));
         ((TextView) findViewById(R.id.dashmonth)).setText(new SimpleDateFormat("MMM").format(new Date()));
         ((TextView) findViewById(R.id.dashyear)).setText(new SimpleDateFormat("yyyy").format(new Date()));
 
-        dbr = db.getDashBoardRecords();
-        dashBoardAdapter = new DashBoardAdapter(dbr, this);
-        dashBoardList.setAdapter(dashBoardAdapter);
+        new Thread(() -> {
+            String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay());
+            String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
+            String yearCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear());
+            dbr = db.getDashBoardRecords();
+            runOnUiThread(() -> {
+                totalD.setText(dayCountTotalHeadText);
+                totalM.setText(monthCountTotalHeadText);
+                totalY.setText(yearCountTotalHeadText);
+                dashBoardAdapter = new DashBoardAdapter(dbr, MainActivity.this);
+                dashBoardList.setAdapter(dashBoardAdapter);
+            });
+        }).start();
     }
 
     private void init() {
