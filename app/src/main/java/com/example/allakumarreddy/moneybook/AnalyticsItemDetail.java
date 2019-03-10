@@ -60,7 +60,6 @@ public class AnalyticsItemDetail extends AppCompatActivity {
                 break;
 
             case android.R.id.home:
-                finish();
                 break;
 
             case R.id.action_analytics_detail_save:
@@ -69,6 +68,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             default:
                 break;
         }
+        finish();
         return super.onOptionsItemSelected(item);
     }
 
@@ -114,6 +114,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
 
     public void save(View view) {
         save();
+        finish();
     }
 
     private void save() {
