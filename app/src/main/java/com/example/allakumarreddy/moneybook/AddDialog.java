@@ -67,12 +67,15 @@ public class AddDialog extends Dialog implements android.view.View.OnClickListen
             case R.id.addCus:
                 String des = ((EditText) findViewById(R.id.des)).getText().toString();
                 String amount = ((EditText) findViewById(R.id.amount)).getText().toString();
-                String category = catArr[categoryView.getSelectedItemPosition()];
-                if (amount == null)
-                    amount = "0";
-                if (des == null)
-                    des = "";
-                LoggerCus.d(TAG, des + " : " + amount);
+                String category = "";
+                if (type == 0) {
+                    category = catArr[categoryView.getSelectedItemPosition()];
+                    if (amount == null)
+                        amount = "0";
+                    if (des == null)
+                        des = "";
+                    LoggerCus.d(TAG, des + " : " + amount);
+                }
                 activity.setAddDialogDetails(new String[]{des, amount, category});
                 activity.afterCallingAddDialog();
                 break;

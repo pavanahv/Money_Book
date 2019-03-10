@@ -702,6 +702,7 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public void deleteCategory(String s) {
         SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE "+TABLE_NAME+" SET "+KEY_CAT+" = (SELECT "+KEY_CAT_ID+" FROM "+CAT_TABLE_NAME+" WHERE "+KEY_NAME+" = 'others') WHERE "+KEY_CAT+" = (SELECT "+KEY_CAT_ID+" FROM "+CAT_TABLE_NAME+" WHERE "+KEY_NAME+" = '"+s+"')");
         db.delete(CAT_TABLE_NAME, KEY_NAME + " = '" + s + "'", null);
         db.close();
     }
