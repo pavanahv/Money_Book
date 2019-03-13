@@ -14,31 +14,31 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginSettingsActivity" />
+        <activity android:name=".Activities.LoginSettingsActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
         <activity
-            android:name=".AnalyticsActivity"
+            android:name=".Activities.AnalyticsActivity"
             android:label="@string/title_activity_analytics"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".GraphActivity"
+            android:name=".Activities.GraphActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_graph"
             android:theme="@style/FullscreenTheme" />
         <activity
-            android:name=".AnalyticsItemDetail"
+            android:name=".Activities.AnalyticsItemDetail"
             android:label="@string/title_activity_analytics_item_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
@@ -50,9 +50,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".GoogleDriveActivity" />
-        <activity android:name=".RestoreActivity" />
-        <activity android:name=".WelcomeActivity" />
+        <activity android:name=".backup.GoogleDriveActivity" />
+        <activity android:name=".Activities.RestoreActivity" />
+        <activity android:name=".Activities.WelcomeActivity" />
     </application>
 
 </manifest>
