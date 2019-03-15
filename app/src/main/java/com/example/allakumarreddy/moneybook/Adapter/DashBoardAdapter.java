@@ -36,6 +36,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     // View lookup cache
     private static class ViewHolder {
+        TextView mBalLeft;
         CircularProgressBar mCircularProgressbarDay;
         TextView mPercentDay;
         TextView mPriceDay;
@@ -93,6 +94,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
             viewHolder.imageButton = (FrameLayout) convertView.findViewById(R.id.ib);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.ibtn);
             viewHolder.mTextHead = (TextView) convertView.findViewById(R.id.dashhead);
+            viewHolder.mBalLeft = (TextView) convertView.findViewById(R.id.bal_left);
             result = convertView;
 
             convertView.setTag(viewHolder);
@@ -169,6 +171,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         viewHolder.mPriceYear.setText(Utils.getFormattedNumber(dataModel.getYear()));
 
         viewHolder.mTextHead.setText(dataModel.getText());
+        viewHolder.mBalLeft.setText(Utils.getFormattedNumber(dataModel.getBalanceLeft()));
         // Return the completed view to render on screen
         return convertView;
     }

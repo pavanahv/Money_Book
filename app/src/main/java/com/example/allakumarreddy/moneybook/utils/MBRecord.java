@@ -32,6 +32,16 @@ public class MBRecord {
 
     private int type;
 
+    public int getBalLeft() {
+        return balLeft;
+    }
+
+    public void setBalLeft(int balLeft) {
+        this.balLeft = balLeft;
+    }
+
+    private int balLeft=0;
+
     public MBRecord(String description, int amount, Date date, String category) {
         this.Description = description;
         this.amount = amount;
@@ -39,6 +49,9 @@ public class MBRecord {
         this.type = -1;
         this.category = category;
         //LoggerCus.d("MBRecord",description+":"+amount+":"+date);
+    }
+
+    public MBRecord() {
     }
 
     public MBRecord(String description, int amount, Date date, int type, String category) {

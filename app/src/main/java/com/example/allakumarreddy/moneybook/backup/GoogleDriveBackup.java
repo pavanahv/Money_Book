@@ -147,12 +147,12 @@ public class GoogleDriveBackup {
                 }
                 if (found) {
                     LoggerCus.d(TAG, "Backup File found");
-                    DriveFile temp = metadata.get(file).getDriveId().asDriveFile();
+                    /*DriveFile temp = metadata.get(file).getDriveId().asDriveFile();
                     if (mBackup) {
                         rewriteContents(temp);
                     } else {
                         retrieveContents(temp);
-                    }
+                    }*/
                 } else {
                     createFile();
                 }

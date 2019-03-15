@@ -1,4 +1,4 @@
-package com.example.allakumarreddy.moneybook;
+package com.example.allakumarreddy.moneybook.test;
 
 import java.util.ArrayList;
 

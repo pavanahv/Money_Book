@@ -37,7 +37,7 @@ public class Backup implements Runnable {
             context.runOnUiThread(() -> {
                 Toast.makeText(context, response, Toast.LENGTH_LONG).show();
                 context.mBackupFile = f;
-                context.signIn();
+                //context.signIn();
             });
         } catch (IOException e) {
             LoggerCus.d("Backup", e.getMessage());

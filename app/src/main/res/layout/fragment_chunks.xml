@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.allakumarreddy.moneybook.MessageParser.ChunksFragment">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Pastte Some Message That Needs To Be Parsed. Then Select All Text Which Is Changing. Example: Suppose Text Is Like This 'You have spent Rs.1000 at Uber Eats on 09-Mar-19. Plase call if you not made this'. Now We Have To Select Changing Fields Like This 'You have spent Rs.{{1000}} at {{Uber Eats}} on {{09-Mar-19}}. Plase call if you not made this'. Just You Need To Place '{{' And '}}' Before And After That Chars Like Above Mentioned. If Placing Is Wrongn Parsing Fails." />
+        </LinearLayout>
+    </ScrollView>
+
+    <EditText
+        android:id="@+id/msg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/parse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:text="Parse"
+        android:textColor="@color/white" />
+</LinearLayout>
+

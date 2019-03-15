@@ -20,17 +20,18 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.dialog.AddDialog;
-import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
-import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
+import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
+import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.dialog.AddDialog;
+import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.test.DataBaseActivity;
+import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
-import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
-import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -138,18 +139,26 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_backup) {
-            new Backup(db, this).send();
-            return true;
-        } else if (id == R.id.action_import) {
-            Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
-            mediaIntent.setType("*/*"); // Set MIME type as per requirement
-            startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
-            return true;
-        } else if (id == R.id.action_analytics) {
-            goToAnalytics("0");
+        switch (id) {
+            case R.id.action_backup:
+                new Backup(db, this).send();
+                return true;
+            case R.id.action_import:
+                Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                mediaIntent.setType("*/*"); // Set MIME type as per requirement
+                startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
+                return true;
+            case R.id.action_analytics:
+                goToAnalytics("0");
+                break;
+            case R.id.action_msgParser:
+                startActivity(new Intent(this, MessageParseActivity.class));
+                break;
+            case R.id.action_test:
+                //startActivity(new Intent(this, DataBaseActivity.class));
+                db.exec();
+                break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

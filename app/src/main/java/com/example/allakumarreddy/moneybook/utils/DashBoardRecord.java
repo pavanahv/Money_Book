@@ -16,7 +16,9 @@ public class DashBoardRecord {
     private int month;
     private int year;
 
-    public DashBoardRecord(String text, int totald, int totalm, int totaly, int day, int month, int year) {
+    private int balanceLeft;
+
+    public DashBoardRecord(String text, int totald, int totalm, int totaly, int day, int month, int year, int balanceLeft) {
         this.text = text;
         this.totald = totald;
         this.totalm = totalm;
@@ -24,6 +26,15 @@ public class DashBoardRecord {
         this.day = day;
         this.month = month;
         this.year = year;
+        this.balanceLeft = balanceLeft;
+    }
+
+    public int getBalanceLeft() {
+        return balanceLeft;
+    }
+
+    public void setBalanceLeft(int balanceLeft) {
+        this.balanceLeft = balanceLeft;
     }
 
     public DashBoardRecord() {
@@ -34,6 +45,7 @@ public class DashBoardRecord {
         this.day = 0;
         this.month = 0;
         this.year = 0;
+        this.balanceLeft = 0;
     }
 
     public int getPercentD() {

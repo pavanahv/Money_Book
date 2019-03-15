@@ -1,0 +1,120 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.allakumarreddy.moneybook.MessageParser.ItemDetailFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="5">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/chunks"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Use below parsed items to fill your data. For example, description you can write like '1 bought from 2'. Here 1 and 2 arguments as you see in below list. They are replaced with parsed text when you got message.\n" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="5dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/white" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:paddingLeft="5dp"
+            android:text="Description"
+            android:textColor="@color/white" />
+
+        <EditText
+            android:id="@+id/descitem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="{{1}} spent at {{2}}"
+            android:textSize="30dp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:paddingLeft="5dp"
+            android:text="amount"
+            android:textColor="@color/white" />
+
+        <EditText
+            android:id="@+id/amountitem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="{{3}}"
+            android:textSize="25dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:paddingLeft="5dp"
+            android:text="Type"
+            android:textColor="@color/white" />
+
+        <Spinner
+            android:id="@+id/typeitem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:paddingLeft="5dp"
+            android:text="Category"
+            android:textColor="@color/white" />
+
+        <Spinner
+            android:id="@+id/catitem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:paddingLeft="5dp"
+            android:text="Left Out Balance"
+            android:textColor="@color/white" />
+
+        <EditText
+            android:id="@+id/leftOutBalance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="{{4}}"
+            android:textSize="25dp" />
+
+        <ImageButton
+            android:id="@+id/savbtn"
+            app:srcCompat="@drawable/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</LinearLayout>

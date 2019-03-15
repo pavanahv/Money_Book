@@ -36,20 +36,29 @@ public class DbHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "MoneyBookManager";
 
     // Contacts table name
-    private static final String TABLE_NAME = "MoneyBook";
+    public static final String TABLE_NAME = "MoneyBook";
 
     // Contacts Table Columns names
-    private static final String KEY_TYPE = "type";
-    private static final String KEY_DESCRIPTION = "description";
-    private static final String KEY_AMOUNT = "amount";
-    private static final String KEY_DATE = "day";
-    private static final String KEY_DATE_MONTH = "month";
-    private static final String KEY_DATE_YEAR = "year";
-    private static final String KEY_CAT = "category";
+    public static final String KEY_TYPE = "type";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_AMOUNT = "amount";
+    public static final String KEY_DATE = "day";
+    public static final String KEY_DATE_MONTH = "month";
+    public static final String KEY_DATE_YEAR = "year";
+    public static final String KEY_CAT = "category";
 
-    private static final String CAT_TABLE_NAME = "Catageories";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_CAT_ID = "id";
+    public static final String CAT_TABLE_NAME = "Catageories";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_CAT_ID = "id";
+    public static final String KEY_CAT_BAL = "balance_left";
+
+    // Contacts Table Columns names
+    public static final String MSG_TABLE_NAME = "Message";
+    public static final String MSG_KEY_TYPE = "type";
+    public static final String MSG_KEY_DESCRIPTION = "description";
+    public static final String MSG_KEY_AMOUNT = "amount";
+    public static final String MSG_KEY_CAT = "category";
+    public static final String MSG_KEY_LEFT_BAL = "balance_left";
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
@@ -73,8 +82,13 @@ public class DbHandler extends SQLiteOpenHelper {
 
         String CREATE_CAT_TABLE = "CREATE TABLE " + CAT_TABLE_NAME + "("
                 + KEY_CAT_ID + " INTEGER PRIMARY KEY,"
-                + KEY_NAME + " TEXT)";
+                + KEY_NAME + " TEXT," + KEY_CAT_BAL + " INTEGER)";
         db.execSQL(CREATE_CAT_TABLE);
+
+        String CREATE_MESSAGE_TABLE = "CREATE TABLE " + MSG_TABLE_NAME + "("
+                + MSG_KEY_TYPE + " INTEGER," + MSG_KEY_DESCRIPTION + " TEXT,"
+                + MSG_KEY_AMOUNT + " TEXT," + MSG_KEY_CAT + " INTEGER," + MSG_KEY_LEFT_BAL + " TEXT)";
+        db.execSQL(CREATE_MESSAGE_TABLE);
     }
 
     // Upgrading database
@@ -83,7 +97,7 @@ public class DbHandler extends SQLiteOpenHelper {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CAT_TABLE_NAME);
-
+        db.execSQL("DROP TABLE IF EXISTS " + MSG_TABLE_NAME);
         // Create tables again
         onCreate(db);
     }
@@ -237,13 +251,13 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + ","+getSQLQueryForCat()+" FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime() + " AND " + KEY_DATE + " <= " + temp2.getTime() + " AND " + KEY_TYPE + "=" + type, null)
+        cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime() + " AND " + KEY_DATE + " <= " + temp2.getTime() + " AND " + KEY_TYPE + "=" + type, null)
         ;
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                mbr.add(new MBRecord(cursor.getString(0), Integer.parseInt(cursor.getString(1)), new Date(cursor.getLong(2)),cursor.getString(3)));
+                mbr.add(new MBRecord(cursor.getString(0), Integer.parseInt(cursor.getString(1)), new Date(cursor.getLong(2)), cursor.getString(3)));
             }
             cursor.close();
         }
@@ -257,7 +271,7 @@ public class DbHandler extends SQLiteOpenHelper {
 
         JSONArray jsonArray = new JSONArray();
 
-        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + ","+KEY_CAT+" FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + "," + KEY_CAT + " FROM " + TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -278,7 +292,7 @@ public class DbHandler extends SQLiteOpenHelper {
         }
 
         JSONArray jsonArrayc = new JSONArray();
-        cursor = db.rawQuery("SELECT " + KEY_NAME + ","+KEY_CAT_ID+" FROM " + CAT_TABLE_NAME, null);
+        cursor = db.rawQuery("SELECT " + KEY_NAME + "," + KEY_CAT_ID + "," + KEY_CAT_BAL + " FROM " + CAT_TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -287,6 +301,7 @@ public class DbHandler extends SQLiteOpenHelper {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("Name", cursor.getString(0));
                     jsonObject.put("ID", cursor.getLong(1));
+                    jsonObject.put("BalLeft", cursor.getLong(2));
                     jsonArrayc.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
@@ -312,14 +327,14 @@ public class DbHandler extends SQLiteOpenHelper {
         this.total = 0;
         JSONArray jsonArray = new JSONArray();
 
-        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + ","+getSQLQueryForCat()+" FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
                 int numSpent = Integer.parseInt(cursor.getString(1));
                 this.total += numSpent;
-                mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3),cursor.getString(4)));
+                mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(4)));
             }
             cursor.close();
         }
@@ -328,7 +343,7 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     private String getSQLQueryForCat() {
-        return "(SELECT "+KEY_NAME+" FROM "+CAT_TABLE_NAME+" WHERE "+KEY_CAT_ID+" = "+KEY_CAT+") AS "+KEY_CAT;
+        return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + KEY_CAT + ") AS " + KEY_CAT;
     }
 
     public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, int moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean categoryNone, String category) {
@@ -362,26 +377,26 @@ public class DbHandler extends SQLiteOpenHelper {
         String eQuery = "";
         if (groupByNone)
             //todo
-            eQuery = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + ","+getSQLQueryForCat()+" FROM " + TABLE_NAME + " WHERE ";
+            eQuery = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
         else {
             switch (groupBy) {
                 case 0:
                     //todo
-                    eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DESCRIPTION + ") as ckd,"+getSQLQueryForCat()+" FROM " + TABLE_NAME + " WHERE ";
+                    eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DESCRIPTION + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                     break;
 
                 case 1:
                     switch (dateInterval) {
                         case 0:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE + ") as ckd,"+getSQLQueryForCat()+" FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                             break;
 
                         case 1:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_MONTH + ") as ckd,"+getSQLQueryForCat()+" FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_MONTH + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                             break;
 
                         case 2:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_YEAR + ") as ckd,"+getSQLQueryForCat()+" FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_YEAR + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                             break;
                     }
                     break;
@@ -432,7 +447,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 eQuery += " ORDER BY " + KEY_DESCRIPTION;
                 break;
         }
-        Log.d(TAG,eQuery);
+        Log.d(TAG, eQuery);
         Cursor cursor = db.rawQuery(eQuery, null);
         if (cursor != null) {
             final int len = cursor.getCount();
@@ -443,26 +458,26 @@ public class DbHandler extends SQLiteOpenHelper {
                 if (!groupByNone) {
                     switch (groupBy) {
                         case 0:
-                            mbr.add(new MBRecord(cursor.getString(0) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3),cursor.getString(7)));
+                            mbr.add(new MBRecord(cursor.getString(0) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(7)));
                             break;
                         case 1:
                             switch (dateInterval) {
                                 case 0:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("dd - MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3),cursor.getString(7)));
+                                    mbr.add(new MBRecord(new SimpleDateFormat("dd - MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(7)));
                                     break;
 
                                 case 1:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3),cursor.getString(7)));
+                                    mbr.add(new MBRecord(new SimpleDateFormat("MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(7)));
                                     break;
 
                                 case 2:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3),cursor.getString(7)));
+                                    mbr.add(new MBRecord(new SimpleDateFormat("yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(7)));
                                     break;
                             }
                             break;
                     }
                 } else {
-                    mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3),cursor.getString(6)));
+                    mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(6)));
                 }
             }
             cursor.close();
@@ -495,7 +510,7 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     private String getCategoryQueryString(String s) {
-        return " AND ("+KEY_CAT+" = (SELECT "+KEY_CAT_ID+" FROM "+CAT_TABLE_NAME+" WHERE "+KEY_NAME+" = '"+s+"'))";
+        return " AND (" + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
     }
 
     public DashBoardRecord getDashBoardRecord(String s) {
@@ -560,117 +575,118 @@ public class DbHandler extends SQLiteOpenHelper {
         dbr.setTotald(getTotalMoneySpentInCurrentDay());
         dbr.setTotalm(getTotalMoneySpentInCurrentMonth());
         dbr.setTotaly(getTotalMoneySpentInCurrentYear());
+        dbr.setBalanceLeft(getBalanceLeft(s));
         dbr.setText(s.toUpperCase());
         db.close();
         return dbr;
     }
 
-    public int getTotalMoneySpentInCurrentMonth() {
-        if (mTotalMoneySpentInCurrentMonth != 0)
-            return mTotalMoneySpentInCurrentMonth;
-        else {
-            Date sDate = new Date();
-            Date eDate = new Date();
-
-            sDate = intializeSDateForDay(sDate);
-            eDate = intializeEDateForDay(eDate);
-
-            sDate.setDate(1);
-            int tempMon = eDate.getMonth() + 1;
-            eDate.setMonth(tempMon);
-            eDate.setDate(0);
-            //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-            int type = 0;
-
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = null;
-            cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
-            int result = 0;
-            if ((cursor != null) && (cursor.getCount() > 0)) {
-                cursor.moveToPosition(0);
-                String temp = cursor.getString(0);
-                if (temp != null)
-                    result = Integer.parseInt(temp);
-                else
-                    result = 0;
-                cursor.close();
-            }
-            db.close();
-            mTotalMoneySpentInCurrentMonth = result;
-            return mTotalMoneySpentInCurrentMonth;
+    private int getBalanceLeft(String s) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        int balLeft = -1;
+        cursor = db.rawQuery("SELECT " + KEY_CAT_BAL + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'", null);
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            balLeft = cursor.getInt(0);
+            cursor.close();
         }
+        db.close();
+        return balLeft;
+    }
+
+    public int getTotalMoneySpentInCurrentMonth() {
+        Date sDate = new Date();
+        Date eDate = new Date();
+
+        sDate = intializeSDateForDay(sDate);
+        eDate = intializeEDateForDay(eDate);
+
+        sDate.setDate(1);
+        int tempMon = eDate.getMonth() + 1;
+        eDate.setMonth(tempMon);
+        eDate.setDate(0);
+        //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+        int type = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+        int result = 0;
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            String temp = cursor.getString(0);
+            if (temp != null)
+                result = Integer.parseInt(temp);
+            else
+                result = 0;
+            cursor.close();
+        }
+        db.close();
+        return result;
     }
 
     public int getTotalMoneySpentInCurrentDay() {
-        if (mTotalMoneySpentInCurrentDay != 0)
-            return mTotalMoneySpentInCurrentDay;
-        else {
-            Date sDate = new Date();
-            Date eDate = new Date();
 
-            sDate = intializeSDateForDay(sDate);
-            eDate = intializeEDateForDay(eDate);
-            //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-            int type = 0;
+        Date sDate = new Date();
+        Date eDate = new Date();
 
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = null;
-            cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
-            int result = 0;
-            if ((cursor != null) && (cursor.getCount() > 0)) {
-                cursor.moveToPosition(0);
-                String temp = cursor.getString(0);
-                if (temp != null)
-                    result = Integer.parseInt(temp);
-                else
-                    result = 0;
-                cursor.close();
-            }
-            db.close();
-            mTotalMoneySpentInCurrentDay = result;
-            return mTotalMoneySpentInCurrentDay;
+        sDate = intializeSDateForDay(sDate);
+        eDate = intializeEDateForDay(eDate);
+        //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+        int type = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+        int result = 0;
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            String temp = cursor.getString(0);
+            if (temp != null)
+                result = Integer.parseInt(temp);
+            else
+                result = 0;
+            cursor.close();
         }
+        db.close();
+        return result;
     }
 
     public int getTotalMoneySpentInCurrentYear() {
-        if (mTotalMoneySpentInCurrentYear != 0)
-            return mTotalMoneySpentInCurrentYear;
-        else {
-            Date sDate = new Date();
-            Date eDate = new Date();
+        Date sDate = new Date();
+        Date eDate = new Date();
 
-            sDate = intializeSDateForDay(sDate);
-            eDate = intializeEDateForDay(eDate);
+        sDate = intializeSDateForDay(sDate);
+        eDate = intializeEDateForDay(eDate);
 
-            sDate.setDate(1);
-            int tempMon = eDate.getMonth() + 1;
-            eDate.setMonth(tempMon);
-            eDate.setDate(0);
+        sDate.setDate(1);
+        int tempMon = eDate.getMonth() + 1;
+        eDate.setMonth(tempMon);
+        eDate.setDate(0);
 
-            sDate.setMonth(0);
-            eDate.setYear(eDate.getYear() + 1);
-            eDate.setMonth(0);
-            eDate.setDate(0);
-            //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-            int type = 0;
+        sDate.setMonth(0);
+        eDate.setYear(eDate.getYear() + 1);
+        eDate.setMonth(0);
+        eDate.setDate(0);
+        //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+        int type = 0;
 
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = null;
-            cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
-            int result = 0;
-            if ((cursor != null) && (cursor.getCount() > 0)) {
-                cursor.moveToPosition(0);
-                String temp = cursor.getString(0);
-                if (temp != null)
-                    result = Integer.parseInt(temp);
-                else
-                    result = 0;
-                cursor.close();
-            }
-            db.close();
-            mTotalMoneySpentInCurrentYear = result;
-            return mTotalMoneySpentInCurrentYear;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+        int result = 0;
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            String temp = cursor.getString(0);
+            if (temp != null)
+                result = Integer.parseInt(temp);
+            else
+                result = 0;
+            cursor.close();
         }
+        db.close();
+        return result;
     }
 
     public ArrayList<DashBoardRecord> getDashBoardRecords() {
@@ -707,8 +723,12 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public void deleteCategory(String s) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("UPDATE "+TABLE_NAME+" SET "+KEY_CAT+" = (SELECT "+KEY_CAT_ID+" FROM "+CAT_TABLE_NAME+" WHERE "+KEY_NAME+" = 'others') WHERE "+KEY_CAT+" = (SELECT "+KEY_CAT_ID+" FROM "+CAT_TABLE_NAME+" WHERE "+KEY_NAME+" = '"+s+"')");
+        db.execSQL("UPDATE " + TABLE_NAME + " SET " + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = 'others') WHERE " + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "')");
         db.delete(CAT_TABLE_NAME, KEY_NAME + " = '" + s + "'", null);
         db.close();
+    }
+
+    public void exec() {
+
     }
 }
