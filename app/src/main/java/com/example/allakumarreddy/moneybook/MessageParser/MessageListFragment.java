@@ -9,10 +9,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
 
@@ -57,12 +55,9 @@ public class MessageListFragment extends Fragment {
         content.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         readMsgs();
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(),msgList.get(position),Toast.LENGTH_LONG).show();
-                mListener.seelctedMsg(msgList.get(position));
-            }
+        lv.setOnItemClickListener((parent, view1, position, id) -> {
+            //Toast.makeText(getContext(),msgList.get(position),Toast.LENGTH_LONG).show();
+            mListener.seelctedMsg(msgList.get(position));
         });
 
         return view;

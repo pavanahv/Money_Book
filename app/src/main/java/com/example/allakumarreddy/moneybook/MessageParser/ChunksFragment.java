@@ -40,6 +40,7 @@ public class ChunksFragment extends Fragment {
     private ChunksFragmentInteractionListener mListener;
     private EditText msg;
     private TextView chunks;
+    private EditText name;
 
     public ChunksFragment() {
         // Required empty public constructor
@@ -79,12 +80,14 @@ public class ChunksFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chunks, container, false);
 
         msg = (EditText) view.findViewById(R.id.msg);
+        name = (EditText) view.findViewById(R.id.name);
         //chunks = (TextView) view.findViewById(R.id.parsed_chunks);
         ((Button) view.findViewById(R.id.parse)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String msgStr = msg.getText().toString();
-                parse(msgStr);
+                String nameStr = name.getText().toString();
+                parse(msgStr, nameStr);
             }
         });
 
@@ -122,7 +125,7 @@ public class ChunksFragment extends Fragment {
         mListener = null;
     }
 
-    private void parse(String msgStr) {
+    private void parse(String msgStr, String nameStr) {
         ArrayList<String> constList = new ArrayList<>();
         ArrayList<String> varList = new ArrayList<>();
         int i;
@@ -151,7 +154,7 @@ public class ChunksFragment extends Fragment {
         for (int j = 0; j < len; j++) {
             sb.append("" + (j + 1) + " -> " + varList.get(j) + "\n");
         }
-        mListener.onParse(sb.toString());
+        mListener.onParse(sb.toString(), msgStr, nameStr);
         //chunks.setText(sb.toString());
     }
 

@@ -1,5 +1,8 @@
 package com.example.allakumarreddy.moneybook.test;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class Test {
@@ -16,7 +19,15 @@ public class Test {
                 System.out.println("N -> " + s);
         }*/
 
-        trail1();
+        //trail1();
+
+        try {
+            String enc=URLEncoder.encode("hi this is pavan's car","UTF-8");
+            String dec= URLDecoder.decode(enc,"UTF-8");
+            System.out.print(enc+" "+dec);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void trail1() {

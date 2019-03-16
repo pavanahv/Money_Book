@@ -16,6 +16,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +62,8 @@ public class DbHandler extends SQLiteOpenHelper {
     public static final String MSG_KEY_AMOUNT = "amount";
     public static final String MSG_KEY_CAT = "category";
     public static final String MSG_KEY_LEFT_BAL = "balance_left";
+    public static final String MSG_KEY_NAME = "name";
+    public static final String MSG_KEY_MSG = "msg";
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
@@ -87,7 +92,9 @@ public class DbHandler extends SQLiteOpenHelper {
 
         String CREATE_MESSAGE_TABLE = "CREATE TABLE " + MSG_TABLE_NAME + "("
                 + MSG_KEY_TYPE + " INTEGER," + MSG_KEY_DESCRIPTION + " TEXT,"
-                + MSG_KEY_AMOUNT + " TEXT," + MSG_KEY_CAT + " INTEGER," + MSG_KEY_LEFT_BAL + " TEXT)";
+                + MSG_KEY_AMOUNT + " TEXT," + MSG_KEY_CAT + " INTEGER,"
+                + MSG_KEY_LEFT_BAL + " TEXT," + MSG_KEY_NAME + " TEXT,"
+                + MSG_KEY_MSG + " TEXT)";
         db.execSQL(CREATE_MESSAGE_TABLE);
     }
 
@@ -730,5 +737,45 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public void exec() {
 
+    }
+
+    public boolean insertMsgRecord(String des, String amount, int type, String cate, String balLeft, String msgStr, String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(MSG_KEY_NAME, name);
+        values.put(MSG_KEY_DESCRIPTION, des);
+        values.put(MSG_KEY_AMOUNT, amount);
+        values.put(MSG_KEY_TYPE, type);
+        values.put(MSG_KEY_CAT, getIdOfCategory(cate));
+        values.put(MSG_KEY_LEFT_BAL, balLeft);
+        values.put(MSG_KEY_MSG, encode(msgStr));
+
+        // Inserting Row
+        long result = db.insert(MSG_TABLE_NAME, null, values);
+        db.close();
+        if (result != -1)
+            return true;
+        else
+            return false;
+    }
+
+    private String encode(String msgStr) {
+        String s = "";
+        try {
+            s = URLEncoder.encode(msgStr, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        }
+        return s;
+    }
+
+    private String decode(String msgStr) {
+        String s = "";
+        try {
+            s = URLDecoder.decode(msgStr, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        }
+        return s;
     }
 }
