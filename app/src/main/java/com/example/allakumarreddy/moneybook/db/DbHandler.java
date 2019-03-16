@@ -168,7 +168,6 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public boolean addRecord(MBRecord mbr, int type) {
-        SQLiteDatabase db = this.getWritableDatabase();
         DateConverter dc = new DateConverter(mbr.getDate());
         ContentValues values = new ContentValues();
         values.put(KEY_TYPE, type);
@@ -179,9 +178,10 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
         values.put(KEY_CAT, getIdOfCategory(mbr.getCategory()));
 
+        SQLiteDatabase db = this.getWritableDatabase();
         // Inserting Row
         long result = db.insert(TABLE_NAME, null, values);
-        db.close(); // Closing database connection
+        db.close();
         if (result != -1)
             return true;
         else
@@ -842,7 +842,7 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         int n = db.delete(MSG_TABLE_NAME, MSG_KEY_NAME + " = '" + msgName + "'", null);
         db.close();
-        if(n>0)
+        if (n > 0)
             return true;
         else
             return false;
