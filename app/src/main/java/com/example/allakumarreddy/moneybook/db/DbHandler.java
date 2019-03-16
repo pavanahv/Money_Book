@@ -195,22 +195,23 @@ public class DbHandler extends SQLiteOpenHelper {
 
         try {
             JSONObject obj = new JSONObject(s);
-            JSONArray jsonArray = obj.getJSONArray("records");
-            JSONArray jsonArrayc = obj.getJSONArray("cats");
+            JSONArray jsonArray = obj.getJSONArray(TABLE_NAME);
+            JSONArray jsonArrayc = obj.getJSONArray(CAT_TABLE_NAME);
+            JSONArray jsonArraym = obj.getJSONArray(MSG_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(KEY_TYPE, Integer.parseInt(jsonObj.getString("Type")));
-                values.put(KEY_DESCRIPTION, jsonObj.getString("Description"));
-                values.put(KEY_AMOUNT, Integer.parseInt(jsonObj.getString("Amount")));
-                DateConverter dc = new DateConverter(jsonObj.getString("Date"));
+                values.put(KEY_TYPE, Integer.parseInt(jsonObj.getString(KEY_TYPE)));
+                values.put(KEY_DESCRIPTION, jsonObj.getString(KEY_DESCRIPTION));
+                values.put(KEY_AMOUNT, Integer.parseInt(jsonObj.getString(KEY_AMOUNT)));
+                DateConverter dc = new DateConverter(jsonObj.getString(KEY_DATE));
 
                 values.put(KEY_DATE, dc.getdDate().getTime());
                 values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
                 values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
-                values.put(KEY_CAT, jsonObj.getLong("Category"));
+                values.put(KEY_CAT, jsonObj.getLong(KEY_CAT));
 
                 // Inserting Row
                 db.insert(TABLE_NAME, null, values);
@@ -220,11 +221,28 @@ public class DbHandler extends SQLiteOpenHelper {
             for (int i = 0; i < len1; i++) {
                 JSONObject jsonObj = jsonArrayc.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(KEY_NAME, jsonObj.getString("Name"));
-                values.put(KEY_CAT_ID, jsonObj.getLong("ID"));
+                values.put(KEY_NAME, jsonObj.getString(KEY_NAME));
+                values.put(KEY_CAT_ID, jsonObj.getLong(KEY_CAT_ID));
+                values.put(KEY_CAT_BAL, jsonObj.getLong(KEY_CAT_BAL));
                 // Inserting Row
                 db.insert(CAT_TABLE_NAME, null, values);
             }
+
+            final int lenm = jsonArraym.length();
+            for (int i = 0; i < lenm; i++) {
+                JSONObject jsonObj = jsonArraym.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(MSG_KEY_NAME, jsonObj.getString(KEY_NAME));
+                values.put(MSG_KEY_DESCRIPTION, jsonObj.getString(MSG_KEY_DESCRIPTION));
+                values.put(MSG_KEY_AMOUNT, jsonObj.getString(MSG_KEY_AMOUNT));
+                values.put(MSG_KEY_TYPE, jsonObj.getInt(MSG_KEY_TYPE));
+                values.put(MSG_KEY_CAT, jsonObj.getLong(MSG_KEY_CAT));
+                values.put(MSG_KEY_LEFT_BAL, jsonObj.getString(MSG_KEY_LEFT_BAL));
+                values.put(MSG_KEY_MSG, jsonObj.getString(MSG_KEY_MSG));
+                // Inserting Row
+                db.insert(MSG_TABLE_NAME, null, values);
+            }
+
             db.close(); // Closing database connection
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
@@ -303,11 +321,11 @@ public class DbHandler extends SQLiteOpenHelper {
                 cursor.moveToPosition(i);
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("Description", cursor.getString(0));
-                    jsonObject.put("Amount", cursor.getString(1));
-                    jsonObject.put("Date", format.format(new Date(cursor.getLong(2))));
-                    jsonObject.put("Type", cursor.getString(3));
-                    jsonObject.put("Category", cursor.getLong(4));
+                    jsonObject.put(KEY_DESCRIPTION, cursor.getString(0));
+                    jsonObject.put(KEY_AMOUNT, cursor.getString(1));
+                    jsonObject.put(KEY_DATE, format.format(new Date(cursor.getLong(2))));
+                    jsonObject.put(KEY_TYPE, cursor.getString(3));
+                    jsonObject.put(KEY_CAT, cursor.getLong(4));
                     jsonArray.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
@@ -324,10 +342,35 @@ public class DbHandler extends SQLiteOpenHelper {
                 cursor.moveToPosition(i);
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("Name", cursor.getString(0));
-                    jsonObject.put("ID", cursor.getLong(1));
-                    jsonObject.put("BalLeft", cursor.getLong(2));
+                    jsonObject.put(KEY_NAME, cursor.getString(0));
+                    jsonObject.put(KEY_CAT_ID, cursor.getLong(1));
+                    jsonObject.put(KEY_CAT_BAL, cursor.getLong(2));
                     jsonArrayc.put(jsonObject);
+                } catch (JSONException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
+            }
+            cursor.close();
+        }
+
+        JSONArray jsonArraym = new JSONArray();
+        cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + "," + MSG_KEY_DESCRIPTION + "," + MSG_KEY_AMOUNT + ","
+                + MSG_KEY_TYPE + "," + MSG_KEY_CAT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_MSG
+                + " FROM " + MSG_TABLE_NAME, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(MSG_KEY_NAME, cursor.getString(0));
+                    jsonObject.put(MSG_KEY_DESCRIPTION, cursor.getString(1));
+                    jsonObject.put(MSG_KEY_AMOUNT, cursor.getString(2));
+                    jsonObject.put(MSG_KEY_TYPE, cursor.getInt(3));
+                    jsonObject.put(MSG_KEY_CAT, cursor.getLong(4));
+                    jsonObject.put(MSG_KEY_LEFT_BAL, cursor.getString(5));
+                    jsonObject.put(MSG_KEY_MSG, cursor.getString(6));
+                    jsonArraym.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
                 }
@@ -337,12 +380,15 @@ public class DbHandler extends SQLiteOpenHelper {
 
         JSONObject obj = new JSONObject();
         try {
-            obj.put("records", jsonArray);
-            obj.put("cats", jsonArrayc);
+            obj.put(TABLE_NAME, jsonArray);
+            obj.put(CAT_TABLE_NAME, jsonArrayc);
+            obj.put(MSG_TABLE_NAME, jsonArraym);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        // return contact
+
+        db.close();
+        // return JSON string
         return obj.toString();
     }
 
