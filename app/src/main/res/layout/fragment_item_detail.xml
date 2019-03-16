@@ -112,8 +112,9 @@
 
         <ImageButton
             android:id="@+id/savbtn"
-            app:srcCompat="@drawable/save"
-            android:layout_width="wrap_content"
+            app:srcCompat="@drawable/ic_save_noti"
+            android:background="@color/colorPrimary"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </LinearLayout>

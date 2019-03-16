@@ -28,7 +28,6 @@ import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.dialog.AddDialog;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.example.allakumarreddy.moneybook.test.DataBaseActivity;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity
                 goToAnalytics("0");
                 break;
             case R.id.action_msgParser:
-                startActivity(new Intent(this, MessageParseActivity.class));
+                startActivity(new Intent(this, MessagesActivity.class));
                 break;
             case R.id.action_test:
                 //startActivity(new Intent(this, DataBaseActivity.class));

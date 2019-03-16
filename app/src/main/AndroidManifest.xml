@@ -15,10 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".test.DataBaseActivity">
-
-        </activity>
-        <activity android:name=".Activities.MessageParseActivity"></activity>
+        <activity
+            android:name=".Activities.MessageDetailActivity"
+            android:label="@string/title_activity_message_detail"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".Activities.MessagesActivity"
+            android:label="@string/title_activity_messages"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".test.DataBaseActivity" />
+        <activity android:name=".Activities.MessageParseActivity" />
         <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

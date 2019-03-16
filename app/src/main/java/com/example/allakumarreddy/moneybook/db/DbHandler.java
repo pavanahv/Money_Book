@@ -122,6 +122,24 @@ public class DbHandler extends SQLiteOpenHelper {
             cursor.close();
         }
 
+        db.close();
+        return result;
+    }
+
+    public String getNameOfCategory(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String result = "";
+        Cursor cursor = db.rawQuery("SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + id + "", null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                result = cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+        db.close();
         return result;
     }
 
@@ -777,5 +795,56 @@ public class DbHandler extends SQLiteOpenHelper {
             LoggerCus.d(TAG, e.getMessage());
         }
         return s;
+    }
+
+    public ArrayList<String> getMsgRecordsAsList() {
+        ArrayList<String> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + " FROM " + MSG_TABLE_NAME, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                list.add(cursor.getString(0));
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return list;
+    }
+
+    public ArrayList getMsgDetails(String msgName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        ArrayList<String> list = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_DESCRIPTION + "," + MSG_KEY_AMOUNT + "," + MSG_KEY_TYPE + "," + MSG_KEY_CAT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_MSG + " FROM " + MSG_TABLE_NAME + " WHERE " + MSG_KEY_NAME + " = '" + msgName + "'", null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                list.add(cursor.getString(0));
+                list.add(cursor.getString(1));
+                list.add("" + cursor.getInt(2));
+                list.add("" + getNameOfCategory(cursor.getInt(3)));
+                list.add(cursor.getString(4));
+                list.add(decode(cursor.getString(5)));
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return list;
+    }
+
+    public boolean deleteMessage(String msgName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int n = db.delete(MSG_TABLE_NAME, MSG_KEY_NAME + " = '" + msgName + "'", null);
+        db.close();
+        if(n>0)
+            return true;
+        else
+            return false;
     }
 }

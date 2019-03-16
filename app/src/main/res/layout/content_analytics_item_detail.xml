@@ -94,11 +94,12 @@
             android:layout_height="wrap_content" />
 
         <ImageButton
+            android:background="@color/colorPrimary"
             android:id="@+id/imageButton"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:onClick="save"
-            app:srcCompat="@drawable/save" />
+            app:srcCompat="@drawable/ic_save_noti" />
     </LinearLayout>
 </FrameLayout>
