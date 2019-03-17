@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 
 /**
@@ -183,6 +184,40 @@ public class DbHandler extends SQLiteOpenHelper {
         long result = db.insert(TABLE_NAME, null, values);
         db.close();
         if (result != -1)
+            return true;
+        else
+            return false;
+    }
+
+    public boolean addRecordWithCatAsID(MBRecord mbr, int type) {
+        DateConverter dc = new DateConverter(mbr.getDate());
+        ContentValues values = new ContentValues();
+        values.put(KEY_TYPE, type);
+        values.put(KEY_DESCRIPTION, mbr.getDescription());
+        values.put(KEY_AMOUNT, mbr.getAmount());
+        values.put(KEY_DATE, dc.getdDate().getTime());
+        values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
+        values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
+        values.put(KEY_CAT, Long.parseLong(mbr.getCategory()));
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Inserting Row
+        long result = db.insert(TABLE_NAME, null, values);
+        db.close();
+        if (result != -1)
+            return true;
+        else
+            return false;
+    }
+
+    public boolean updateBalLeft(long catId, int bal) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_CAT_BAL, bal);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.update(CAT_TABLE_NAME, values, KEY_CAT_ID + "=" + catId, null);
+        db.close();
+        if (result > 0)
             return true;
         else
             return false;
@@ -804,7 +839,6 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public boolean insertMsgRecord(String des, String amount, int type, String cate, String balLeft, String msgStr, String name) {
-        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(MSG_KEY_NAME, name);
         values.put(MSG_KEY_DESCRIPTION, des);
@@ -814,7 +848,7 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(MSG_KEY_LEFT_BAL, balLeft);
         values.put(MSG_KEY_MSG, encode(msgStr));
 
-        // Inserting Row
+        SQLiteDatabase db = this.getWritableDatabase();
         long result = db.insert(MSG_TABLE_NAME, null, values);
         db.close();
         if (result != -1)
@@ -892,5 +926,33 @@ public class DbHandler extends SQLiteOpenHelper {
             return true;
         else
             return false;
+    }
+
+    public ArrayList getMsgRecordsAsMap() {
+        ArrayList<HashMap> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + "," + MSG_KEY_DESCRIPTION + ","
+                + MSG_KEY_AMOUNT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_TYPE + "," + MSG_KEY_CAT
+                + "," + MSG_KEY_MSG + " FROM " + MSG_TABLE_NAME, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                HashMap<String, String> map = new HashMap<>();
+                map.put(MSG_KEY_NAME, cursor.getString(0));
+                map.put(MSG_KEY_DESCRIPTION, cursor.getString(1));
+                map.put(MSG_KEY_AMOUNT, cursor.getString(2));
+                map.put(MSG_KEY_LEFT_BAL, cursor.getString(3));
+                map.put(MSG_KEY_TYPE, "" + cursor.getInt(4));
+                map.put(MSG_KEY_CAT, "" + cursor.getLong(5));
+                map.put(MSG_KEY_MSG, decode(cursor.getString(6)));
+                list.add(map);
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return list;
     }
 }

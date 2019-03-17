@@ -19,9 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
+import com.example.allakumarreddy.moneybook.MessageParser.MessagesParserService;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
@@ -47,6 +49,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -320,6 +324,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void init() {
+        startMsgParserService();
         db = new DbHandler(this);
         mainLayout = (FrameLayout) findViewById(R.id.main);
         createTabs(R.id.tabHost, R.id.tab1, R.id.tab2, R.id.tab3, R.id.tab4, 0);
@@ -327,6 +332,13 @@ public class MainActivity extends AppCompatActivity
         currentScreen = 1;
         dashBoard();
         switchScreen();
+    }
+
+    private void startMsgParserService() {
+        //Toast.makeText(this, "started service", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(MainActivity.this, MessagesParserService.class);
+        intent.setAction(ACTION_MSG_PARSE_BY_DATE);
+        startService(intent);
     }
 
     private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {
