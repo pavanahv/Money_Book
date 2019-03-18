@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     private TextView totalM;
     private TextView totalY;
     private View mProgressBAr;
+    private ArrayList<MBRecord>[] mbr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,17 +226,22 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        showProgressBar();
         if (id == R.id.dash) {
             currentScreen = 1;
-            dashBoard();
-            switchScreen();
+            dashBoardUIData();
         } else if (id == R.id.home) {
             currentScreen = 0;
             switchScreen();
+            homeUIData();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showProgressBar() {
+        mProgressBAr.setVisibility(View.VISIBLE);
     }
 
     private void switchScreen() {
@@ -270,36 +276,38 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView = new ListView[4];
         mTextViewTotal = new TextView[4];
 
-        des = new ArrayList[4];
-        date = new ArrayList[4];
-        amount = new ArrayList[4];
         mAdapter = new MyAdapter[4];
+        mbr = new ArrayList[4];
         for (int i = 0; i < 4; i++) {
             mRecyclerView[i] = (ListView) findViewById(o[i]);
             mTextViewTotal[i] = (TextView) findViewById(t[i]);
-
-            ArrayList<MBRecord> mbr = db.getRecords(curDateStr, i);
-            final int len = mbr.size();
-            LoggerCus.d(TAG, "length : " + len);
-            des[i] = new ArrayList();
-            date[i] = new ArrayList();
-            amount[i] = new ArrayList();
-            for (int j = 0; j < len; j++) {
-                des[i].add(mbr.get(j).getDescription());
-                amount[i].add(mbr.get(j).getAmount() + "");
-                date[i].add(mbr.get(j).getDate().toString());
-            }
-            // specify an adapter
-            mAdapter[i] = new MyAdapter(mbr, this, i);
+            mbr[i] = new ArrayList<>();
+            mAdapter[i] = new MyAdapter(mbr[i], this, i);
             mRecyclerView[i].setAdapter(mAdapter[i]);
-            mTextViewTotal[i].setText(Utils.getFormattedNumber(getTotalAmount(i)));
         }
+    }
+
+    private void homeUIData() {
+        new Thread(() -> {
+            for (int i = 0; i < 4; i++) {
+                mbr[i] = db.getRecords(tablesDate, i);
+            }
+
+            runOnUiThread(() -> {
+                for (int i = 0; i < 4; i++) {
+                    mAdapter[i].clear();
+                    mAdapter[i].addAll(mbr[i]);
+                    mAdapter[i].notifyDataSetChanged();
+                    mTextViewTotal[i].setText(Utils.getFormattedNumber(getTotalAmount(i)));
+                }
+            });
+        }).start();
     }
 
     private int getTotalAmount(int i) {
         int total = 0;
-        for (String n : amount[i])
-            total += Integer.parseInt(n);
+        for (MBRecord n : mbr[i])
+            total += n.getAmount();
         return total;
     }
 
@@ -309,6 +317,10 @@ public class MainActivity extends AppCompatActivity
         totalD = (TextView) findViewById(R.id.dashboardtotald);
         totalM = (TextView) findViewById(R.id.dashboardtotalm);
         totalY = (TextView) findViewById(R.id.dashboardtotaly);
+
+        dbr = new ArrayList<>();
+        dashBoardAdapter = new DashBoardAdapter(dbr, MainActivity.this);
+        dashBoardList.setAdapter(dashBoardAdapter);
 
         ((TextView) findViewById(R.id.dashday)).setText(new SimpleDateFormat("dd").format(new Date()));
         ((TextView) findViewById(R.id.dashmonth)).setText(new SimpleDateFormat("MMM").format(new Date()));
@@ -322,11 +334,16 @@ public class MainActivity extends AppCompatActivity
             String yearCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear());
             dbr = db.getDashBoardRecords();
             runOnUiThread(() -> {
+                // if main ui thread is slow then ui will not created.
+                // But still on that ui we will perform actions which will raise error
+                if (totalD == null)
+                    dashBoard();
                 totalD.setText(dayCountTotalHeadText);
                 totalM.setText(monthCountTotalHeadText);
                 totalY.setText(yearCountTotalHeadText);
-                dashBoardAdapter = new DashBoardAdapter(dbr, MainActivity.this);
-                dashBoardList.setAdapter(dashBoardAdapter);
+                dashBoardAdapter.clear();
+                dashBoardAdapter.addAll(dbr);
+                dashBoardAdapter.notifyDataSetChanged();
                 switchScreen();
             });
         }).start();
@@ -355,6 +372,7 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUI() {
         dashBoardUIData();
+        homeUIData();
     }
 
     private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {
@@ -394,7 +412,7 @@ public class MainActivity extends AppCompatActivity
                 final int pos = host.getCurrentTab();
                 MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2]);
                 db.addRecord(mbr, pos);
-                addItem(mbr, pos);
+                addItem(pos);
             }
         } else {
             db.addCategory(s[0]);
@@ -404,11 +422,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void addItem(MBRecord mbr, final int position) {
-        des[position].add(mbr.getDescription());
-        amount[position].add(mbr.getAmount() + "");
-        date[position].add(format.format(new Date()));
-        mAdapter[position].add(mbr);
+    private void addItem(final int position) {
+        mAdapter[position].clear();
+        mbr[position] = db.getRecords(tablesDate, position);
+        mAdapter[position].addAll(mbr[position]);
         mAdapter[position].notifyDataSetChanged();
         mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
     }
