@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleDriveBackup gdb;
     private TextView totalM;
     private TextView totalY;
+    private View mProgressBAr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         if (!loginCrt)
             finish();
 
+        mProgressBAr = findViewById(R.id.mainlayoutProgressBar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -252,6 +254,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void closeOtherScreens() {
+        if (mProgressBAr.getVisibility() == View.VISIBLE)
+            mProgressBAr.setVisibility(View.GONE);
     }
 
     private void home() {
@@ -323,6 +327,7 @@ public class MainActivity extends AppCompatActivity
                 totalY.setText(yearCountTotalHeadText);
                 dashBoardAdapter = new DashBoardAdapter(dbr, MainActivity.this);
                 dashBoardList.setAdapter(dashBoardAdapter);
+                switchScreen();
             });
         }).start();
     }
@@ -335,7 +340,6 @@ public class MainActivity extends AppCompatActivity
         home();
         currentScreen = 1;
         dashBoard();
-        switchScreen();
     }
 
     private void startMsgParserService() {
