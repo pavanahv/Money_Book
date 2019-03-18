@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,18 +20,19 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
-import com.example.allakumarreddy.moneybook.MessageParser.MessagesParserService;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
+import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.dialog.AddDialog;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
@@ -307,7 +309,9 @@ public class MainActivity extends AppCompatActivity
         ((TextView) findViewById(R.id.dashday)).setText(new SimpleDateFormat("dd").format(new Date()));
         ((TextView) findViewById(R.id.dashmonth)).setText(new SimpleDateFormat("MMM").format(new Date()));
         ((TextView) findViewById(R.id.dashyear)).setText(new SimpleDateFormat("yyyy").format(new Date()));
+    }
 
+    private void dashBoardUIData() {
         new Thread(() -> {
             String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay());
             String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
@@ -335,10 +339,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startMsgParserService() {
-        //Toast.makeText(this, "started service", Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(MainActivity.this, MessagesParserService.class);
+        Intent intent = new Intent(MainActivity.this, MoneyBookIntentService.class);
         intent.setAction(ACTION_MSG_PARSE_BY_DATE);
+        intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
+            if (msg.what == GlobalConstants.MSG_PARSING_COMPLETED) {
+                updateUI();
+            }
+        })));
         startService(intent);
+    }
+
+    private void updateUI() {
+        dashBoardUIData();
     }
 
     private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {

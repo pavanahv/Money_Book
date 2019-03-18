@@ -1,12 +1,16 @@
-package com.example.allakumarreddy.moneybook.MessageParser;
+package com.example.allakumarreddy.moneybook.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
@@ -16,12 +20,13 @@ import java.util.HashMap;
 
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
-public class MessagesParserService extends IntentService {
+public class MoneyBookIntentService extends IntentService {
 
-    private static final String TAG = "MessagesParserService";
+    private static final String TAG = "MoneyBookIntentService";
+    private Messenger handler;
 
-    public MessagesParserService() {
-        super("MessagesParserService");
+    public MoneyBookIntentService() {
+        super("MoneyBookIntentService");
     }
 
     @Override
@@ -29,7 +34,15 @@ public class MessagesParserService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_MSG_PARSE_BY_DATE.equals(action)) {
+                handler = intent.getParcelableExtra(GlobalConstants.HANDLER_NAME);
                 handleActionMsgParse();
+                Message msg = new Message();
+                msg.what = GlobalConstants.MSG_PARSING_COMPLETED;
+                try {
+                    handler.send(msg);
+                } catch (RemoteException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
             }
         }
     }
