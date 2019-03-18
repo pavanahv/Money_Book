@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity
         showProgressBar();
         if (id == R.id.dash) {
             currentScreen = 1;
-            dashBoardUIData();
+            dashBoardUIData(false);
         } else if (id == R.id.home) {
             currentScreen = 0;
             switchScreen();
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity
         ((TextView) findViewById(R.id.dashyear)).setText(new SimpleDateFormat("yyyy").format(new Date()));
     }
 
-    private void dashBoardUIData() {
+    private void dashBoardUIData(boolean typeActivate) {
         new Thread(() -> {
             String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay());
             String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
@@ -344,6 +344,8 @@ public class MainActivity extends AppCompatActivity
                 dashBoardAdapter.clear();
                 dashBoardAdapter.addAll(dbr);
                 dashBoardAdapter.notifyDataSetChanged();
+                if (typeActivate)
+                    homeUIData();
                 switchScreen();
             });
         }).start();
@@ -371,8 +373,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateUI() {
-        dashBoardUIData();
-        homeUIData();
+        dashBoardUIData(true);
     }
 
     private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {

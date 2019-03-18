@@ -105,6 +105,8 @@ public class MoneyBookIntentService extends IntentService {
                 flist.add(orgStr.substring(sind, ind));
                 sind = ind + s.length();
             }
+            if ((len == 1) && (flist.size() == 0))
+                flist.add(orgStr.substring(sind));
             parseUpdateAllFields(flist, rawMsgMap, dbMsgMap, db);
             result = true;
         } else {
@@ -134,11 +136,15 @@ public class MoneyBookIntentService extends IntentService {
 
         } else if ((desc.compareToIgnoreCase("") != 0) && (bal.compareToIgnoreCase("") == 0)) {
             String des = parseUpdateField(flist, desc);
-            int amount = Integer.parseInt(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
+            int amount = (int) Float.parseFloat(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
             LoggerCus.d(TAG, des + " -> " + amount);
+
+            MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT));
+            boolean res = db.addRecordWithCatAsID(mbRecord, Integer.parseInt(dbMsgMap.get(DbHandler.MSG_KEY_TYPE)));
         } else if ((desc.compareToIgnoreCase("") == 0) && (bal.compareToIgnoreCase("") != 0)) {
-            int balLeft = Integer.parseInt(parseUpdateField(flist, bal));
+            int balLeft = (int) Float.parseFloat(parseUpdateField(flist, bal));
             LoggerCus.d(TAG, "" + balLeft);
+            boolean res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_CAT)), balLeft);
         }
     }
 

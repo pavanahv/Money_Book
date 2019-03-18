@@ -15,11 +15,13 @@ import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
 import java.util.ArrayList;
 
 public class ItemDetailFragment extends Fragment {
 
+    private static final String TAG = "ItemDetailFragment";
     private ChunksFragmentInteractionListener mListener;
     private TextView chunks;
     private EditText des;
@@ -195,16 +197,24 @@ public class ItemDetailFragment extends Fragment {
             ArrayList<String> flist = new ArrayList<>();
             final int len = constList.size();
             int sind = orgStr.indexOf(constList.get(0));
+            LoggerCus.d(TAG, constList.get(0));
+            LoggerCus.d(TAG, "sind " + sind);
             if (sind != 0) {
                 flist.add(orgStr.substring(0, sind));
             }
             sind += constList.get(0).length();
+            LoggerCus.d(TAG, "sind " + sind);
             for (int j = 1; j < len; j++) {
                 String s = constList.get(j);
                 int ind = orgStr.indexOf(s, sind);
                 flist.add(orgStr.substring(sind, ind));
                 sind = ind + s.length();
             }
+            if ((len == 1) && (flist.size() == 0))
+                flist.add(orgStr.substring(sind));
+            LoggerCus.d(TAG, "sind " + sind);
+            LoggerCus.d(TAG, "len " + len);
+            LoggerCus.d(TAG, flist.toString());
             parseUpdateAllFields(flist);
         } else {
             // selected message is not valid
