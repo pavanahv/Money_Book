@@ -287,6 +287,8 @@ public class DbHandler extends SQLiteOpenHelper {
     private void deleteAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, null, null);
+        db.delete(CAT_TABLE_NAME, null, null);
+        db.delete(MSG_TABLE_NAME, null, null);
         db.close();
     }
 
