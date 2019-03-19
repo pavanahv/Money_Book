@@ -80,4 +80,8 @@ public class Utils {
         else
             return s;
     }
+
+    public static int castFloat2IntRemovingCommas(String s) {
+        return (int)Float.parseFloat(s.replaceAll(",", ""));
+    }
 }

@@ -1,8 +1,7 @@
 package com.example.allakumarreddy.moneybook.backup;
 
-import android.widget.Toast;
+import android.content.Context;
 
-import com.example.allakumarreddy.moneybook.Activities.MainActivity;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.FileStore;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -14,35 +13,29 @@ import java.io.IOException;
  * Created by alla.kumarreddy on 17-Mar-18.
  */
 
-public class Backup implements Runnable {
+public class Backup {
     private final DbHandler db;
-    private final MainActivity context;
+    private final Context context;
 
-    public Backup(DbHandler db, MainActivity context) {
-        this.db = db;
+    public Backup(Context context) {
         this.context = context;
+        this.db = new DbHandler(this.context);
     }
 
-    public void send() {
-        new Thread(this).start();
-    }
-
-    @Override
-    public void run() {
+    public boolean send() {
         String s = db.getRecords();
+        boolean res = false;
         try {
             final File f = new FileStore().writeFile(s);
             String response = "Backup Successfull !";
             LoggerCus.d("Backup", response);
-            context.runOnUiThread(() -> {
-                Toast.makeText(context, response, Toast.LENGTH_LONG).show();
-                context.mBackupFile = f;
-                //context.signIn();
-            });
+            //context.mBackupFile = f;
+            //context.signIn();
+            res = true;
         } catch (IOException e) {
             LoggerCus.d("Backup", e.getMessage());
-            context.runOnUiThread(() -> Toast.makeText(context, "Error in Backup !" + e.getMessage(), Toast.LENGTH_LONG).show());
+            res = false;
         }
-
+        return res;
     }
 }

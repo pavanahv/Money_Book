@@ -8,16 +8,20 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
+import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP;
+import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MoneyBookIntentService extends IntentService {
@@ -38,6 +42,22 @@ public class MoneyBookIntentService extends IntentService {
                 handleActionMsgParse();
                 Message msg = new Message();
                 msg.what = GlobalConstants.MSG_PARSING_COMPLETED;
+                try {
+                    handler.send(msg);
+                } catch (RemoteException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
+            } else if (ACTION_BACKUP.equals(action)) {
+                new Backup(this).send();
+            } else if (ACTION_BACKUP_MAIN_ACTIVITY_OPEN.equals(action)) {
+                handler = intent.getParcelableExtra(GlobalConstants.HANDLER_NAME);
+                boolean res = new Backup(this).send();
+                Message msg = new Message();
+                msg.what = GlobalConstants.BACKUP_COMPLETED;
+                if (res)
+                    msg.arg1 = 1;
+                else
+                    msg.arg1 = 0;
                 try {
                     handler.send(msg);
                 } catch (RemoteException e) {
@@ -124,8 +144,8 @@ public class MoneyBookIntentService extends IntentService {
             return;
         else if ((desc.compareToIgnoreCase("") != 0) && (bal.compareToIgnoreCase("") != 0)) {
             String des = parseUpdateField(flist, desc);
-            int amount = (int) Float.parseFloat(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
-            int balLeft = (int) Float.parseFloat(parseUpdateField(flist, bal));
+            int amount = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
+            int balLeft = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, bal));
             LoggerCus.d(TAG, des + " -> " + amount + " -> " + balLeft + " -> " + rawMsgMap.get("date") + " -> " + new Date(Long.parseLong(rawMsgMap.get("date"))).toString());
 
             MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT));
@@ -136,13 +156,13 @@ public class MoneyBookIntentService extends IntentService {
 
         } else if ((desc.compareToIgnoreCase("") != 0) && (bal.compareToIgnoreCase("") == 0)) {
             String des = parseUpdateField(flist, desc);
-            int amount = (int) Float.parseFloat(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
+            int amount = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
             LoggerCus.d(TAG, des + " -> " + amount);
 
             MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT));
             boolean res = db.addRecordWithCatAsID(mbRecord, Integer.parseInt(dbMsgMap.get(DbHandler.MSG_KEY_TYPE)));
         } else if ((desc.compareToIgnoreCase("") == 0) && (bal.compareToIgnoreCase("") != 0)) {
-            int balLeft = (int) Float.parseFloat(parseUpdateField(flist, bal));
+            int balLeft = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, bal));
             LoggerCus.d(TAG, "" + balLeft);
             boolean res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_CAT)), balLeft);
         }

@@ -20,13 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
-import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.dialog.AddDialog;
@@ -140,6 +140,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        backup(false);
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -149,7 +155,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_backup:
-                new Backup(db, this).send();
+                backup(true);
                 return true;
             case R.id.action_import:
                 Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -168,6 +174,25 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void backup(boolean typeActivate) {
+        Intent intent = new Intent(MainActivity.this, MoneyBookIntentService.class);
+        if (typeActivate) {
+            intent.setAction(GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN);
+            intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
+                if (msg.what == GlobalConstants.BACKUP_COMPLETED) {
+                    if (msg.arg1 == 0) {
+                        Toast.makeText(MainActivity.this, "Failed To Backup !\nSomething Went Wrong", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Backup Successful !", Toast.LENGTH_LONG).show();
+                    }
+                }
+            })));
+        } else {
+            intent.setAction(GlobalConstants.ACTION_BACKUP);
+        }
+        startService(intent);
     }
 
 
