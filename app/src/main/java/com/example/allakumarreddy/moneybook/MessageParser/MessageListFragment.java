@@ -85,8 +85,8 @@ public class MessageListFragment extends Fragment {
             ContentResolver cr = getActivity().getContentResolver();
             Cursor c = cr.query(message, null, null, null, null);
             int totalSMS = c.getCount();
-            if(totalSMS>=100)
-                totalSMS=100;
+            if(totalSMS>=1000)
+                totalSMS=1000;
             if (c.moveToFirst()) {
                 int ind = c.getColumnIndex("body");
                 for (int i = 0; i < totalSMS; i++) {

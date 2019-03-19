@@ -105,7 +105,7 @@ public class MoneyBookIntentService extends IntentService {
                 flist.add(orgStr.substring(sind, ind));
                 sind = ind + s.length();
             }
-            if ((len == 1) && (flist.size() == 0))
+            if (sind != orgStr.length())
                 flist.add(orgStr.substring(sind));
             parseUpdateAllFields(flist, rawMsgMap, dbMsgMap, db);
             result = true;
