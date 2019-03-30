@@ -1,12 +1,15 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -52,6 +55,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
+import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_IMPORT;
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
@@ -60,6 +65,8 @@ public class MainActivity extends AppCompatActivity
     final static String TAG = "MainActivity";
     private static final int REQUESTCODE_PICK_JSON = 504;
     private static final int REQUEST_CODE_SIGN_IN = 200;
+    private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE = 1001;
+    private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
     private TabHost host;
     private String[] addDialogDetails = {"", "", ""};
     private ListView[] mRecyclerView;
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity
     private TextView totalY;
     private View mProgressBAr;
     private ArrayList<MBRecord>[] mbr;
+    private String bfrPermissionAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,9 +166,7 @@ public class MainActivity extends AppCompatActivity
                 backup(true);
                 return true;
             case R.id.action_import:
-                Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                mediaIntent.setType("*/*"); // Set MIME type as per requirement
-                startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
+                importAction();
                 return true;
             case R.id.action_analytics:
                 goToAnalytics("0");
@@ -176,25 +182,100 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void importAction() {
+        boolean perm = Utils.checkReadWriteStoragePermissions(this);
+        if (perm) {
+            Intent mediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            mediaIntent.setType("*/*"); // Set MIME type as per requirement
+            startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
+        } else {
+            bfrPermissionAction = ACTION_IMPORT;
+            requestPermissionForReadWriteStorage();
+        }
+    }
+
     private void backup(boolean typeActivate) {
+        boolean perm = Utils.checkReadWriteStoragePermissions(this);
         Intent intent = new Intent(MainActivity.this, MoneyBookIntentService.class);
         if (typeActivate) {
-            intent.setAction(GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN);
-            intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
-                if (msg.what == GlobalConstants.BACKUP_COMPLETED) {
-                    if (msg.arg1 == 0) {
-                        Toast.makeText(MainActivity.this, "Failed To Backup !\nSomething Went Wrong", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Backup Successful !", Toast.LENGTH_LONG).show();
+            if (perm) {
+                intent.setAction(GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN);
+                intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
+                    if (msg.what == GlobalConstants.BACKUP_COMPLETED) {
+                        if (msg.arg1 == 0) {
+                            Toast.makeText(MainActivity.this, "Failed To Backup !\nSomething Went Wrong", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Backup Successful !", Toast.LENGTH_LONG).show();
+                        }
                     }
-                }
-            })));
+                })));
+            } else {
+                bfrPermissionAction = ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
+                requestPermissionForReadWriteStorage();
+            }
         } else {
-            intent.setAction(GlobalConstants.ACTION_BACKUP);
+            if (perm)
+                intent.setAction(GlobalConstants.ACTION_BACKUP);
+            else
+                return;
         }
         startService(intent);
     }
 
+    private void requestPermissionForReadWriteStorage() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    switch (bfrPermissionAction) {
+                        case ACTION_BACKUP_MAIN_ACTIVITY_OPEN:
+                            backup(true);
+                            break;
+                        case ACTION_IMPORT:
+                            importAction();
+                            break;
+                    }
+                } else {
+                    switch (bfrPermissionAction) {
+                        case ACTION_BACKUP_MAIN_ACTIVITY_OPEN:
+                            Toast.makeText(this, "Not given permission to backup. Try again", Toast.LENGTH_LONG).show();
+                            break;
+                        case ACTION_IMPORT:
+                            Toast.makeText(this, "Not given permission to import. Try again", Toast.LENGTH_LONG).show();
+                            break;
+                    }
+                }
+                return;
+            }
+
+            case MY_PERMISSIONS_REQUEST_READ_SMS:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    switch (bfrPermissionAction) {
+                        case ACTION_MSG_PARSE_BY_DATE:
+                            startMsgParserService();
+                            break;
+                    }
+                } else {
+                    switch (bfrPermissionAction) {
+                        case ACTION_MSG_PARSE_BY_DATE:
+                            Toast.makeText(this, "Message parser will not work. Try again", Toast.LENGTH_LONG).show();
+                            updateUI();
+                            break;
+                    }
+                }
+                return;
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
@@ -387,14 +468,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startMsgParserService() {
-        Intent intent = new Intent(MainActivity.this, MoneyBookIntentService.class);
-        intent.setAction(ACTION_MSG_PARSE_BY_DATE);
-        intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
-            if (msg.what == GlobalConstants.MSG_PARSING_COMPLETED) {
-                updateUI();
-            }
-        })));
-        startService(intent);
+        boolean perm = Utils.checkReadSMSPermissions(this);
+        if (perm) {
+            Intent intent = new Intent(MainActivity.this, MoneyBookIntentService.class);
+            intent.setAction(ACTION_MSG_PARSE_BY_DATE);
+            intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
+                if (msg.what == GlobalConstants.MSG_PARSING_COMPLETED) {
+                    updateUI();
+                }
+            })));
+            startService(intent);
+        } else {
+            bfrPermissionAction = ACTION_MSG_PARSE_BY_DATE;
+            requestPermissionForReadSMS();
+        }
+    }
+
+    private void requestPermissionForReadSMS() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.READ_SMS},
+                MY_PERMISSIONS_REQUEST_READ_SMS);
     }
 
     private void updateUI() {

@@ -1,7 +1,10 @@
 package com.example.allakumarreddy.moneybook.utils;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
 import java.text.DecimalFormat;
@@ -13,8 +16,8 @@ import java.text.NumberFormat;
 
 public class Utils {
 
-    private static String email="EMAIL";
-    private static String appFolder="APP_FOLDER";
+    private static String email = "EMAIL";
+    private static String appFolder = "APP_FOLDER";
 
     public static String getBackupFile() {
         return backupFile;
@@ -24,7 +27,7 @@ public class Utils {
         Utils.backupFile = backupFile;
     }
 
-    private static String backupFile="backup.JSON";
+    private static String backupFile = "backup.JSON";
 
     public static String getEmail() {
         return email;
@@ -82,6 +85,26 @@ public class Utils {
     }
 
     public static int castFloat2IntRemovingCommas(String s) {
-        return (int)Float.parseFloat(s.replaceAll(",", ""));
+        return (int) Float.parseFloat(s.replaceAll(",", ""));
+    }
+
+    public static boolean checkReadWriteStoragePermissions(Context context) {
+        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean checkReadSMSPermissions(Context context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS)
+                == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
