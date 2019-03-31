@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,6 +33,16 @@ public class LoginActivity extends AppCompatActivity {
 
         inputText = (EditText) findViewById(R.id.inputnumber);
         numberView = (TextView) findViewById(R.id.number);
+
+        inputText.setOnKeyListener((v, keyCode, event) -> {
+            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                login(null);
+                return true;
+            }
+            return false;
+        });
+
         generateRandNumber();
     }
 
