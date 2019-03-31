@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE = 1001;
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
     private TabHost host;
-    private String[] addDialogDetails = {"", "", ""};
     private ListView[] mRecyclerView;
     private List<String>[] des, amount, date;
     private MyAdapter[] mAdapter;
@@ -432,7 +431,7 @@ public class MainActivity extends AppCompatActivity
         ((TextView) findViewById(R.id.dashyear)).setText(new SimpleDateFormat("yyyy").format(new Date()));
     }
 
-    private void dashBoardUIData(boolean typeActivate) {
+    public void dashBoardUIData(boolean typeActivate) {
         new Thread(() -> {
             String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay());
             String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
@@ -523,8 +522,7 @@ public class MainActivity extends AppCompatActivity
         host.setVisibility(View.INVISIBLE);
     }
 
-    public void afterCallingAddDialog() {
-        String[] s = this.getAddDialogDetails();
+    public void afterCallingAddDialog(String[] s, int type) {
         if (this.currentScreen == 0) {
             if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
                 final int pos = host.getCurrentTab();
@@ -533,10 +531,24 @@ public class MainActivity extends AppCompatActivity
                 addItem(pos);
             }
         } else {
-            db.addCategory(s[0]);
-            DashBoardRecord temp = db.getDashBoardRecord(s[0]);
-            dbr.add(temp);
-            dashBoardAdapter.notifyDataSetChanged();
+            if (type == 1) {
+                db.addCategory(s[0]);
+                DashBoardRecord temp = db.getDashBoardRecord(s[0]);
+                dbr.add(temp);
+                dashBoardAdapter.add(temp);
+                dashBoardAdapter.notifyDataSetChanged();
+            } else if (type == 2) {
+                if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
+                    MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[3]);
+                    mbr.setToCategory(s[2]);
+                    boolean res = db.addMTRecord(mbr);
+                    if (res) {
+                        Toast.makeText(this, "Succrssfully Trasfered !", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Something Went Wrong\nPlease Try Again!", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
         }
     }
 
@@ -546,14 +558,6 @@ public class MainActivity extends AppCompatActivity
         mAdapter[position].addAll(mbr[position]);
         mAdapter[position].notifyDataSetChanged();
         mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
-    }
-
-    public String[] getAddDialogDetails() {
-        return this.addDialogDetails;
-    }
-
-    public void setAddDialogDetails(String[] s) {
-        this.addDialogDetails = s.clone();
     }
 
     public void signIn() {

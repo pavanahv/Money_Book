@@ -1,9 +1,7 @@
 package com.example.allakumarreddy.moneybook.Adapter;
 
-import android.content.Intent;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -15,9 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
-import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.dialog.AddDialog;
+import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
@@ -116,30 +115,27 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
                 .inflate(R.menu.dashboard_popmenu, popup.getMenu());
 
         //registering popup with OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.dashboardPopupDelete:
-                        db.deleteCategory(dataModel.getText().toLowerCase());
-                        break;
-                }
-                Intent intent = mContext.getIntent();
-                mContext.finish();
-                mContext.startActivity(intent);
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.dashboardPopupDelete:
+                    db.deleteCategory(dataModel.getText().toLowerCase());
+                    mContext.runOnUiThread(() -> mContext.dashBoardUIData(false));
+                    break;
+
+                case R.id.dashboardPopupMT:
+                    new AddDialog(mContext, 2, dataModel.getText().toLowerCase()).show();
+                    break;
             }
+            return true;
         });
 
-        convertView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (dataModel.getText().compareToIgnoreCase("others") != 0) {
-                    popup.show();
-                } else {
-                    Toast.makeText(mContext, "You Can't Delete Default Category", Toast.LENGTH_LONG).show();
-                }
-                return false;
+        convertView.setOnLongClickListener(v -> {
+            if (dataModel.getText().compareToIgnoreCase("others") != 0) {
+                popup.show();
+            } else {
+                Toast.makeText(mContext, "You Can't Delete Default Category", Toast.LENGTH_LONG).show();
             }
+            return false;
         });
 
         if (dataModel.getText().compareToIgnoreCase("others") != 0) {
@@ -149,6 +145,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
                     popup.show(); //showing popup menu
                 }
             });
+            viewHolder.imageButton.setVisibility(View.VISIBLE);
         } else {
             viewHolder.imageButton.setVisibility(View.GONE);
         }

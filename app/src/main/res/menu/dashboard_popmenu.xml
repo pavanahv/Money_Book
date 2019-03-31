@@ -4,4 +4,8 @@
         android:id="@+id/dashboardPopupDelete"
         android:title="Delete"/>
 
+    <item
+        android:id="@+id/dashboardPopupMT"
+        android:title="Money Transfer"/>
+
 </menu>

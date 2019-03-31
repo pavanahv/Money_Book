@@ -21,6 +21,7 @@ public class MBRecord {
     }
 
     private String category;
+    private String toCategory;
 
     public int getType() {
         return type;
@@ -85,5 +86,13 @@ public class MBRecord {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getToCategory() {
+        return toCategory;
+    }
+
+    public void setToCategory(String toCategory) {
+        this.toCategory = toCategory;
     }
 }

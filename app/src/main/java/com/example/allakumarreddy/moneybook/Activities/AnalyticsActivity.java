@@ -47,7 +47,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private int MENU_TYPE_SPENT = 121;
     private int MENU_TYPE = 120;
     String menuDate[] = new String[]{"Start Date", "End Date", "All"};
-    String menuType[] = new String[]{"All", "Spent", "Earn", "Due", "Loan"};
+    String menuType[] = new String[]{"All", "Spent", "Earn", "Due", "Loan","Money Transfer"};
     String menuInterval[] = new String[]{"Day", "Month", "Year"};
     String menuGOTType[] = new String[]{"List", "Graph"};
     String menuGraphType[] = new String[]{"Line", "Bar", "Pie", "Radar", "Scatter"};
