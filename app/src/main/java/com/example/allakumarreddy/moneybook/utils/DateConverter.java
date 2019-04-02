@@ -29,6 +29,15 @@ public class DateConverter {
 
     Date mDate = null;
     Date yDate = null;
+
+    public SimpleDateFormat getSdf() {
+        return sdf;
+    }
+
+    public void setSdf(SimpleDateFormat sdf) {
+        this.sdf = sdf;
+    }
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     public DateConverter(Date dDate) {
@@ -43,6 +52,10 @@ public class DateConverter {
 
     private void dateToString() {
         date = sdf.format(dDate);
+        initialize();
+    }
+
+    public void initialize() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(dDate);
         month = cal.get(Calendar.MONTH) + 1;
@@ -50,9 +63,9 @@ public class DateConverter {
         year = cal.get(Calendar.YEAR);
         cal = Calendar.getInstance();
         cal.setTime(dDate);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getMinimum(Calendar.DAY_OF_MONTH));
         mDate = cal.getTime();
-        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
         yDate = cal.getTime();
     }
 
@@ -104,19 +117,8 @@ public class DateConverter {
     public void stringToDate() {
         try {
             dDate = sdf.parse(date);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dDate);
-            month = cal.get(Calendar.MONTH) + 1;
-            day = cal.get(Calendar.DATE);
-            year = cal.get(Calendar.YEAR);
-            cal = Calendar.getInstance();
-            cal.setTime(dDate);
-            cal.set(Calendar.DAY_OF_MONTH, 1);
-            mDate = cal.getTime();
-            cal.set(Calendar.MONTH, 0);
-            yDate = cal.getTime();
         } catch (Exception e) {
-            LoggerCus.d("DateConverter",e.getMessage());
+            LoggerCus.d("DateConverter", e.getMessage());
         }
     }
 }

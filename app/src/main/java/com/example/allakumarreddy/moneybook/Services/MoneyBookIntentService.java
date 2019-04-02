@@ -48,7 +48,8 @@ public class MoneyBookIntentService extends IntentService {
                     LoggerCus.d(TAG, e.getMessage());
                 }
             } else if (ACTION_BACKUP.equals(action)) {
-                new Backup(this).send();
+                boolean res = new Backup(this).send();
+                LoggerCus.d(TAG, "Backup : " + res);
             } else if (ACTION_BACKUP_MAIN_ACTIVITY_OPEN.equals(action)) {
                 handler = intent.getParcelableExtra(GlobalConstants.HANDLER_NAME);
                 boolean res = new Backup(this).send();

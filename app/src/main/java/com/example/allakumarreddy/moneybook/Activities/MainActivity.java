@@ -34,6 +34,7 @@ import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.dialog.AddDialog;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.test.DataBaseActivity;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -147,12 +148,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        backup(false);
-        super.onDestroy();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -174,8 +169,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, MessagesActivity.class));
                 break;
             case R.id.action_test:
-                //startActivity(new Intent(this, DataBaseActivity.class));
-                db.exec();
+                startActivity(new Intent(this, DataBaseActivity.class));
+                //db.exec();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -295,9 +290,7 @@ public class MainActivity extends AppCompatActivity
                             }
                             db.addRecords(s.toString());
                             MainActivity.this.runOnUiThread(() -> {
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
+                                updateUI();
                             });
                         } catch (FileNotFoundException e) {
                             LoggerCus.d(TAG, e.getMessage());

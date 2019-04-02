@@ -13,6 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+
+import static com.example.allakumarreddy.moneybook.db.DbHandler.CAT_TABLE_NAME;
 import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_AMOUNT;
 import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_CAT;
 import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_CAT_BAL;
@@ -23,6 +26,7 @@ import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_DATE_YEAR;
 import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_DESCRIPTION;
 import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_NAME;
 import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_TYPE;
+import static com.example.allakumarreddy.moneybook.db.DbHandler.TABLE_NAME;
 
 public class DataBaseActivity extends AppCompatActivity {
 
@@ -51,8 +55,8 @@ public class DataBaseActivity extends AppCompatActivity {
         String s = db.getRecords();
         try {
             JSONObject obj = new JSONObject(s);
-            JSONArray jsonArray = obj.getJSONArray("records");
-            JSONArray jsonArrayc = obj.getJSONArray("cats");
+            JSONArray jsonArray = obj.getJSONArray(TABLE_NAME);
+            JSONArray jsonArrayc = obj.getJSONArray(CAT_TABLE_NAME);
 
             final int len = jsonArray.length();
             sb.append("<table style=\"border:1px solid black;border-collapse:collapse;\">");
@@ -68,14 +72,16 @@ public class DataBaseActivity extends AppCompatActivity {
             for (int i = 0; i < len; i++) {
                 sb.append("<tr>");
                 JSONObject jsonObj = jsonArray.getJSONObject(i);
-                sb.append("<td>" + Integer.parseInt(jsonObj.getString("Type")) + "</td>");
-                sb.append("<td>" + jsonObj.getString("Description") + "</td>");
-                sb.append("<td>" + Integer.parseInt(jsonObj.getString("Amount")) + "</td>");
-                DateConverter dc = new DateConverter(jsonObj.getString("Date"));
-                sb.append("<td>" + dc.getdDate().getTime() + "</td>");
-                sb.append("<td>" + dc.getmDate().getTime() + "</td>");
-                sb.append("<td>" + dc.getyDate().getTime() + "</td>");
-                sb.append("<td>" + jsonObj.getLong("Category") + "</td>");
+                sb.append("<td>" + Integer.parseInt(jsonObj.getString(KEY_TYPE)) + "</td>");
+                sb.append("<td>" + jsonObj.getString(KEY_DESCRIPTION) + "</td>");
+                sb.append("<td>" + Integer.parseInt(jsonObj.getString(KEY_AMOUNT)) + "</td>");
+                DateConverter dc = new DateConverter(jsonObj.getString(KEY_DATE));
+                dc.initialize();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd-H:m:s:S");
+                sb.append("<td>" + sdf.format(dc.getdDate().getTime()) + "</br>" + jsonObj.getLong("test_day") + "</td>");
+                sb.append("<td>" + sdf.format(dc.getmDate().getTime()) + "</br>" + jsonObj.getLong("test_month") + "</td>");
+                sb.append("<td>" + sdf.format(dc.getyDate().getTime()) + "</br>" + jsonObj.getLong("test_year") + "</td>");
+                sb.append("<td>" + jsonObj.getLong(KEY_CAT) + "</td>");
                 sb.append("</tr>");
             }
             sb.append("</table>");
@@ -90,9 +96,9 @@ public class DataBaseActivity extends AppCompatActivity {
             for (int i = 0; i < len1; i++) {
                 sb.append("<tr>");
                 JSONObject jsonObj = jsonArrayc.getJSONObject(i);
-                sb.append("<td>" + jsonObj.getString("Name") + "</td>");
-                sb.append("<td>" + jsonObj.getLong("ID") + "</td>");
-                sb.append("<td>" + jsonObj.getInt("BalLeft") + "</td>");
+                sb.append("<td>" + jsonObj.getString(KEY_NAME) + "</td>");
+                sb.append("<td>" + jsonObj.getLong(KEY_CAT_ID) + "</td>");
+                sb.append("<td>" + jsonObj.getInt(KEY_CAT_BAL) + "</td>");
                 sb.append("</tr>");
             }
             sb.append("</table>");
@@ -100,6 +106,7 @@ public class DataBaseActivity extends AppCompatActivity {
             LoggerCus.d("DataBaseActivity", e.getMessage());
         }
         sb.append("</body></html>");
+        LoggerCus.d("DataBaseActivity", sb.toString());
         return sb.toString();
     }
 }

@@ -16,14 +16,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.AnalyticsAdapter;
-import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
+import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.XLStore;
+import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.example.allakumarreddy.moneybook.utils.IDate;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
-import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.Utils;
-import com.example.allakumarreddy.moneybook.storage.XLStore;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -47,7 +47,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private int MENU_TYPE_SPENT = 121;
     private int MENU_TYPE = 120;
     String menuDate[] = new String[]{"Start Date", "End Date", "All"};
-    String menuType[] = new String[]{"All", "Spent", "Earn", "Due", "Loan","Money Transfer"};
+    String menuType[] = new String[]{"All", "Spent", "Earn", "Due", "Loan", "Money Transfer"};
     String menuInterval[] = new String[]{"Day", "Month", "Year"};
     String menuGOTType[] = new String[]{"List", "Graph"};
     String menuGraphType[] = new String[]{"Line", "Bar", "Pie", "Radar", "Scatter"};
@@ -131,10 +131,20 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             menuTypeSubM.add(menuType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    setMoneyType(itemNum);
+                    if (item.isChecked()) {
+                        item.setChecked(false);
+                    } else {
+                        item.setChecked(true);
+                        setMoneyType(itemNum);
+                    }
                     return false;
                 }
             });
+        }
+        int len = menuTypeSubM.size();
+        for (int i = 0; i < len; i++) {
+            MenuItem menuItem = menuTypeSubM.getItem(i);
+            menuItem.setCheckable(true);
         }
 
         SubMenu menuIntervalSubM = menu.addSubMenu("Interval");

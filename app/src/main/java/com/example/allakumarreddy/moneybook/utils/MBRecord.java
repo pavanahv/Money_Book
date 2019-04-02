@@ -61,7 +61,7 @@ public class MBRecord {
         this.date = date;
         this.type = type;
         this.category = category;
-        //LoggerCus.d("MBRecord",description+":"+amount+":"+date+":"+category);
+        //LoggerCus.d("MBRecord",description+":"+amount+":"+date+":"+category+";"+type);
     }
 
     public String getDescription() {

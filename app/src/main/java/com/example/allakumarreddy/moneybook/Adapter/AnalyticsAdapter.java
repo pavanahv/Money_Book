@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.allakumarreddy.moneybook.Activities.AnalyticsActivity;
-import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -105,6 +105,9 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
                 viewHolder.im.setImageResource(R.drawable.loan);
                 break;
 
+            case 4:
+                viewHolder.im.setImageResource(R.drawable.ic_money_transfer);
+                break;
             default:
                 break;
         }
