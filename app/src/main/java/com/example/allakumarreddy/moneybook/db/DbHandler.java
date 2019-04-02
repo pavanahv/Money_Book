@@ -524,12 +524,31 @@ public class DbHandler extends SQLiteOpenHelper {
         return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + MT_KEY_CAT_FROM + ") AS " + MT_KEY_CAT_FROM;
     }
 
-    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, int moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean categoryNone, String category) {
+    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, boolean[] moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean categoryNone, String category) {
         this.total = 0;
-        LoggerCus.d(TAG, moneyType + "");
-        if ((!isAllMoneyType) && (moneyType == 4)) {
+
+        ArrayList<MBRecord> mbr = new ArrayList<>();
+        int moneyTypeVal = 0;
+        boolean res = false;
+        for (int i = 0; i < moneyType.length - 1; i++) {
+            if (moneyType[i]) {
+                res = true;
+                break;
+            }
+        }
+        if (res && moneyType[moneyType.length - 1]) {
+            moneyTypeVal = 3;
+        } else if (res && !moneyType[moneyType.length - 1]) {
+            moneyTypeVal = 1;
+        } else if (!res && moneyType[moneyType.length - 1]) {
+            moneyTypeVal = 2;
+        } else {
+            return mbr;
+        }
+
+        if (moneyTypeVal == 2) {
             return getMTRecordsAsList(query, isAllDate, sDate, eDate,
-                    isAllMoneyType, moneyType, dateInterval, groupByNone,
+                    isAllMoneyType, 4, dateInterval, groupByNone,
                     groupBy, sortBy, categoryNone, category);
         }
 
@@ -556,7 +575,7 @@ public class DbHandler extends SQLiteOpenHelper {
             default:
                 break;
         }
-        ArrayList<MBRecord> mbr = new ArrayList<>();
+
         SQLiteDatabase db = this.getReadableDatabase();
         String eQuery = "";
         if (groupByNone)
@@ -594,15 +613,15 @@ public class DbHandler extends SQLiteOpenHelper {
         if (!isAllDate) {
             eQuery += " AND " + KEY_DATE + " >= " + dcs.getdDate().getTime() + " AND " + KEY_DATE + " <= " + dce.getdDate().getTime();
         }
-        if ((!isAllMoneyType) && (moneyType != 4))
-            eQuery += " AND " + KEY_TYPE + " = " + moneyType;
+        if (moneyTypeVal != 2)
+            eQuery += getQueryForMoneyType(moneyType);
 
         if (!categoryNone)
             eQuery += getCategoryQueryString(category);
 
-        if (isAllMoneyType)
+        if (moneyTypeVal == 3)
             eQuery += " UNION ALL " + getMTRecordsAsListQueryString(query, isAllDate, sDate, eDate,
-                    isAllMoneyType, moneyType, dateInterval, groupByNone,
+                    isAllMoneyType, 4, dateInterval, groupByNone,
                     groupBy, sortBy, categoryNone, category);
 
         if (!groupByNone) {
@@ -677,6 +696,22 @@ public class DbHandler extends SQLiteOpenHelper {
         }
         // return contact
         return mbr;
+    }
+
+    private String getQueryForMoneyType(boolean[] moneyType) {
+        String eQuery = "";
+        eQuery += " AND (";
+        boolean notFistItem = false;
+        for (int i = 0; i < moneyType.length - 1; i++) {
+            if (moneyType[i]) {
+                if (notFistItem)
+                    eQuery += " OR ";
+                eQuery += KEY_TYPE + " = " + i;
+                notFistItem = true;
+            }
+        }
+        eQuery += ")";
+        return eQuery;
     }
 
     private ArrayList<MBRecord> getMTRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, int moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean categoryNone, String category) {

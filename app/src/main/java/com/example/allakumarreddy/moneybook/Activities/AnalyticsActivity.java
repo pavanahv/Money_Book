@@ -33,6 +33,7 @@ import java.util.Date;
 
 public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
+    private static final String TAG = "AnalyticsActivity";
     private LinearLayout main;
     private View prevView;
     private DbHandler db;
@@ -48,6 +49,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private int MENU_TYPE = 120;
     String menuDate[] = new String[]{"Start Date", "End Date", "All"};
     String menuType[] = new String[]{"All", "Spent", "Earn", "Due", "Loan", "Money Transfer"};
+    boolean menuTypeBool[] = new boolean[5];
     String menuInterval[] = new String[]{"Day", "Month", "Year"};
     String menuGOTType[] = new String[]{"List", "Graph"};
     String menuGraphType[] = new String[]{"Line", "Bar", "Pie", "Radar", "Scatter"};
@@ -65,6 +67,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private String[] cols = null;
     private String category = null;
     private boolean categoryNone = true;
+    private SubMenu menuTypeSubM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +128,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             });
         }
 
-        SubMenu menuTypeSubM = menu.addSubMenu("Money Type");
+        menuTypeSubM = menu.addSubMenu("Money Type");
         for (int i = 0; i < menuType.length; i++) {
             final int itemNum = i;
             menuTypeSubM.add(menuType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -133,9 +136,10 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
                 public boolean onMenuItemClick(MenuItem item) {
                     if (item.isChecked()) {
                         item.setChecked(false);
+                        setMoneyType(itemNum, false);
                     } else {
                         item.setChecked(true);
-                        setMoneyType(itemNum);
+                        setMoneyType(itemNum, true);
                     }
                     return false;
                 }
@@ -329,15 +333,33 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         updateData();
     }
 
-    private void setMoneyType(int itemNum) {
+    private void setMoneyType(int itemNum, boolean check) {
         if (itemNum == 0) {
-            this.moneyTypeAll = true;
+            this.moneyTypeAll = check;
             this.moneyTypeInstance = -1;
+            checkMenuItemsOfMoneyType(check);
         } else {
             this.moneyTypeInstance = itemNum - 1;
             this.moneyTypeAll = false;
+            checkMenuItemsOfMoneyType(check, itemNum);
         }
+        //LoggerCus.d(TAG, Arrays.toString(menuTypeBool));
         updateData();
+    }
+
+    private void checkMenuItemsOfMoneyType(boolean check, int itemNum) {
+        menuTypeBool[itemNum - 1] = check;
+        menuTypeSubM.getItem(0).setChecked(false);
+    }
+
+    private void checkMenuItemsOfMoneyType(boolean all) {
+        int len = menuTypeSubM.size();
+        // started from 1 because 0th item is all
+        for (int i = 1; i < len; i++) {
+            MenuItem menuItem = menuTypeSubM.getItem(i);
+            menuItem.setChecked(all);
+            menuTypeBool[i - 1] = all;
+        }
     }
 
 
@@ -398,7 +420,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
     private void updateData() {
         list.clear();
-        dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, moneyTypeInstance, dateInterval, groupByNone, groupBy, sortBy, categoryNone, category);
+        dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, categoryNone, category);
         list.addAll(dataList);
         analyticsAdapter.notifyDataSetChanged();
         upDateTotal();
