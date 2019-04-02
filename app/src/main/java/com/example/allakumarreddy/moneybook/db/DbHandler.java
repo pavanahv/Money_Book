@@ -630,7 +630,6 @@ public class DbHandler extends SQLiteOpenHelper {
                     eQuery += " GROUP BY " + KEY_DESCRIPTION;
                     break;
                 case 1:
-                    //todo
                     switch (dateInterval) {
                         case 0:
                             eQuery += " GROUP BY " + KEY_DATE;

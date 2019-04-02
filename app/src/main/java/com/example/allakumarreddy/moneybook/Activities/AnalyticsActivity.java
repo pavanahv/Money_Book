@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 public class AnalyticsActivity extends AppCompatActivity implements IDate {
@@ -145,11 +146,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
                 }
             });
         }
-        int len = menuTypeSubM.size();
-        for (int i = 0; i < len; i++) {
-            MenuItem menuItem = menuTypeSubM.getItem(i);
-            menuItem.setCheckable(true);
-        }
+        initMoneyTypeAfterOptionMenuCreation();
 
         SubMenu menuIntervalSubM = menu.addSubMenu("Interval");
         for (int i = 0; i < menuInterval.length; i++) {
@@ -232,6 +229,17 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         });
 
         return true;
+    }
+
+    private void initMoneyTypeAfterOptionMenuCreation() {
+        int len = menuTypeSubM.size();
+        for (int i = 0; i < len; i++) {
+            MenuItem menuItem = menuTypeSubM.getItem(i);
+            // making menu item as checkbox
+            menuItem.setCheckable(true);
+            // initiating it checked since all records should be shown while starting activity
+            menuItem.setChecked(true);
+        }
     }
 
     public void startDetailActivity(int pos) {
@@ -317,7 +325,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         searchView.clearFocus();
         queryText = "";
         dateAll = true;
-        moneyTypeAll = true;
+        initMoneyType();
         moneyTypeInstance = -1;
         dateInterval = 0;
         graphType = 0;
@@ -326,6 +334,12 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         sortBy = 0;
         this.category = null;
         this.categoryNone = true;
+    }
+
+    private void initMoneyType() {
+        moneyTypeAll = true;
+        // setting boolean array to true to load all records of meneytype
+        Arrays.fill(menuTypeBool, true);
     }
 
     private void setDateInterval(int itemNum) {
@@ -390,6 +404,10 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             }
         });
         clearAllFilters();
+        init();
+    }
+
+    private void init() {
         Intent intent = getIntent();
         String tempCat = intent.getStringExtra("name");
         if (tempCat.compareToIgnoreCase("0") != 0) {
