@@ -265,10 +265,10 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         }
 
         len = cols.length;
-        for(int i=1;i<len;i++){
+        for (int i = 1; i <= len; i++) {
             MenuItem menuItem = menuCategoriesSubM.getItem(i);
             // initiating it checked since all records should be shown while starting activity
-            if (CatTypeBool[i-1])
+            if (CatTypeBool[i - 1])
                 menuItem.setChecked(true);
             else
                 menuItem.setChecked(false);
