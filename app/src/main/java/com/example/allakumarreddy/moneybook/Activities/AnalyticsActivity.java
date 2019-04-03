@@ -69,6 +69,8 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private String category = null;
     private boolean categoryNone = true;
     private SubMenu menuTypeSubM;
+    private SubMenu menuCategoriesSubM;
+    private boolean[] CatTypeBool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,25 +210,37 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             });
         }
 
-        cols = db.getCategeories();
-        SubMenu menuCategoriesSubM = menu.addSubMenu("Category");
+        menuCategoriesSubM = menu.addSubMenu("Category");
+        menuCategoriesSubM.add("All").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    setCategory(0, false);
+                } else {
+                    item.setChecked(true);
+                    setCategory(0, true);
+                }
+                return false;
+            }
+        });
         for (int i = 0; i < cols.length; i++) {
-            final int itemNum = i;
+            final int itemNum = i + 1;
             menuCategoriesSubM.add(cols[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    setCategory(itemNum);
+                    if (item.isChecked()) {
+                        item.setChecked(false);
+                        setCategory(itemNum, false);
+                    } else {
+                        item.setChecked(true);
+                        setCategory(itemNum, true);
+                    }
                     return false;
                 }
             });
         }
-        menuCategoriesSubM.add("None").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                setCategory(cols.length);
-                return false;
-            }
-        });
+        initCategoryAfterOptionMenuCreation();
 
         return true;
     }
@@ -242,6 +256,25 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         }
     }
 
+    private void initCategoryAfterOptionMenuCreation() {
+        int len = menuCategoriesSubM.size();
+        for (int i = 0; i < len; i++) {
+            MenuItem menuItem = menuCategoriesSubM.getItem(i);
+            // making menu item as checkbox
+            menuItem.setCheckable(true);
+        }
+
+        len = cols.length;
+        for(int i=1;i<len;i++){
+            MenuItem menuItem = menuCategoriesSubM.getItem(i);
+            // initiating it checked since all records should be shown while starting activity
+            if (CatTypeBool[i-1])
+                menuItem.setChecked(true);
+            else
+                menuItem.setChecked(false);
+        }
+    }
+
     public void startDetailActivity(int pos) {
         MBRecord mbr = dataList.get(pos);
         Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
@@ -253,14 +286,17 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         startActivity(intent);
     }
 
-    private void setCategory(int itemNum) {
-        if (itemNum == cols.length) {
+    private void setCategory(int itemNum, boolean check) {
+        if (itemNum == 0) {
+            this.categoryNone = check;
             this.category = null;
-            this.categoryNone = true;
+            checkMenuItemsOfCategory(check);
         } else {
-            this.category = cols[itemNum];
+            this.category = cols[itemNum - 1];
             this.categoryNone = false;
+            checkMenuItemsOfCategory(check, itemNum);
         }
+        LoggerCus.d(TAG, Arrays.toString(CatTypeBool));
         updateData();
     }
 
@@ -332,14 +368,34 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         groupByNone = true;
         groupBy = -1;
         sortBy = 0;
-        this.category = null;
-        this.categoryNone = true;
+        initCategory();
     }
 
     private void initMoneyType() {
         moneyTypeAll = true;
         // setting boolean array to true to load all records of meneytype
         Arrays.fill(menuTypeBool, true);
+    }
+
+    private void initCategory() {
+        cols = db.getCategeories();
+        CatTypeBool = new boolean[cols.length];
+
+        Intent intent = getIntent();
+        String tempCat = intent.getStringExtra("name");
+        if (tempCat.compareToIgnoreCase("0") != 0) {
+            this.categoryNone = false;
+            this.category = tempCat.toLowerCase();
+            for (int i = 0; i < cols.length; i++) {
+                if (cols[i].compareToIgnoreCase(category) == 0) {
+                    CatTypeBool[i] = true;
+                    break;
+                }
+            }
+        } else {
+            // setting boolean array to true to load all records of meneytype
+            Arrays.fill(CatTypeBool, true);
+        }
     }
 
     private void setDateInterval(int itemNum) {
@@ -364,6 +420,21 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private void checkMenuItemsOfMoneyType(boolean check, int itemNum) {
         menuTypeBool[itemNum - 1] = check;
         menuTypeSubM.getItem(0).setChecked(false);
+    }
+
+    private void checkMenuItemsOfCategory(boolean check, int itemNum) {
+        CatTypeBool[itemNum - 1] = check;
+        menuCategoriesSubM.getItem(0).setChecked(false);
+    }
+
+    private void checkMenuItemsOfCategory(boolean all) {
+        int len = menuCategoriesSubM.size();
+        // started from 1 because 0th item is all
+        for (int i = 1; i < len; i++) {
+            MenuItem menuItem = menuCategoriesSubM.getItem(i);
+            menuItem.setChecked(all);
+            CatTypeBool[i - 1] = all;
+        }
     }
 
     private void checkMenuItemsOfMoneyType(boolean all) {
@@ -408,12 +479,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     }
 
     private void init() {
-        Intent intent = getIntent();
-        String tempCat = intent.getStringExtra("name");
-        if (tempCat.compareToIgnoreCase("0") != 0) {
-            this.categoryNone = false;
-            this.category = tempCat.toLowerCase();
-        }
+
     }
 
     @Override
@@ -438,7 +504,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
     private void updateData() {
         list.clear();
-        dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, categoryNone, category);
+        dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, CatTypeBool, cols);
         list.addAll(dataList);
         analyticsAdapter.notifyDataSetChanged();
         upDateTotal();

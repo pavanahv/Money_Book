@@ -524,7 +524,7 @@ public class DbHandler extends SQLiteOpenHelper {
         return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + MT_KEY_CAT_FROM + ") AS " + MT_KEY_CAT_FROM;
     }
 
-    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, boolean[] moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean categoryNone, String category) {
+    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, boolean[] moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool, String[] category) {
         this.total = 0;
 
         ArrayList<MBRecord> mbr = new ArrayList<>();
@@ -549,7 +549,7 @@ public class DbHandler extends SQLiteOpenHelper {
         if (moneyTypeVal == 2) {
             return getMTRecordsAsList(query, isAllDate, sDate, eDate,
                     isAllMoneyType, 4, dateInterval, groupByNone,
-                    groupBy, sortBy, categoryNone, category);
+                    groupBy, sortBy, categoryBool, category);
         }
 
         DateConverter dcs = new DateConverter(intializeSDateForDay(sDate));
@@ -616,13 +616,12 @@ public class DbHandler extends SQLiteOpenHelper {
         if (moneyTypeVal != 2)
             eQuery += getQueryForMoneyType(moneyType);
 
-        if (!categoryNone)
-            eQuery += getCategoryQueryString(category);
+        eQuery += getCategoryQueryString(categoryBool, category);
 
         if (moneyTypeVal == 3)
             eQuery += " UNION ALL " + getMTRecordsAsListQueryString(query, isAllDate, sDate, eDate,
                     isAllMoneyType, 4, dateInterval, groupByNone,
-                    groupBy, sortBy, categoryNone, category);
+                    groupBy, sortBy, categoryBool, category);
 
         if (!groupByNone) {
             switch (groupBy) {
@@ -713,16 +712,16 @@ public class DbHandler extends SQLiteOpenHelper {
         return eQuery;
     }
 
-    private ArrayList<MBRecord> getMTRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, int moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean categoryNone, String category) {
+    private ArrayList<MBRecord> getMTRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, int moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool, String[] category) {
 
         ArrayList<MBRecord> mbr = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String eQuery = getMTRecordsAsListQueryString(query, isAllDate, sDate, eDate,
                 isAllMoneyType, moneyType, dateInterval, groupByNone,
-                groupBy, sortBy, categoryNone, category);
+                groupBy, sortBy, categoryBool, category);
         eQuery += getMTRecordsAsListQueryStringAddOrderGroupBy(query, isAllDate, sDate, eDate,
                 isAllMoneyType, moneyType, dateInterval, groupByNone,
-                groupBy, sortBy, categoryNone, category);
+                groupBy, sortBy, categoryBool, category);
         LoggerCus.d(TAG, eQuery);
         try {
             Cursor cursor = db.rawQuery(eQuery, null);
@@ -770,7 +769,7 @@ public class DbHandler extends SQLiteOpenHelper {
     private String getMTRecordsAsListQueryStringAddOrderGroupBy(String query, boolean isAllDate, Date sDate,
                                                                 Date eDate, boolean isAllMoneyType, int moneyType,
                                                                 int dateInterval, boolean groupByNone, int groupBy,
-                                                                int sortBy, boolean categoryNone, String category) {
+                                                                int sortBy, boolean[] categoryBool, String[] category) {
         String eQuery = "";
         if (!groupByNone) {
             switch (groupBy) {
@@ -813,7 +812,7 @@ public class DbHandler extends SQLiteOpenHelper {
     private String getMTRecordsAsListQueryString(String query, boolean isAllDate, Date sDate,
                                                  Date eDate, boolean isAllMoneyType, int moneyType,
                                                  int dateInterval, boolean groupByNone, int groupBy,
-                                                 int sortBy, boolean categoryNone, String category) {
+                                                 int sortBy, boolean[] categoryBool, String[] category) {
         DateConverter dcs = new DateConverter(intializeSDateForDay(sDate));
         DateConverter dce = new DateConverter(intializeSDateForDay(eDate));
         switch (dateInterval) {
@@ -870,8 +869,7 @@ public class DbHandler extends SQLiteOpenHelper {
             eQuery += " AND " + MT_KEY_DATE + " >= " + dcs.getdDate().getTime() + " AND " + MT_KEY_DATE + " <= " + dce.getdDate().getTime();
         }
 
-        if (!categoryNone)
-            eQuery += getCategoryQueryStringMT(category);
+        eQuery += getCategoryQueryStringMT(categoryBool, category);
 
         return eQuery;
     }
@@ -900,12 +898,47 @@ public class DbHandler extends SQLiteOpenHelper {
         return cal.getTime();
     }
 
-    private String getCategoryQueryString(String s) {
-        return " AND (" + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
+    private String getCategoryQueryString(boolean[] res, String[] s) {
+        String eQuery = "";
+        eQuery += " AND (";
+        boolean started = false;
+        boolean evenOneCatTrue = false;
+        for (int i = 0; i < res.length; i++) {
+            if (res[i]) {
+                evenOneCatTrue = true;
+                if (started)
+                    eQuery += " OR ";
+                eQuery += "(" + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s[i] + "')) ";
+                started = true;
+            }
+        }
+        eQuery += ")";
+        if (evenOneCatTrue)
+            return eQuery;
+        else
+            return "";
     }
 
-    private String getCategoryQueryStringMT(String s) {
-        return " AND (" + MT_KEY_CAT_FROM + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
+    private String getCategoryQueryStringMT(boolean[] res, String[] s) {
+        String eQuery = "";
+        eQuery += " AND (";
+        boolean started = false;
+        boolean evenOneCatTrue = false;
+        for (int i = 0; i < res.length; i++) {
+            if (res[i]) {
+                evenOneCatTrue = true;
+                if (started)
+                    eQuery += " OR ";
+                eQuery += "(" + MT_KEY_CAT_FROM + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s[i] + "')) ";
+                started = true;
+            }
+        }
+        eQuery += ")";
+        if (evenOneCatTrue)
+            return eQuery;
+        else
+            return "";
+        //return " AND (" + MT_KEY_CAT_FROM + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
     }
 
     public DashBoardRecord getDashBoardRecord(String s) {
@@ -974,6 +1007,10 @@ public class DbHandler extends SQLiteOpenHelper {
         dbr.setText(s.toUpperCase());
         db.close();
         return dbr;
+    }
+
+    private String getCategoryQueryString(String s) {
+        return " AND (" + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
     }
 
     private int getBalanceLeft(String s) {
