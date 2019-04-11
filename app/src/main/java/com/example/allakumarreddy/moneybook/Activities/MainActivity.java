@@ -32,7 +32,6 @@ import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.dialog.AddDialog;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.test.DataBaseActivity;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
@@ -68,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_CODE_SIGN_IN = 200;
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE = 1001;
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
+    public static final int ADD_ACTIVITY = 1001;
     private TabHost host;
     private ListView[] mRecyclerView;
     private List<String>[] des, amount, date;
@@ -113,7 +113,11 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AddDialog(MainActivity.this, currentScreen).show();
+                //showDialog();
+                //new AddDialog(MainActivity.this, currentScreen).show();
+                Intent intent = new Intent(MainActivity.this, AddActivity.class);
+                intent.putExtra("type",currentScreen);
+                startActivityForResult(intent,ADD_ACTIVITY);
             }
         });
 
@@ -314,6 +318,18 @@ public class MainActivity extends AppCompatActivity
                     LoggerCus.d(TAG, "error in sign in");
                 }
                 break;
+
+            case (ADD_ACTIVITY): {
+                if (resultCode == Activity.RESULT_OK) {
+
+                    afterCallingAddDialog(new String[]{data.getStringExtra("fdes"),
+                                    data.getStringExtra("famount"),
+                                    data.getStringExtra("fcategory"),
+                                    data.getStringExtra("tcategory")},
+                            data.getIntExtra("type", -1));
+                }
+                break;
+            }
         }
     }
 

@@ -49,7 +49,7 @@ public class MBRecord {
         this.date = date;
         this.type = -1;
         this.category = category;
-        //LoggerCus.d("MBRecord",description+":"+amount+":"+date);
+        LoggerCus.d("MBRecord",description+":"+amount+":"+date+":"+category+";"+type);
     }
 
     public MBRecord() {

@@ -1,5 +1,6 @@
 package com.example.allakumarreddy.moneybook.Adapter;
 
+import android.content.Intent;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,7 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.dialog.AddDialog;
+import com.example.allakumarreddy.moneybook.Activities.AddActivity;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
@@ -123,7 +124,11 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
                     break;
 
                 case R.id.dashboardPopupMT:
-                    new AddDialog(mContext, 2, dataModel.getText().toLowerCase()).show();
+                    //new AddDialog(mContext, 2, dataModel.getText().toLowerCase()).show();
+                    Intent intent = new Intent(mContext, AddActivity.class);
+                    intent.putExtra("type",2);
+                    intent.putExtra("tcategory",dataModel.getText().toLowerCase());
+                    mContext.startActivityForResult(intent,MainActivity.ADD_ACTIVITY);
                     break;
             }
             return true;

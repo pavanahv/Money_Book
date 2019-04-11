@@ -1301,4 +1301,23 @@ public class DbHandler extends SQLiteOpenHelper {
         else
             return false;
     }
+
+    public ArrayList<String> getDesForAutoComplete(String s) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String> list = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery("SELECT "+KEY_DESCRIPTION+" FROM "+TABLE_NAME+" WHERE "+KEY_DESCRIPTION+" LIKE '%"+s+"%' LIMIT 5",null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                list.add(cursor.getString(0));
+            }
+            cursor.close();
+        }
+
+        db.close();
+        //LoggerCus.d(TAG,list.toString());
+        return list;
+    }
 }
