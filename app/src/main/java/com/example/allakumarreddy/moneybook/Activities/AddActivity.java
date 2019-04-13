@@ -8,15 +8,20 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.example.allakumarreddy.moneybook.Adapter.DescriptionAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
+import com.example.allakumarreddy.moneybook.utils.MBRecord;
+
+import java.util.ArrayList;
 
 public class AddActivity extends AppCompatActivity implements android.view.View.OnClickListener {
 
@@ -27,9 +32,11 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     private Spinner categoryView;
     private DbHandler db;
     private String[] catArr;
-    private ArrayAdapter<String> adapter;
+    private DescriptionAdapter adapter;
     private Button add;
     private Button cancel;
+    private ArrayList<MBRecord> records;
+    private EditText amtv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     private void init() {
         autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewDes);
         categoryView = (Spinner) findViewById(R.id.addcategory);
+        amtv = ((EditText) findViewById(R.id.amount));
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         if (type == 0 || type == 2) {
             catArr = db.getCategeories();
@@ -57,7 +65,10 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                 }
             }
             if (type == 0) {
-                //desEd.setHint("Description");
+                ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+                aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                categoryView.setAdapter(aa);
+                categoryView.setSelection(curInd);
                 autoCompleteTextView.setHint("Description");
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
 
@@ -78,16 +89,39 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                     }
                 });
 
-                adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_item);
+                adapter = new DescriptionAdapter(new ArrayList<>(), this);
                 updateAdapter("");
                 autoCompleteTextView.setAdapter(adapter);
                 autoCompleteTextView.setThreshold(1);
+                autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String s = (String) parent.getItemAtPosition(position);
+                        MBRecord mbr = null;
+                        for (MBRecord rec : records) {
+                            String a = rec.getDescription();
+                            if (a.compareToIgnoreCase(s) == 0) {
+                                mbr = rec;
+                                break;
+                            }
+                        }
+                        amtv.setText(mbr.getAmount() + "");
+                        String catStr = mbr.getCategory();
+                        int catSel = -1;
+                        for (int i = 0; i < catArr.length; i++) {
+                            String ss = catArr[i];
+                            if (ss.compareToIgnoreCase(catStr) == 0) {
+                                catSel = i;
+                                break;
+                            }
+                        }
+                        if (catSel != -1)
+                            categoryView.setSelection(catSel, true);
+                        add.setFocusable(true);
+                    }
+                });
             } else if (type == 2)
                 autoCompleteTextView.setVisibility(View.GONE);
-            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
-            aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            categoryView.setAdapter(aa);
-            categoryView.setSelection(curInd);
         } else {
             autoCompleteTextView.setHint("Name Of Category");
             findViewById(R.id.amount).setVisibility(View.GONE);
@@ -101,7 +135,11 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
 
     private void updateAdapter(String s) {
         adapter.clear();
-        adapter.addAll(db.getDesForAutoComplete(s));
+        records = db.getDesForAutoComplete(s);
+        ArrayList<String> alist = new ArrayList<>();
+        for (MBRecord rec : records)
+            alist.add(rec.getDescription());
+        adapter.addAll(alist);
         adapter.notifyDataSetChanged();
     }
 
@@ -110,7 +148,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
         switch (v.getId()) {
             case R.id.addCus:
                 String des = autoCompleteTextView.getText().toString();
-                String amount = ((EditText) findViewById(R.id.amount)).getText().toString();
+                String amount = amtv.getText().toString();
                 String category = "";
                 if (type == 0 || type == 2) {
                     category = catArr[categoryView.getSelectedItemPosition()];

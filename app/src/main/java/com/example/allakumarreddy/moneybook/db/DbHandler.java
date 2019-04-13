@@ -1102,7 +1102,7 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public void exec() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("UPDATE "+TABLE_NAME+" SET "+KEY_DESCRIPTION+" = "+KEY_CAT+" , "+KEY_CAT+" = "+KEY_DESCRIPTION+" WHERE "+KEY_TYPE+" = 4");
+        db.execSQL("UPDATE " + TABLE_NAME + " SET " + KEY_DESCRIPTION + " = " + KEY_CAT + " , " + KEY_CAT + " = " + KEY_DESCRIPTION + " WHERE " + KEY_TYPE + " = 4");
         db.close();
     }
 
@@ -1245,16 +1245,16 @@ public class DbHandler extends SQLiteOpenHelper {
             return false;
     }
 
-    public ArrayList<String> getDesForAutoComplete(String s) {
+    public ArrayList<MBRecord> getDesForAutoComplete(String s) {
         SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<MBRecord> list = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + " FROM " + TABLE_NAME + " WHERE " + KEY_DESCRIPTION + " LIKE '%" + s + "%' LIMIT 5", null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE " + KEY_DESCRIPTION + " LIKE '%" + s + "%' LIMIT 5", null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                list.add(cursor.getString(0));
+                list.add(new MBRecord(cursor.getString(0),cursor.getInt(1),null,cursor.getString(2)));
             }
             cursor.close();
         }
