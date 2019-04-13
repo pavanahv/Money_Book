@@ -173,8 +173,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, MessagesActivity.class));
                 break;
             case R.id.action_test:
-                startActivity(new Intent(this, DataBaseActivity.class));
                 //db.exec();
+                startActivity(new Intent(this, DataBaseActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -547,7 +547,7 @@ public class MainActivity extends AppCompatActivity
                 dashBoardAdapter.add(temp);
                 dashBoardAdapter.notifyDataSetChanged();
             } else if (type == 2) {
-                if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
+                if ((s[1].compareToIgnoreCase("") != 0) && (s[2].compareToIgnoreCase("") != 0)) {
                     MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[3]);
                     mbr.setToCategory(s[2]);
                     boolean res = db.addMTRecord(mbr);
@@ -556,6 +556,8 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         Toast.makeText(this, "Something Went Wrong\nPlease Try Again!", Toast.LENGTH_LONG).show();
                     }
+                }else{
+                    Toast.makeText(this,"Please Enter Amount",Toast.LENGTH_LONG).show();
                 }
             }
         }

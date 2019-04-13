@@ -70,6 +70,7 @@ public class DbHandler extends SQLiteOpenHelper {
     public static final String MT_KEY_CAT_FROM = "from_category";
     public static final String MT_KEY_CAT_TO = "to_category";
     private static final String MT_KEY_TYPE = "4";
+    private static final int MT_TYPE = 4;
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
@@ -241,13 +242,11 @@ public class DbHandler extends SQLiteOpenHelper {
         deleteAllData();
 
         SQLiteDatabase db = this.getWritableDatabase();
-
         try {
             JSONObject obj = new JSONObject(s);
             JSONArray jsonArray = obj.getJSONArray(TABLE_NAME);
             JSONArray jsonArrayc = obj.getJSONArray(CAT_TABLE_NAME);
             JSONArray jsonArraym = obj.getJSONArray(MSG_TABLE_NAME);
-            JSONArray jsonArrayMT = obj.getJSONArray(MT_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -296,26 +295,6 @@ public class DbHandler extends SQLiteOpenHelper {
                 db.insert(MSG_TABLE_NAME, null, values);
             }
 
-            final int lenMT = jsonArray.length();
-            for (int i = 0; i < lenMT; i++) {
-                JSONObject jsonObj = jsonArrayMT.getJSONObject(i);
-                ContentValues values = new ContentValues();
-                values.put(MT_KEY_DESCRIPTION, jsonObj.getString(MT_KEY_DESCRIPTION));
-                values.put(MT_KEY_AMOUNT, Integer.parseInt(jsonObj.getString(MT_KEY_AMOUNT)));
-
-                DateConverter dc = new DateConverter(jsonObj.getString(MT_KEY_DATE));
-                dc.setdDate(intializeSDateForDay(dc.getdDate()));
-                dc.initialize();
-
-                values.put(MT_KEY_DATE, dc.getdDate().getTime());
-                values.put(MT_KEY_DATE_MONTH, dc.getmDate().getTime());
-                values.put(MT_KEY_DATE_YEAR, dc.getyDate().getTime());
-                values.put(MT_KEY_CAT_FROM, jsonObj.getLong(MT_KEY_CAT_FROM));
-                values.put(MT_KEY_CAT_TO, jsonObj.getLong(MT_KEY_CAT_TO));
-
-                // Inserting Row
-                db.insert(MT_TABLE_NAME, null, values);
-            }
             db.close(); // Closing database connection
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
@@ -327,7 +306,6 @@ public class DbHandler extends SQLiteOpenHelper {
         db.delete(TABLE_NAME, null, null);
         db.delete(CAT_TABLE_NAME, null, null);
         db.delete(MSG_TABLE_NAME, null, null);
-        db.delete(MT_TABLE_NAME, null, null);
         db.close();
     }
 
@@ -456,36 +434,11 @@ public class DbHandler extends SQLiteOpenHelper {
             cursor.close();
         }
 
-        JSONArray jsonArrayMT = new JSONArray();
-
-        cursor = db.rawQuery("SELECT " + MT_KEY_DESCRIPTION + "," + MT_KEY_AMOUNT + "," + MT_KEY_DATE + ",4," + MT_KEY_CAT_FROM + "," + MT_KEY_DATE_MONTH + "," + MT_KEY_DATE_YEAR + "," + MT_KEY_CAT_TO + " FROM " + MT_TABLE_NAME, null);
-        if (cursor != null) {
-            final int len = cursor.getCount();
-            for (int i = 0; i < len; i++) {
-                cursor.moveToPosition(i);
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(MT_KEY_DESCRIPTION, cursor.getString(0));
-                    jsonObject.put(MT_KEY_AMOUNT, cursor.getString(1));
-                    jsonObject.put(MT_KEY_DATE, format.format(new Date(cursor.getLong(2))));
-                    jsonObject.put("test_day", cursor.getLong(2));
-                    jsonObject.put("test_month", cursor.getLong(5));
-                    jsonObject.put("test_year", cursor.getLong(6));
-                    jsonObject.put(MT_KEY_CAT_FROM, cursor.getLong(4));
-                    jsonObject.put(MT_KEY_CAT_TO, cursor.getLong(7));
-                    jsonArrayMT.put(jsonObject);
-                } catch (JSONException e) {
-                    LoggerCus.d(TAG, e.getMessage());
-                }
-            }
-            cursor.close();
-        }
         JSONObject obj = new JSONObject();
         try {
             obj.put(TABLE_NAME, jsonArray);
             obj.put(CAT_TABLE_NAME, jsonArrayc);
             obj.put(MSG_TABLE_NAME, jsonArraym);
-            obj.put(MT_TABLE_NAME, jsonArrayMT);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -530,26 +483,14 @@ public class DbHandler extends SQLiteOpenHelper {
         ArrayList<MBRecord> mbr = new ArrayList<>();
         int moneyTypeVal = 0;
         boolean res = false;
-        for (int i = 0; i < moneyType.length - 1; i++) {
+        for (int i = 0; i < moneyType.length; i++) {
             if (moneyType[i]) {
                 res = true;
                 break;
             }
         }
-        if (res && moneyType[moneyType.length - 1]) {
-            moneyTypeVal = 3;
-        } else if (res && !moneyType[moneyType.length - 1]) {
-            moneyTypeVal = 1;
-        } else if (!res && moneyType[moneyType.length - 1]) {
-            moneyTypeVal = 2;
-        } else {
+        if (!res) {
             return mbr;
-        }
-
-        if (moneyTypeVal == 2) {
-            return getMTRecordsAsList(query, isAllDate, sDate, eDate,
-                    isAllMoneyType, 4, dateInterval, groupByNone,
-                    groupBy, sortBy, categoryBool, category);
         }
 
         DateConverter dcs = new DateConverter(intializeSDateForDay(sDate));
@@ -613,15 +554,14 @@ public class DbHandler extends SQLiteOpenHelper {
         if (!isAllDate) {
             eQuery += " AND " + KEY_DATE + " >= " + dcs.getdDate().getTime() + " AND " + KEY_DATE + " <= " + dce.getdDate().getTime();
         }
-        if (moneyTypeVal != 2)
-            eQuery += getQueryForMoneyType(moneyType);
+        eQuery += getQueryForMoneyType(moneyType);
 
         eQuery += getCategoryQueryString(categoryBool, category);
 
-        if (moneyTypeVal == 3)
+        /*if (moneyTypeVal == 3)
             eQuery += " UNION ALL " + getMTRecordsAsListQueryString(query, isAllDate, sDate, eDate,
                     isAllMoneyType, 4, dateInterval, groupByNone,
-                    groupBy, sortBy, categoryBool, category);
+                    groupBy, sortBy, categoryBool, category);*/
 
         if (!groupByNone) {
             switch (groupBy) {
@@ -700,7 +640,7 @@ public class DbHandler extends SQLiteOpenHelper {
         String eQuery = "";
         eQuery += " AND (";
         boolean notFistItem = false;
-        for (int i = 0; i < moneyType.length - 1; i++) {
+        for (int i = 0; i < moneyType.length; i++) {
             if (moneyType[i]) {
                 if (notFistItem)
                     eQuery += " OR ";
@@ -1161,7 +1101,9 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public void exec() {
-
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE "+TABLE_NAME+" SET "+KEY_DESCRIPTION+" = "+KEY_CAT+" , "+KEY_CAT+" = "+KEY_DESCRIPTION+" WHERE "+KEY_TYPE+" = 4");
+        db.close();
     }
 
     public boolean insertMsgRecord(String des, String amount, int type, String cate, String balLeft, String msgStr, String name) {
@@ -1285,16 +1227,17 @@ public class DbHandler extends SQLiteOpenHelper {
     public boolean addMTRecord(MBRecord mbr) {
         DateConverter dc = new DateConverter(intializeSDateForDay(mbr.getDate()));
         ContentValues values = new ContentValues();
-        values.put(MT_KEY_DESCRIPTION, mbr.getDescription());
-        values.put(MT_KEY_AMOUNT, mbr.getAmount());
-        values.put(MT_KEY_DATE, dc.getdDate().getTime());
-        values.put(MT_KEY_DATE_MONTH, dc.getmDate().getTime());
-        values.put(MT_KEY_DATE_YEAR, dc.getyDate().getTime());
-        values.put(MT_KEY_CAT_FROM, getIdOfCategory(mbr.getCategory()));
-        values.put(MT_KEY_CAT_TO, getIdOfCategory(mbr.getToCategory()));
+        values.put(KEY_TYPE, MT_TYPE);
+        values.put(KEY_DESCRIPTION, mbr.getToCategory());
+        values.put(KEY_AMOUNT, mbr.getAmount());
+        values.put(KEY_DATE, dc.getdDate().getTime());
+        values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
+        values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
+        values.put(KEY_CAT, getIdOfCategory(mbr.getCategory()));
 
         SQLiteDatabase db = this.getWritableDatabase();
-        long result = db.insert(MT_TABLE_NAME, null, values);
+        // Inserting Row
+        long result = db.insert(TABLE_NAME, null, values);
         db.close();
         if (result != -1)
             return true;
@@ -1306,7 +1249,7 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<String> list = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT "+KEY_DESCRIPTION+" FROM "+TABLE_NAME+" WHERE "+KEY_DESCRIPTION+" LIKE '%"+s+"%' LIMIT 5",null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + " FROM " + TABLE_NAME + " WHERE " + KEY_DESCRIPTION + " LIKE '%" + s + "%' LIMIT 5", null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {

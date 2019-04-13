@@ -83,7 +83,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                 autoCompleteTextView.setAdapter(adapter);
                 autoCompleteTextView.setThreshold(1);
             } else if (type == 2)
-                autoCompleteTextView.setHint("Description For MoneyTransfer");
+                autoCompleteTextView.setVisibility(View.GONE);
             ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             categoryView.setAdapter(aa);
