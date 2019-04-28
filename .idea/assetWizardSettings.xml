@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_account_balance_wallet_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_backup_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -67,9 +67,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="TEXT" />
-                                      <entry key="outputName" value="ic_money_transfer" />
-                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="outputName" value="ic_setings_backup" />
                                       <entry key="themeColor" value="428bca" />
                                     </map>
                                   </option>

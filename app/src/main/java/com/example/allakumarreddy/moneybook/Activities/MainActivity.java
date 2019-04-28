@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
@@ -39,12 +40,7 @@ import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveResourceClient;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -84,8 +80,6 @@ public class MainActivity extends AppCompatActivity
     private FrameLayout mainLayout;
     private String tablesDate;
     private GoogleSignInClient mGoogleSignInClient;
-    private DriveClient mDriveClient;
-    private DriveResourceClient mDriveResourceClient;
     private PreferencesCus sp;
     public File mBackupFile;
     private GoogleDriveBackup gdb;
@@ -116,8 +110,8 @@ public class MainActivity extends AppCompatActivity
                 //showDialog();
                 //new AddDialog(MainActivity.this, currentScreen).show();
                 Intent intent = new Intent(MainActivity.this, AddActivity.class);
-                intent.putExtra("type",currentScreen);
-                startActivityForResult(intent,ADD_ACTIVITY);
+                intent.putExtra("type", currentScreen);
+                startActivityForResult(intent, ADD_ACTIVITY);
             }
         });
 
@@ -161,7 +155,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_backup:
-                backup(true);
+                //backup(true);
+                backupToGoogleDrive();
                 return true;
             case R.id.action_import:
                 importAction();
@@ -172,12 +167,22 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_msgParser:
                 startActivity(new Intent(this, MessagesActivity.class));
                 break;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
             case R.id.action_test:
                 //db.exec();
                 startActivity(new Intent(this, DataBaseActivity.class));
+                //signIn();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void backupToGoogleDrive() {
+        Intent intent = new Intent(MainActivity.this, BackupToGoogleDriveService.class);
+        intent.setAction(GlobalConstants.BACKUP_TO_GOOGLE_DRIVE);
+        startService(intent);
     }
 
     private void importAction() {
@@ -236,7 +241,8 @@ public class MainActivity extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     switch (bfrPermissionAction) {
                         case ACTION_BACKUP_MAIN_ACTIVITY_OPEN:
-                            backup(true);
+                            //backup(true);
+                            backupToGoogleDrive();
                             break;
                         case ACTION_IMPORT:
                             importAction();
@@ -308,12 +314,7 @@ public class MainActivity extends AppCompatActivity
             case REQUEST_CODE_SIGN_IN:
                 if (resultCode == RESULT_OK) {
                     LoggerCus.d(TAG, "Signed in successfully.");
-                    mDriveClient = Drive.getDriveClient(this, GoogleSignIn.getLastSignedInAccount(this));
-                    sp.setData(Utils.getEmail(), GoogleSignIn.getLastSignedInAccount(this).getEmail());
-                    mDriveResourceClient =
-                            Drive.getDriveResourceClient(this, GoogleSignIn.getLastSignedInAccount(this));
-                    gdb = new GoogleDriveBackup(mBackupFile, this, mDriveResourceClient, db.getRecords());
-                    gdb.backup();
+                    //mDriveClientbackupToDrive();
                 } else {
                     LoggerCus.d(TAG, "error in sign in");
                 }
@@ -388,6 +389,7 @@ public class MainActivity extends AppCompatActivity
         int[] t = {R.id.homespenttotal, R.id.homeearntotal, R.id.homeduetotal, R.id.homeloantotal};
         mRecyclerView = new ListView[4];
         mTextViewTotal = new TextView[4];
+
 
         mAdapter = new MyAdapter[4];
         mbr = new ArrayList[4];
@@ -556,8 +558,8 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         Toast.makeText(this, "Something Went Wrong\nPlease Try Again!", Toast.LENGTH_LONG).show();
                     }
-                }else{
-                    Toast.makeText(this,"Please Enter Amount",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Please Enter Amount", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -571,15 +573,15 @@ public class MainActivity extends AppCompatActivity
         mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
     }
 
-    public void signIn() {
+    /*public void signIn() {
         LoggerCus.d(TAG, "Start sign in");
         mGoogleSignInClient = buildGoogleSignInClient();
         startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
     }
 
-    /**
+    *//**
      * Build a Google SignIn client.
-     */
+     *//*
     private GoogleSignInClient buildGoogleSignInClient() {
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -587,6 +589,6 @@ public class MainActivity extends AppCompatActivity
                         .requestEmail()
                         .build();
         return GoogleSignIn.getClient(this, signInOptions);
-    }
+    }*/
 
 }

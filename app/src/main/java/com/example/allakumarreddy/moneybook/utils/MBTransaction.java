@@ -75,7 +75,7 @@ public class MBTransaction {
         final String s = jsonObj.toString();
         LoggerCus.d(TAG, s);
         try {
-            fs.writeFile(s);
+            fs.writeFile(s,true);
         } catch (IOException e) {
             LoggerCus.d(TAG, e.getMessage());
         }
@@ -100,7 +100,7 @@ public class MBTransaction {
         }
         LoggerCus.d(TAG, finalobject.toString());
         try {
-            fs.writeFile(finalobject.toString());
+            fs.writeFile(finalobject.toString(),true);
         } catch (IOException e) {
             LoggerCus.d(TAG, e.getMessage());
         }

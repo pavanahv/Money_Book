@@ -6,14 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.allakumarreddy.moneybook.utils.LoggerCus;
-import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.drive.Drive;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -33,18 +31,18 @@ public class WelcomeActivity extends AppCompatActivity {
 
     public void signIn(View view) {
         LoggerCus.d(TAG, "Start sign in");
-        mGoogleSignInClient = buildGoogleSignInClient();
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+        /*mGoogleSignInClient = buildGoogleSignInClient();
+        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);*/
     }
 
-    private GoogleSignInClient buildGoogleSignInClient() {
+    /*private GoogleSignInClient buildGoogleSignInClient() {
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestScopes(Drive.SCOPE_APPFOLDER)
                         .requestEmail()
                         .build();
         return GoogleSignIn.getClient(this, signInOptions);
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {

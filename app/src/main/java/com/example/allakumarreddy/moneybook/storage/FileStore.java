@@ -17,6 +17,7 @@ import java.io.RandomAccessFile;
 public class FileStore {
 
     final static String TAG = "FileStore";
+    private String restoredFileName;
     private String fileName;
 
     public FileStore(int type) {
@@ -25,12 +26,13 @@ public class FileStore {
 
     public FileStore() {
         this.fileName = "Backup";
+        this.restoredFileName = "Restore";
     }
 
     public String readFile() {
         String outs = "";
         try {
-            RandomAccessFile rs = new RandomAccessFile(getMediaFile(), "rw");
+            RandomAccessFile rs = new RandomAccessFile(getMediaFile(true), "rw");
             for (String s = ""; s != null; s = rs.readLine())
                 outs += s;
             rs.close();
@@ -42,8 +44,8 @@ public class FileStore {
         return outs;
     }
 
-    public File writeFile(String s) throws IOException {
-        File f=getMediaFile();
+    public File writeFile(String s,boolean isBackup) throws IOException {
+        File f = getMediaFile(isBackup);
         RandomAccessFile rs = new RandomAccessFile(f, "rw");
         rs.setLength(0);
         rs.writeBytes(s);
@@ -51,7 +53,7 @@ public class FileStore {
         return f;
     }
 
-    private File getMediaFile() {
+    private File getMediaFile(boolean isBackup) {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "MBStore");
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
@@ -61,7 +63,11 @@ public class FileStore {
         }
 
         File mediaFile;
-        String filename = this.fileName + ".JSON";
+        String filename = "";
+        if (isBackup)
+            filename += this.fileName + ".JSON";
+        else
+            filename += this.restoredFileName + ".JSON";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
         if (mediaFile.exists())
             mediaFile.delete();

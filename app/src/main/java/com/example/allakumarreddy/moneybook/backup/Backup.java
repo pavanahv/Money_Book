@@ -16,6 +16,7 @@ import java.io.IOException;
 public class Backup {
     private final DbHandler db;
     private final Context context;
+    private File f;
 
     public Backup(Context context) {
         this.context = context;
@@ -26,7 +27,7 @@ public class Backup {
         String s = db.getRecords();
         boolean res = false;
         try {
-            final File f = new FileStore().writeFile(s);
+            f = new FileStore().writeFile(s,true);
             String response = "Backup Successfull !";
             LoggerCus.d("Backup", response);
             //context.mBackupFile = f;
@@ -37,5 +38,9 @@ public class Backup {
             res = false;
         }
         return res;
+    }
+
+    public File getBackupFile() {
+        return this.f;
     }
 }

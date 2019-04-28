@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
 import java.text.ParseException;
@@ -53,5 +54,30 @@ public class PreferencesCus {
         LoggerCus.d(TAG, "Old Date : " + date);
         saveMsgParsedDate(sdf.format(new Date()));
         return date;
+    }
+
+    public void saveGoogleDriveBackypFileName(String data){
+        mSharedPreference.edit().putString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_NAME, data).apply();
+    }
+
+    public String getGoogleDriveBackypFileName(){
+        return mSharedPreference.getString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_NAME, mDefaultStringIfNothingFound);
+    }
+
+    public void saveGoogleDriveBackypFileSize(String data){
+        mSharedPreference.edit().putString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE, data).apply();
+    }
+
+    public String getGoogleDriveBackypFileSize(){
+        return mSharedPreference.getString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE, mDefaultStringIfNothingFound);
+    }
+
+    public void saveGoogleDriveBackypFileDate(){
+
+        mSharedPreference.edit().putString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE, new SimpleDateFormat(" dd / MM / yyyy  HH:mm:ss ").format(new Date())).apply();
+    }
+
+    public String getGoogleDriveBackypFileDate(){
+        return mSharedPreference.getString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE, mDefaultStringIfNothingFound);
     }
 }
