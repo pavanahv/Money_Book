@@ -64,11 +64,11 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                     break;
                 }
             }
+            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+            aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            categoryView.setAdapter(aa);
+            categoryView.setSelection(curInd);
             if (type == 0) {
-                ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
-                aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                categoryView.setAdapter(aa);
-                categoryView.setSelection(curInd);
                 autoCompleteTextView.setHint("Description");
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
 
