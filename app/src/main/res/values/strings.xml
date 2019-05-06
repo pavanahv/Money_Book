@@ -10,7 +10,7 @@
     <string name="title_activity_analytics">Analytics</string>
 
     <string name="title_activity_graph">GraphActivity</string>
-    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_button">Go To Full Screen</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_analytics_item_detail">AnalyticsItemDetail</string>
 

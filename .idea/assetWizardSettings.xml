@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_backup_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_add_to_queue_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -67,8 +67,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_setings_backup" />
-                                      <entry key="themeColor" value="428bca" />
+                                      <entry key="outputName" value="ic_add_to_home_screen" />
+                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="themeColor" value="208a1d" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -116,7 +117,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_view_list_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_add_to_queue_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -126,7 +127,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="icon_categorys" />
+                                      <entry key="outputName" value="icon_add_to_home_screen" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -174,7 +175,6 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="TEXT" />
                                       <entry key="outputName" value="ic_add_noti" />
                                     </map>
                                   </option>
@@ -185,7 +185,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
+                            <entry key="outputIconType" value="LAUNCHER_LEGACY" />
                           </map>
                         </option>
                       </PersistentState>

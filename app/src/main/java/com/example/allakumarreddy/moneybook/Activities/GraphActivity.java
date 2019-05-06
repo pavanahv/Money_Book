@@ -6,9 +6,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
 import com.github.mikephil.charting.charts.BarChart;
@@ -47,7 +51,7 @@ public class GraphActivity extends AppCompatActivity {
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
      */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+    private static final int AUTO_HIDE_DELAY_MILLIS = 500;
 
     /**
      * Some older devices needs a small delay between UI widget updates
@@ -120,7 +124,6 @@ public class GraphActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_graph);
 
-        mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = (FrameLayout) findViewById(R.id.fullscreen_content);
 
@@ -147,13 +150,32 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.graph_option_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch (id) {
+            case R.id.action_add_to_home_screen:
+                Toast.makeText(this, "Added to dashboard", Toast.LENGTH_LONG).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
         // Trigger the initial hide() shortly after the activity has been
         // created, to briefly hint to the user that UI controls
         // are available.
-        delayedHide(100);
+        //delayedHide(100);
     }
 
     private void toggle() {
@@ -234,6 +256,19 @@ public class GraphActivity extends AppCompatActivity {
         if (mContentView.getChildCount() > 0)
             mContentView.removeAllViews();
         mContentView.addView((View) o);
+        addFullScreenToggle();
+    }
+
+    private void addFullScreenToggle() {
+        ImageButton im = new ImageButton(this);
+        im.setImageResource(R.drawable.ic_graph_full_screen);
+        im.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggle();
+            }
+        });
+        mContentView.addView(im, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
     }
 
     private void drawLineGraph() {
