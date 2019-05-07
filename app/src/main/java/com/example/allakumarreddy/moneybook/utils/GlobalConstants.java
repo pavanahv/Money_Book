@@ -18,6 +18,7 @@ public class GlobalConstants {
     public static final String GOOGLE_DRIVE_BACKUP_FILE_NAME = "MoneyBook.json";
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE = "PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE";
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE = "PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE";
+    public static final String ACTION_INTERNET_CONNECTED = "ACTION_INTERNET_CONNECTED";
     public static String type[]={"SPENT","EARN","DUE","LOAN"};
     public static String fields[]={"DESCRIPTION","AMOUNT","DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";
