@@ -39,24 +39,16 @@
 
     <string name="pref_title_add_friends_to_messages">Backup Frequency</string>
     <string-array name="pref_backup_to_google_drive_list_titles">
-        <item>1 Hour</item>
         <item>6 Hour</item>
         <item>12 Hour</item>
         <item>Daily</item>
-        <item>2 Days</item>
         <item>Weekly</item>
-        <item>Monthly</item>
-        <item>Yearly</item>
     </string-array>
     <string-array name="pref_backup_to_google_drive_list_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->

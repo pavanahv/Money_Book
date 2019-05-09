@@ -1,7 +1,10 @@
 package com.example.allakumarreddy.moneybook.utils;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
@@ -9,6 +12,9 @@ import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.widget.Toast;
+
+import com.example.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
+import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -126,5 +132,37 @@ public class Utils {
             Toast.makeText(context, "MoneyBook : Connected to Internet", Toast.LENGTH_SHORT).show();
         }
         return status;
+    }
+
+    public static void setAlarmForGoogleDriveBackup(Context context) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(context, AlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        int freq = new PreferencesCus(context).getGoogleDriveBackupFrequency();
+        if (freq != -1) {
+            int millsec = 1000 * 60 * 60;
+            switch (freq) {
+                case 0:
+                    millsec *= 6;
+                    break;
+                case 1:
+                    millsec *= 12;
+                    break;
+                case 2:
+                    millsec *= 24;
+                    break;
+                case 3:
+                    millsec *= 24 * 7;
+                    break;
+            }
+            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), millsec, pi); // Millisec * Second * Minute
+        }
+    }
+
+    public static void cancelAlarmForGoogleDriveBackup(Context context) {
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(sender);
     }
 }

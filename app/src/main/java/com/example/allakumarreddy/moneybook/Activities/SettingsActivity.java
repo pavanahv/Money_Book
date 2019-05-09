@@ -21,6 +21,7 @@ import android.view.MenuItem;
 
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
+    private static final String TAG = "SettingsAcitivy";
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -57,6 +59,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
+
+                if (prefInit && (preference.getKey().compareToIgnoreCase(GlobalConstants.PREF_BACKUP_FREQUENCY) == 0)) {
+                    Utils.cancelAlarmForGoogleDriveBackup(context);
+                    Utils.setAlarmForGoogleDriveBackup(context);
+                }
 
             } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
@@ -88,6 +95,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
     };
+    private static boolean prefInit = false;
+    private static Context context;
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -113,10 +122,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         // Trigger the listener immediately with the preference's
         // current value.
+        prefInit = false;
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+        prefInit = true;
     }
 
     private static void bindPreferenceSummaryToValueBool(Preference preference) {
@@ -125,15 +136,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         // Trigger the listener immediately with the preference's
         // current value.
+        prefInit = false;
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getBoolean(preference.getKey(), false));
+        prefInit = true;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
         setupActionBar();
     }
 

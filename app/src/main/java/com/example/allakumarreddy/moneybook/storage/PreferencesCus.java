@@ -56,28 +56,37 @@ public class PreferencesCus {
         return date;
     }
 
-    public void saveGoogleDriveBackypFileName(String data){
+    public void saveGoogleDriveBackypFileName(String data) {
         mSharedPreference.edit().putString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_NAME, data).apply();
     }
 
-    public String getGoogleDriveBackypFileName(){
+    public String getGoogleDriveBackypFileName() {
         return mSharedPreference.getString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_NAME, mDefaultStringIfNothingFound);
     }
 
-    public void saveGoogleDriveBackypFileSize(String data){
+    public void saveGoogleDriveBackypFileSize(String data) {
         mSharedPreference.edit().putString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE, data).apply();
     }
 
-    public String getGoogleDriveBackypFileSize(){
+    public String getGoogleDriveBackypFileSize() {
         return mSharedPreference.getString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE, mDefaultStringIfNothingFound);
     }
 
-    public void saveGoogleDriveBackypFileDate(){
+    public void saveGoogleDriveBackypFileDate() {
 
         mSharedPreference.edit().putString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE, new SimpleDateFormat(" dd / MM / yyyy  HH:mm:ss ").format(new Date())).apply();
     }
 
-    public String getGoogleDriveBackypFileDate(){
+    public String getGoogleDriveBackypFileDate() {
         return mSharedPreference.getString(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE, mDefaultStringIfNothingFound);
+    }
+
+    public int getGoogleDriveBackupFrequency() {
+        try {
+            return Integer.parseInt(mSharedPreference.getString(GlobalConstants.PREF_BACKUP_FREQUENCY, mDefaultStringIfNothingFound));
+        } catch (Exception e) {
+            LoggerCus.d(TAG, e.getMessage());
+            return -1;
+        }
     }
 }

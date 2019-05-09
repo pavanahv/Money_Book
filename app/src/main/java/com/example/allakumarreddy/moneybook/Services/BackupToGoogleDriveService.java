@@ -14,10 +14,10 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import com.example.allakumarreddy.moneybook.broadcastreceivers.NetworkConnectionReceiver;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
+import com.example.allakumarreddy.moneybook.broadcastreceivers.NetworkConnectionReceiver;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -85,6 +85,8 @@ public class BackupToGoogleDriveService extends Service {
             channel.setDescription("NOTIFICATION_CHANNEL_DESCRIPTION");
             notificationManager.createNotificationChannel(channel);
         }
+        builder.setOngoing(true);
+        builder.setProgress(100, 0, false);
         startForeground(NOTIFICATION_ID, notification);
         startBackupToDriveIfInternetAvailable();
     }
@@ -123,8 +125,6 @@ public class BackupToGoogleDriveService extends Service {
 
     private void backupToDrive() {
         new Thread(() -> {
-            builder.setOngoing(true);
-            builder.setProgress(100, 0, true);
             Backup backup = new Backup(BackupToGoogleDriveService.this);
             backup.send();
             GoogleDriveBackup gdb = new GoogleDriveBackup(BackupToGoogleDriveService.this);

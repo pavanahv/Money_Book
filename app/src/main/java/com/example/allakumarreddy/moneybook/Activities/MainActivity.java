@@ -34,7 +34,6 @@ import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandl
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.example.allakumarreddy.moneybook.test.DataBaseActivity;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -172,8 +171,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.action_test:
                 //db.exec();
-                startActivity(new Intent(this, DataBaseActivity.class));
+                //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
+                Utils.setAlarmForGoogleDriveBackup(this);
                 break;
         }
         return super.onOptionsItemSelected(item);
