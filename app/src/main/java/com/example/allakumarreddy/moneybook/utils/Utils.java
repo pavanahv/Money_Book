@@ -156,6 +156,7 @@ public class Utils {
                     break;
             }
             am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), millsec, pi); // Millisec * Second * Minute
+            Toast.makeText(context,"Backup Frequency Set Successfully!",Toast.LENGTH_LONG).show();
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.allakumarreddy.moneybook.broadcastreceivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
@@ -32,6 +33,10 @@ public class AlarmReceiver extends BroadcastReceiver {
     private void backupToGoogleDrive(Context context) {
         Intent intent = new Intent(context, BackupToGoogleDriveService.class);
         intent.setAction(GlobalConstants.BACKUP_TO_GOOGLE_DRIVE);
-        context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 }
