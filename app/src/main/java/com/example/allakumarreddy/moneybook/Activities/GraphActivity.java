@@ -1,6 +1,7 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,26 +16,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.charts.RadarChart;
-import com.github.mikephil.charting.charts.ScatterChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.RadarData;
-import com.github.mikephil.charting.data.RadarDataSet;
-import com.github.mikephil.charting.data.ScatterData;
-import com.github.mikephil.charting.data.ScatterDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-
-import java.util.ArrayList;
+import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.LoggerCus;
+import com.example.allakumarreddy.moneybook.utils.Utils;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -58,6 +42,8 @@ public class GraphActivity extends AppCompatActivity {
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
+    private static final String TAG = "GraphActivity";
+    private static final int ADD_ACTIVITY = 1000;
     private final Handler mHideHandler = new Handler();
     private FrameLayout mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
@@ -117,6 +103,9 @@ public class GraphActivity extends AppCompatActivity {
     private String[] data;
     private int len;
     private FrameLayout.LayoutParams glp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+    private String jsonStrFiltr;
+    private DbHandler db;
+    private int activateType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,12 +135,17 @@ public class GraphActivity extends AppCompatActivity {
         label = intent.getExtras().getStringArray("label");
         data = intent.getExtras().getStringArray("data");
         type = intent.getExtras().getInt("type");
+        activateType = intent.getExtras().getInt("activateType");
+        if (activateType == 0)
+            jsonStrFiltr = intent.getExtras().getString("jsonStrFiltr");
+        db = new DbHandler(this);
         init();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.graph_option_menu, menu);
+        if (activateType == 0)
+            getMenuInflater().inflate(R.menu.graph_option_menu, menu);
         return true;
     }
 
@@ -162,10 +156,28 @@ public class GraphActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_add_to_home_screen:
-                Toast.makeText(this, "Added to dashboard", Toast.LENGTH_LONG).show();
+                LoggerCus.d(TAG, jsonStrFiltr);
+                Intent intent = new Intent(GraphActivity.this, AddActivity.class);
+                intent.putExtra("type", 3);
+                startActivityForResult(intent, ADD_ACTIVITY);
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case ADD_ACTIVITY:
+                if (resultCode == Activity.RESULT_OK) {
+                    String name = data.getExtras().getString("fdes");
+                    boolean res = db.insertFilterRecord(name, jsonStrFiltr, true);
+                    if (res)
+                        Toast.makeText(this, "Added to dashboard", Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
     }
 
     @Override
@@ -224,30 +236,32 @@ public class GraphActivity extends AppCompatActivity {
     private void init() {
         this.len = data.length;
         if (len > 0) {
+            View view = null;
             switch (this.type) {
                 case 0:
-                    drawLineGraph();
+                    view = Utils.drawLineGraph(len, label, data, this);
                     break;
 
                 case 1:
-                    drawBarGraph();
+                    view = Utils.drawBarGraph(len, label, data, this);
                     break;
 
                 case 2:
-                    drawPieGraph();
+                    view = Utils.drawPieGraph(len, label, data, this);
                     break;
 
                 case 3:
-                    drawRadarGraph();
+                    view = Utils.drawRadarGraph(len, label, data, this);
                     break;
 
                 case 4:
-                    drawScatterGraph();
+                    view = Utils.drawScatterGraph(len, label, data, this);
                     break;
 
                 default:
                     break;
             }
+            setLayout(view);
         }
     }
 
@@ -269,100 +283,5 @@ public class GraphActivity extends AppCompatActivity {
             }
         });
         mContentView.addView(im, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-    }
-
-    private void drawLineGraph() {
-        LineChart chart = new LineChart(this);
-        setLayout(chart);
-
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
-        for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
-        }
-        LineDataSet dataSet = new LineDataSet(entry, "Amount");
-        LineData lineData = new LineData(labels, dataSet);
-        chart.setData(lineData);
-
-        chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-    }
-
-    private void drawBarGraph() {
-        BarChart chart = new BarChart(this);
-        setLayout(chart);
-
-        ArrayList<BarEntry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<String>();
-        for (int i = 0; i < len; i++) {
-            entry.add(new BarEntry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
-        }
-        BarDataSet dataSet = new BarDataSet(entry, "Amount");
-        BarData barData = new BarData(labels, dataSet);
-        chart.setData(barData);
-
-        chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-    }
-
-    private void drawPieGraph() {
-        PieChart chart = new PieChart(this);
-        setLayout(chart);
-
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
-        for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
-        }
-        PieDataSet dataSet = new PieDataSet(entry, "Amount");
-        PieData barData = new PieData(labels, dataSet);
-        chart.setData(barData);
-
-        chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-    }
-
-    private void drawRadarGraph() {
-        RadarChart chart = new RadarChart(this);
-        setLayout(chart);
-
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
-        for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
-        }
-        RadarDataSet dataSet = new RadarDataSet(entry, "Amount");
-        RadarData barData = new RadarData(labels, dataSet);
-        chart.setData(barData);
-
-        chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
-    }
-
-    private void drawScatterGraph() {
-        ScatterChart chart = new ScatterChart(this);
-        setLayout(chart);
-
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
-        for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
-        }
-        ScatterDataSet dataSet = new ScatterDataSet(entry, "Amount");
-        ScatterData barData = new ScatterData(labels, dataSet);
-        chart.setData(barData);
-
-        chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
     }
 }

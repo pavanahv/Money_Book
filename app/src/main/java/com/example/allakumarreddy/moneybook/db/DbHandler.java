@@ -61,6 +61,11 @@ public class DbHandler extends SQLiteOpenHelper {
     public static final String MSG_KEY_NAME = "name";
     public static final String MSG_KEY_MSG = "msg";
 
+    public static final String F_TABLE_NAME = "Filter";
+    public static final String F_KEY_NAME = "name";
+    public static final String F_KEY_FILTER = "filter";
+    public static final String F_KEY_SHOW_DASH = "showOnDash";
+
     public static final String MT_TABLE_NAME = "MoneyTransfer";
     public static final String MT_KEY_DESCRIPTION = "description";
     public static final String MT_KEY_AMOUNT = "amount";
@@ -111,6 +116,11 @@ public class DbHandler extends SQLiteOpenHelper {
                 + " INTEGER," + MT_KEY_CAT_FROM + " INTEGER,"
                 + MT_KEY_CAT_TO + " INTEGER)";
         db.execSQL(CREATE_MT_TABLE);
+
+        String CREATE_FILTER_TABLE = "CREATE TABLE " + F_TABLE_NAME + "("
+                + F_KEY_NAME + " TEXT PRIMARY KEY,"
+                + F_KEY_FILTER + " TEXT," + F_KEY_SHOW_DASH + " INTEGER)";
+        db.execSQL(CREATE_FILTER_TABLE);
     }
 
     // Upgrading database
@@ -205,7 +215,7 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public boolean addRecordWithCatAsID(MBRecord mbr, int type) {
-        DateConverter dc = new DateConverter(mbr.getDate());
+        DateConverter dc = new DateConverter(intializeSDateForDay(mbr.getDate()));
         ContentValues values = new ContentValues();
         values.put(KEY_TYPE, type);
         values.put(KEY_DESCRIPTION, mbr.getDescription());
@@ -247,6 +257,7 @@ public class DbHandler extends SQLiteOpenHelper {
             JSONArray jsonArray = obj.getJSONArray(TABLE_NAME);
             JSONArray jsonArrayc = obj.getJSONArray(CAT_TABLE_NAME);
             JSONArray jsonArraym = obj.getJSONArray(MSG_TABLE_NAME);
+            JSONArray jsonArrayf = obj.getJSONArray(F_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -284,7 +295,7 @@ public class DbHandler extends SQLiteOpenHelper {
             for (int i = 0; i < lenm; i++) {
                 JSONObject jsonObj = jsonArraym.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(MSG_KEY_NAME, jsonObj.getString(KEY_NAME));
+                values.put(MSG_KEY_NAME, jsonObj.getString(MSG_KEY_NAME));
                 values.put(MSG_KEY_DESCRIPTION, jsonObj.getString(MSG_KEY_DESCRIPTION));
                 values.put(MSG_KEY_AMOUNT, jsonObj.getString(MSG_KEY_AMOUNT));
                 values.put(MSG_KEY_TYPE, jsonObj.getInt(MSG_KEY_TYPE));
@@ -293,6 +304,17 @@ public class DbHandler extends SQLiteOpenHelper {
                 values.put(MSG_KEY_MSG, jsonObj.getString(MSG_KEY_MSG));
                 // Inserting Row
                 db.insert(MSG_TABLE_NAME, null, values);
+            }
+
+            final int lenf = jsonArrayf.length();
+            for (int i = 0; i < lenf; i++) {
+                JSONObject jsonObj = jsonArrayf.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(F_KEY_NAME, jsonObj.getString(F_KEY_NAME));
+                values.put(F_KEY_FILTER, jsonObj.getString(F_KEY_FILTER));
+                values.put(F_KEY_SHOW_DASH, jsonObj.getString(F_KEY_SHOW_DASH));
+                // Inserting Row
+                db.insert(F_TABLE_NAME, null, values);
             }
 
             db.close(); // Closing database connection
@@ -306,6 +328,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.delete(TABLE_NAME, null, null);
         db.delete(CAT_TABLE_NAME, null, null);
         db.delete(MSG_TABLE_NAME, null, null);
+        db.delete(F_TABLE_NAME, null, null);
         db.close();
     }
 
@@ -434,11 +457,32 @@ public class DbHandler extends SQLiteOpenHelper {
             cursor.close();
         }
 
+        JSONArray jsonArrayf = new JSONArray();
+        cursor = db.rawQuery("SELECT " + F_KEY_NAME + "," + F_KEY_FILTER + "," + F_KEY_SHOW_DASH
+                + " FROM " + F_TABLE_NAME, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(F_KEY_NAME, cursor.getString(0));
+                    jsonObject.put(F_KEY_FILTER, cursor.getString(1));
+                    jsonObject.put(F_KEY_SHOW_DASH, cursor.getString(2));
+                    jsonArrayf.put(jsonObject);
+                } catch (JSONException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
+            }
+            cursor.close();
+        }
+
         JSONObject obj = new JSONObject();
         try {
             obj.put(TABLE_NAME, jsonArray);
             obj.put(CAT_TABLE_NAME, jsonArrayc);
             obj.put(MSG_TABLE_NAME, jsonArraym);
+            obj.put(F_TABLE_NAME, jsonArrayf);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1102,7 +1146,7 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public void exec() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("UPDATE " + TABLE_NAME + " SET " + KEY_DESCRIPTION + " = " + KEY_CAT + " , " + KEY_CAT + " = " + KEY_DESCRIPTION + " WHERE " + KEY_TYPE + " = 4");
+        db.delete(F_TABLE_NAME, null, null);
         db.close();
     }
 
@@ -1254,7 +1298,7 @@ public class DbHandler extends SQLiteOpenHelper {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                list.add(new MBRecord(cursor.getString(0),cursor.getInt(1),null,cursor.getString(2)));
+                list.add(new MBRecord(cursor.getString(0), cursor.getInt(1), null, cursor.getString(2)));
             }
             cursor.close();
         }
@@ -1262,5 +1306,43 @@ public class DbHandler extends SQLiteOpenHelper {
         db.close();
         //LoggerCus.d(TAG,list.toString());
         return list;
+    }
+
+    public boolean insertFilterRecord(String name, String filter, boolean showOnDash) {
+        ContentValues values = new ContentValues();
+        values.put(F_KEY_NAME, name);
+        values.put(F_KEY_FILTER, encode(filter));
+        values.put(F_KEY_SHOW_DASH, (showOnDash ? 1 : 0));
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.insert(F_TABLE_NAME, null, values);
+        db.close();
+        if (result != -1)
+            return true;
+        else
+            return false;
+    }
+
+    public String[][] getDashBoardFilterRecords() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[][] records = null;
+        Cursor cursor = db.rawQuery("SELECT " + F_KEY_NAME + ", " + F_KEY_FILTER + " FROM " + F_TABLE_NAME + " WHERE " + F_KEY_SHOW_DASH + " = 1", null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            records = new String[len][2];
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                records[i][0] = cursor.getString(0);
+                records[i][1] = decode(cursor.getString(1));
+            }
+            cursor.close();
+        }
+        return records;
+    }
+
+    public void deleteFilter(String s) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(F_TABLE_NAME, F_KEY_NAME + " = '" + s + "'", null);
+        db.close();
     }
 }

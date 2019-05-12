@@ -122,7 +122,11 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                 });
             } else if (type == 2)
                 autoCompleteTextView.setVisibility(View.GONE);
-        } else {
+        } else if (type == 3) {
+            autoCompleteTextView.setHint("Name Of Filter");
+            findViewById(R.id.amount).setVisibility(View.GONE);
+            categoryView.setVisibility(View.GONE);
+        }else{
             autoCompleteTextView.setHint("Name Of Category");
             findViewById(R.id.amount).setVisibility(View.GONE);
             categoryView.setVisibility(View.GONE);

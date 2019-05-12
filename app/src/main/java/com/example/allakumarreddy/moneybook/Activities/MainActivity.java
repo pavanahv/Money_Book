@@ -14,6 +14,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
+import com.example.allakumarreddy.moneybook.Adapter.DashBoardFilterAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity
     private View mProgressBAr;
     private ArrayList<MBRecord>[] mbr;
     private String bfrPermissionAction;
+    private RecyclerView dashBoardFilterList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,10 +174,9 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_test:
-                //db.exec();
+                db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
-                Utils.setAlarmForGoogleDriveBackup(this);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -192,6 +195,7 @@ public class MainActivity extends AppCompatActivity
             mediaIntent.setType("*/*"); // Set MIME type as per requirement
             startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
         } else {
+            bfrPermissionAction = ACTION_IMPORT;
             bfrPermissionAction = ACTION_IMPORT;
             requestPermissionForReadWriteStorage();
         }
@@ -428,6 +432,7 @@ public class MainActivity extends AppCompatActivity
 
     private void dashBoard() {
         dashBoardList = (ListView) findViewById(R.id.dashboardlist);
+        dashBoardFilterList = (RecyclerView) findViewById(R.id.dash_filter_recycler);
 
         totalD = (TextView) findViewById(R.id.dashboardtotald);
         totalM = (TextView) findViewById(R.id.dashboardtotalm);
@@ -436,6 +441,14 @@ public class MainActivity extends AppCompatActivity
         dbr = new ArrayList<>();
         dashBoardAdapter = new DashBoardAdapter(dbr, MainActivity.this);
         dashBoardList.setAdapter(dashBoardAdapter);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        dashBoardFilterList.setHasFixedSize(true);
+
+        // use a linear layout manager
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        dashBoardFilterList.setLayoutManager(layoutManager);
 
         ((TextView) findViewById(R.id.dashday)).setText(new SimpleDateFormat("dd").format(new Date()));
         ((TextView) findViewById(R.id.dashmonth)).setText(new SimpleDateFormat("MMM").format(new Date()));
@@ -448,6 +461,7 @@ public class MainActivity extends AppCompatActivity
             String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
             String yearCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear());
             dbr = db.getDashBoardRecords();
+            String[][] jsonDataTitle = db.getDashBoardFilterRecords();
             runOnUiThread(() -> {
                 // if main ui thread is slow then ui will not created.
                 // But still on that ui we will perform actions which will raise error
@@ -459,6 +473,10 @@ public class MainActivity extends AppCompatActivity
                 dashBoardAdapter.clear();
                 dashBoardAdapter.addAll(dbr);
                 dashBoardAdapter.notifyDataSetChanged();
+
+                DashBoardFilterAdapter mDashBoardFilterAdapter = new DashBoardFilterAdapter(jsonDataTitle, MainActivity.this);
+                dashBoardFilterList.setAdapter(mDashBoardFilterAdapter);
+
                 if (typeActivate)
                     homeUIData();
                 switchScreen();

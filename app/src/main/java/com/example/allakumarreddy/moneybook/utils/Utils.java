@@ -11,13 +11,42 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
+import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.charts.RadarChart;
+import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.RadarData;
+import com.github.mikephil.charting.data.RadarDataSet;
+import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by alla.kumarreddy on 09-Apr-18.
@@ -156,7 +185,7 @@ public class Utils {
                     break;
             }
             am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), millsec, pi); // Millisec * Second * Minute
-            Toast.makeText(context,"Backup Frequency Set Successfully!",Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Backup Frequency Set Successfully!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -165,5 +194,274 @@ public class Utils {
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
+    }
+
+    public static String getParcelableJSONStringForFilter(String queryText, boolean dateAll, Date sDate, Date eDate, boolean moneyTypeAll, boolean[] menuTypeBool, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean[] catTypeBool, String[] cols, int graphType) {
+        JSONObject jobj = new JSONObject();
+        try {
+            jobj.put("queryText", queryText);
+            jobj.put("dateAll", dateAll);
+            SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
+            jobj.put("sDate", jformat.format(sDate));
+            jobj.put("eDate", jformat.format(eDate));
+            jobj.put("moneyTypeAll", moneyTypeAll);
+
+            JSONArray jarrmenuTypeBool = new JSONArray();
+            for (int i = 0; i < menuTypeBool.length; i++) {
+                JSONObject jobjSub = new JSONObject();
+                jobjSub.put("element" + i, menuTypeBool[i]);
+                jarrmenuTypeBool.put(jobjSub);
+            }
+            jobj.put("menuTypeBool", jarrmenuTypeBool);
+
+            jobj.put("dateInterval", dateInterval);
+            jobj.put("groupByNone", groupByNone);
+            jobj.put("groupBy", groupBy);
+            jobj.put("sortBy", sortBy);
+
+            JSONArray jarrCatTypeBool = new JSONArray();
+            for (int i = 0; i < catTypeBool.length; i++) {
+                JSONObject jobjSub = new JSONObject();
+                jobjSub.put("element" + i, catTypeBool[i]);
+                jarrCatTypeBool.put(jobjSub);
+            }
+            jobj.put("CatTypeBool", jarrCatTypeBool);
+
+            JSONArray jarrcols = new JSONArray();
+            for (int i = 0; i < cols.length; i++) {
+                JSONObject jobjSub = new JSONObject();
+                jobjSub.put("element" + i, cols[i]);
+                jarrcols.put(jobjSub);
+            }
+            jobj.put("cols", jarrcols);
+
+            jobj.put("graphType", graphType);
+        } catch (JSONException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        }
+        return jobj.toString();
+    }
+
+    public static View getGraphFromParelableJSONString(String s, Context context) {
+        JSONObject jobj = null;
+        try {
+            jobj = new JSONObject(s);
+            String queryText = jobj.getString("queryText");
+            boolean dateAll = jobj.getBoolean("dateAll");
+            SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
+            Date sDate = jformat.parse(jobj.getString("sDate"));
+            Date eDate = jformat.parse(jobj.getString("eDate"));
+            boolean moneyTypeAll = jobj.getBoolean("moneyTypeAll");
+
+            JSONArray jarrmenuTypeBool = jobj.getJSONArray("menuTypeBool");
+            boolean[] menuTypeBool = new boolean[jarrmenuTypeBool.length()];
+            for (int i = 0; i < jarrmenuTypeBool.length(); i++) {
+                menuTypeBool[i] = jarrmenuTypeBool.getJSONObject(i).getBoolean("element" + i);
+            }
+
+            int dateInterval = jobj.getInt("dateInterval");
+            boolean groupByNone = jobj.getBoolean("groupByNone");
+            int groupBy = jobj.getInt("groupBy");
+            int sortBy = jobj.getInt("sortBy");
+
+            JSONArray jarrCatTypeBool = jobj.getJSONArray("CatTypeBool");
+            boolean[] catTypeBool = new boolean[jarrCatTypeBool.length()];
+            for (int i = 0; i < jarrCatTypeBool.length(); i++) {
+                catTypeBool[i] = jarrCatTypeBool.getJSONObject(i).getBoolean("element" + i);
+            }
+
+            JSONArray jarrcols = jobj.getJSONArray("cols");
+            String[] cols = new String[jarrcols.length()];
+            for (int i = 0; i < jarrcols.length(); i++) {
+                cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
+            }
+            DbHandler db = new DbHandler(context);
+            ArrayList<MBRecord> dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols);
+            int graphType = jobj.getInt("graphType");
+            final int size = dataList.size();
+            String[] label = new String[size];
+            String[] data = new String[size];
+            for (int i = 0; i < size; i++) {
+                MBRecord mbr = dataList.get(i);
+                label[i] = mbr.getDescription();
+                data[i] = mbr.getAmount() + "";
+            }
+            View view = null;
+            switch (graphType) {
+                case 0:
+                    view = drawLineGraph(data.length, label, data, context);
+                    break;
+                case 1:
+                    view = drawBarGraph(data.length, label, data, context);
+                    break;
+                case 2:
+                    view = drawPieGraph(data.length, label, data, context);
+                    break;
+                case 3:
+                    view = drawRadarGraph(data.length, label, data, context);
+                    break;
+                case 4:
+                    view = drawScatterGraph(data.length, label, data, context);
+                    break;
+            }
+            return view;
+        } catch (JSONException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        } catch (ParseException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        }
+        TextView tv = new TextView(context);
+        tv.setText("No Filters Yet");
+        return tv;
+    }
+
+    public static ArrayList<MBRecord> getFilterRecordsFromParelableJSONString(String s, Context context) {
+        JSONObject jobj = null;
+        try {
+            jobj = new JSONObject(s);
+            String queryText = jobj.getString("queryText");
+            boolean dateAll = jobj.getBoolean("dateAll");
+            SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
+            Date sDate = jformat.parse(jobj.getString("sDate"));
+            Date eDate = jformat.parse(jobj.getString("eDate"));
+            boolean moneyTypeAll = jobj.getBoolean("moneyTypeAll");
+
+            JSONArray jarrmenuTypeBool = jobj.getJSONArray("menuTypeBool");
+            boolean[] menuTypeBool = new boolean[jarrmenuTypeBool.length()];
+            for (int i = 0; i < jarrmenuTypeBool.length(); i++) {
+                menuTypeBool[i] = jarrmenuTypeBool.getJSONObject(i).getBoolean("element" + i);
+            }
+
+            int dateInterval = jobj.getInt("dateInterval");
+            boolean groupByNone = jobj.getBoolean("groupByNone");
+            int groupBy = jobj.getInt("groupBy");
+            int sortBy = jobj.getInt("sortBy");
+
+            JSONArray jarrCatTypeBool = jobj.getJSONArray("CatTypeBool");
+            boolean[] catTypeBool = new boolean[jarrCatTypeBool.length()];
+            for (int i = 0; i < jarrCatTypeBool.length(); i++) {
+                catTypeBool[i] = jarrCatTypeBool.getJSONObject(i).getBoolean("element" + i);
+            }
+
+            JSONArray jarrcols = jobj.getJSONArray("cols");
+            String[] cols = new String[jarrcols.length()];
+            for (int i = 0; i < jarrcols.length(); i++) {
+                cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
+            }
+            DbHandler db = new DbHandler(context);
+            return db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols);
+        } catch (JSONException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        } catch (ParseException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        }
+        return new ArrayList<MBRecord>();
+    }
+
+    public static View drawLineGraph(int len, String[] label, String[] data, Context context) {
+        LineChart chart = new LineChart(context);
+
+        ArrayList<Entry> entry = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            entry.add(new Entry(Float.parseFloat(data[i]), i));
+            labels.add(label[i]);
+        }
+        LineDataSet dataSet = new LineDataSet(entry, "Amount");
+        LineData lineData = new LineData(labels, dataSet);
+        chart.setData(lineData);
+
+        chart.animateXY(2000, 2000);
+        chart.setDescription("");
+        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        return chart;
+    }
+
+    public static View drawBarGraph(int len, String[] label, String[] data, Context context) {
+        BarChart chart = new BarChart(context);
+
+        ArrayList<BarEntry> entry = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<String>();
+        for (int i = 0; i < len; i++) {
+            entry.add(new BarEntry(Float.parseFloat(data[i]), i));
+            labels.add(label[i]);
+        }
+        BarDataSet dataSet = new BarDataSet(entry, "Amount");
+        BarData barData = new BarData(labels, dataSet);
+        chart.setData(barData);
+
+        chart.animateXY(2000, 2000);
+        chart.setDescription("");
+        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        return chart;
+    }
+
+    public static View drawPieGraph(int len, String[] label, String[] data, Context context) {
+        PieChart chart = new PieChart(context);
+
+        ArrayList<Entry> entry = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            entry.add(new Entry(Float.parseFloat(data[i]), i));
+            labels.add(label[i]);
+        }
+        PieDataSet dataSet = new PieDataSet(entry, "Amount");
+        PieData barData = new PieData(labels, dataSet);
+        chart.setData(barData);
+
+        chart.animateXY(2000, 2000);
+        chart.setDescription("");
+        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        return chart;
+    }
+
+    public static View drawRadarGraph(int len, String[] label, String[] data, Context context) {
+        RadarChart chart = new RadarChart(context);
+
+        ArrayList<Entry> entry = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            entry.add(new Entry(Float.parseFloat(data[i]), i));
+            labels.add(label[i]);
+        }
+        RadarDataSet dataSet = new RadarDataSet(entry, "Amount");
+        RadarData barData = new RadarData(labels, dataSet);
+        chart.setData(barData);
+
+        chart.animateXY(2000, 2000);
+        chart.setDescription("");
+        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        return chart;
+    }
+
+    public static View drawScatterGraph(int len, String[] label, String[] data, Context context) {
+        ScatterChart chart = new ScatterChart(context);
+
+        ArrayList<Entry> entry = new ArrayList<>();
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            entry.add(new Entry(Float.parseFloat(data[i]), i));
+            labels.add(label[i]);
+        }
+        ScatterDataSet dataSet = new ScatterDataSet(entry, "Amount");
+        ScatterData barData = new ScatterData(labels, dataSet);
+        chart.setData(barData);
+
+        chart.animateXY(2000, 2000);
+        chart.setDescription("");
+        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        return chart;
+    }
+
+    public static int getFilterGraphType(String s) {
+        JSONObject jobj = null;
+        int graphType = 0;
+        try {
+            jobj = new JSONObject(s);
+            graphType = jobj.getInt("graphType");
+        } catch (JSONException e) {
+            LoggerCus.d(TAG, e.getMessage());
+        }
+        return graphType;
     }
 }

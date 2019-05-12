@@ -20,6 +20,7 @@ import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.XLStore;
 import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.IDate;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
@@ -330,10 +331,14 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             label[i] = mbr.getDescription();
             data[i] = mbr.getAmount() + "";
         }
+        String jsonStrFiltr = Utils.getParcelableJSONStringForFilter(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, CatTypeBool, cols, graphType);
+
         Intent in = new Intent(this, GraphActivity.class);
         in.putExtra("label", label);
         in.putExtra("data", data);
         in.putExtra("type", graphType);
+        in.putExtra("jsonStrFiltr", jsonStrFiltr);
+        in.putExtra("activateType", GlobalConstants.ACTIVATE_GRAPH_ACTIVITY_WITH_ADD_TO_SCREEN_MENU);
         startActivity(in);
     }
 

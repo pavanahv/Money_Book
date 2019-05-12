@@ -19,8 +19,10 @@ public class GlobalConstants {
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE = "PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE";
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE = "PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE";
     public static final String ACTION_INTERNET_CONNECTED = "ACTION_INTERNET_CONNECTED";
-    public static String type[]={"SPENT","EARN","DUE","LOAN"};
-    public static String fields[]={"DESCRIPTION","AMOUNT","DATE"};
+    public static final int ACTIVATE_GRAPH_ACTIVITY_WITHOUT_ADD_TO_SCREEN_MENU = 1;
+    public static final int ACTIVATE_GRAPH_ACTIVITY_WITH_ADD_TO_SCREEN_MENU = 0;
+    public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
+    public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";
     public static final String BACKUP_TO_GOOGLE_DRIVE = "BACKUP_TO_GOOGLE_DRIVE";
     public static final String RESTORE_FROM_GOOGLE_DRIVE = "RESOTRE_FROM_GOOGLE_DRIVE";
