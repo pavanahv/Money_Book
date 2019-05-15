@@ -1,5 +1,6 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,57 +12,84 @@ import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+
+import java.util.Collections;
 
 public class WelcomeActivity extends AppCompatActivity {
 
     private static final String TAG = "WelcomeActivity";
     private static final int REQUEST_CODE_SIGN_IN = 100;
     private GoogleSignInClient mGoogleSignInClient;
-    PreferencesCus sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        sp = new PreferencesCus(this);
-        if (sp.getData(Utils.getEmail()) != null)
-            goToNextActivity(false);
     }
 
     public void signIn(View view) {
         LoggerCus.d(TAG, "Start sign in");
-        /*mGoogleSignInClient = buildGoogleSignInClient();
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);*/
+        requestSignIn();
     }
 
-    /*private GoogleSignInClient buildGoogleSignInClient() {
+    private void requestSignIn() {
+        LoggerCus.d(TAG, "Requesting sign-in");
+
         GoogleSignInOptions signInOptions =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestScopes(Drive.SCOPE_APPFOLDER)
                         .requestEmail()
+                        .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
                         .build();
-        return GoogleSignIn.getClient(this, signInOptions);
-    }*/
+        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
+
+        // The result of the sign-in Intent is handled in onActivityResult.
+        startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+    }
+
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        // TODO Auto-generated method stub
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         switch (requestCode) {
             case REQUEST_CODE_SIGN_IN:
-                if (resultCode == RESULT_OK) {
-                    LoggerCus.d(TAG, "Signed in successfully.");
-                    sp.setData(Utils.getEmail(), GoogleSignIn.getLastSignedInAccount(this).getEmail());
-                    Toast.makeText(this, "Signed in successfully.", Toast.LENGTH_SHORT).show();
-                    goToNextActivity(true);
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResult(resultData);
                 } else {
-                    LoggerCus.d(TAG, "error in sign in");
-                    Toast.makeText(this, "Error in SignIn", Toast.LENGTH_LONG).show();
-                    finish();
+                    Toast.makeText(this, "Something went wrong not able to Sign In. Please try again later", Toast.LENGTH_LONG).show();
                 }
                 break;
         }
+
+        super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+
+    private void handleSignInResult(Intent result) {
+        GoogleSignInAccount googleAccount = GoogleSignIn.getLastSignedInAccount(this);
+        // Use the authenticated account to sign in to the Drive service.
+        GoogleAccountCredential credential =
+                GoogleAccountCredential.usingOAuth2(
+                        this, Collections.singleton(DriveScopes.DRIVE_FILE));
+        credential.setSelectedAccount(googleAccount.getAccount());
+        Drive googleDriveService =
+                new Drive.Builder(
+                        AndroidHttp.newCompatibleTransport(),
+                        new GsonFactory(),
+                        credential)
+                        .setApplicationName("MoneyBook")
+                        .build();
+        PreferencesCus sp = new PreferencesCus(this);
+        sp.setData(Utils.getEmail(), GoogleSignIn.getLastSignedInAccount(this).getEmail());
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 
     private void goToNextActivity(boolean restore) {
