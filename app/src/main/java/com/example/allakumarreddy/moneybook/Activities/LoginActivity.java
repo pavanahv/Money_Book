@@ -36,6 +36,9 @@ public class LoginActivity extends AppCompatActivity {
         PreferencesCus sp = new PreferencesCus(this);
         if (sp.getData(Utils.getEmail()) == null) {
             startActivity(new Intent(this, WelcomeActivity.class));
+            finish();
+        } else {
+            Toast.makeText(this, "Logged in as " + sp.getData(Utils.getEmail()), Toast.LENGTH_LONG).show();
         }
 
         inputText = (EditText) findViewById(R.id.inputnumber);

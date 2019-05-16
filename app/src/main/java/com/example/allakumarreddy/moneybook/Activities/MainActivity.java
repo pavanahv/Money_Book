@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         sp = new PreferencesCus(this);
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        ((TextView) headerView.findViewById(R.id.mail)).setText(sp.getData(Utils.getEmail()));
         init();
     }
 

@@ -89,6 +89,9 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.analytics_filter:
+                startActivity(new Intent(this, FiltersAnalyticsActivity.class));
+                break;
             case R.id.analytics_clear_all:
                 clearAllFilters();
                 updateData();
