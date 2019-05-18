@@ -11,10 +11,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
-import com.example.allakumarreddy.moneybook.Adapter.DashBoardFilterAdapter;
+import com.example.allakumarreddy.moneybook.Adapter.DashboardViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
@@ -58,7 +58,7 @@ import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface {
 
     final static String TAG = "MainActivity";
     private static final int REQUESTCODE_PICK_JSON = 504;
@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<MBRecord>[] mbr;
     private String bfrPermissionAction;
     private RecyclerView dashBoardFilterList;
+    private ViewPager mViewPager;
+    private DashboardViewPagerAdapter mDashBoardViewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_test:
-                db.exec();
+                //db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
                 break;
@@ -349,7 +351,7 @@ public class MainActivity extends AppCompatActivity
         showProgressBar();
         if (id == R.id.dash) {
             currentScreen = 1;
-            dashBoardUIData(false);
+            updateUI();
         } else if (id == R.id.home) {
             currentScreen = 0;
             switchScreen();
@@ -364,7 +366,7 @@ public class MainActivity extends AppCompatActivity
         mProgressBAr.setVisibility(View.VISIBLE);
     }
 
-    private void switchScreen() {
+    public void switchScreen() {
         closeOtherScreens();
         if (currentScreen == 1) {
             host.setVisibility(View.INVISIBLE);
@@ -433,67 +435,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void dashBoard() {
-        dashBoardList = (ListView) findViewById(R.id.dashboardlist);
-        dashBoardFilterList = (RecyclerView) findViewById(R.id.dash_filter_recycler);
-
-        totalD = (TextView) findViewById(R.id.dashboardtotald);
-        totalM = (TextView) findViewById(R.id.dashboardtotalm);
-        totalY = (TextView) findViewById(R.id.dashboardtotaly);
-
-        dbr = new ArrayList<>();
-        dashBoardAdapter = new DashBoardAdapter(dbr, MainActivity.this);
-        dashBoardList.setAdapter(dashBoardAdapter);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        dashBoardFilterList.setHasFixedSize(true);
-
-        // use a linear layout manager
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        dashBoardFilterList.setLayoutManager(layoutManager);
-
-        ((TextView) findViewById(R.id.dashday)).setText(new SimpleDateFormat("dd").format(new Date()));
-        ((TextView) findViewById(R.id.dashmonth)).setText(new SimpleDateFormat("MMM").format(new Date()));
-        ((TextView) findViewById(R.id.dashyear)).setText(new SimpleDateFormat("yyyy").format(new Date()));
-    }
-
-    public void dashBoardUIData(boolean typeActivate) {
-        new Thread(() -> {
-            String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay());
-            String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
-            String yearCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear());
-            dbr = db.getDashBoardRecords();
-            String[][] jsonDataTitle = db.getDashBoardFilterRecords();
-            runOnUiThread(() -> {
-                // if main ui thread is slow then ui will not created.
-                // But still on that ui we will perform actions which will raise error
-                if (totalD == null)
-                    dashBoard();
-                totalD.setText(dayCountTotalHeadText);
-                totalM.setText(monthCountTotalHeadText);
-                totalY.setText(yearCountTotalHeadText);
-                dashBoardAdapter.clear();
-                dashBoardAdapter.addAll(dbr);
-                dashBoardAdapter.notifyDataSetChanged();
-
-                DashBoardFilterAdapter mDashBoardFilterAdapter = new DashBoardFilterAdapter(jsonDataTitle, MainActivity.this);
-                dashBoardFilterList.setAdapter(mDashBoardFilterAdapter);
-
-                if (typeActivate)
-                    homeUIData();
-                switchScreen();
-            });
-        }).start();
+        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mDashBoardViewPagerAdapter = new DashboardViewPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mDashBoardViewPagerAdapter);
     }
 
     private void init() {
-        startMsgParserService();
         db = new DbHandler(this);
         mainLayout = (FrameLayout) findViewById(R.id.main);
+        currentScreen = 1;
         createTabs(R.id.tabHost, R.id.tab1, R.id.tab2, R.id.tab3, R.id.tab4, 0);
         home();
-        currentScreen = 1;
-        dashBoard();
+        startMsgParserService();
     }
 
     private void startMsgParserService() {
@@ -503,7 +456,7 @@ public class MainActivity extends AppCompatActivity
             intent.setAction(ACTION_MSG_PARSE_BY_DATE);
             intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
                 if (msg.what == GlobalConstants.MSG_PARSING_COMPLETED) {
-                    updateUI();
+                    dashBoard();
                 }
             })));
             startService(intent);
@@ -520,7 +473,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateUI() {
-        dashBoardUIData(true);
+        DashboardFragment dashboardFragment = (DashboardFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(0);
+        dashboardFragment.dashBoardUIData();
+
+        DashboardFilterFragment dashboardFilterFragment = (DashboardFilterFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(1);
+        dashboardFilterFragment.dashBoardUIData();
+
+        switchScreen();
     }
 
     private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {
@@ -563,24 +522,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             if (type == 1) {
-                db.addCategory(s[0]);
-                DashBoardRecord temp = db.getDashBoardRecord(s[0]);
-                dbr.add(temp);
-                dashBoardAdapter.add(temp);
-                dashBoardAdapter.notifyDataSetChanged();
-            } else if (type == 2) {
-                if ((s[1].compareToIgnoreCase("") != 0) && (s[2].compareToIgnoreCase("") != 0)) {
-                    MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[3]);
-                    mbr.setToCategory(s[2]);
-                    boolean res = db.addMTRecord(mbr);
-                    if (res) {
-                        Toast.makeText(this, "Succrssfully Trasfered !", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Something Went Wrong\nPlease Try Again!", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(this, "Please Enter Amount", Toast.LENGTH_LONG).show();
-                }
+                DashboardFragment dashboardFragment = (DashboardFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(0);
+                dashboardFragment.addCategory(s[0]);
             }
         }
     }
@@ -592,23 +535,5 @@ public class MainActivity extends AppCompatActivity
         mAdapter[position].notifyDataSetChanged();
         mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
     }
-
-    /*public void signIn() {
-        LoggerCus.d(TAG, "Start sign in");
-        mGoogleSignInClient = buildGoogleSignInClient();
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
-    }
-
-    *//**
-     * Build a Google SignIn client.
-     *//*
-    private GoogleSignInClient buildGoogleSignInClient() {
-        GoogleSignInOptions signInOptions =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestScopes(Drive.SCOPE_APPFOLDER)
-                        .requestEmail()
-                        .build();
-        return GoogleSignIn.getClient(this, signInOptions);
-    }*/
 
 }

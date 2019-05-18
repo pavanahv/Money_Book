@@ -1,6 +1,6 @@
 package com.example.allakumarreddy.moneybook.Adapter;
 
-import android.content.Intent;
+import android.content.Context;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.allakumarreddy.moneybook.Activities.MainActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.Activities.AddActivity;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
@@ -30,8 +28,9 @@ import java.util.ArrayList;
 public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     private final DbHandler db;
+    private DashBoardAdapterInterface mDashBoardAdapterInterface;
     private ArrayList<DashBoardRecord> dataSet;
-    MainActivity mContext;
+    Context mContext;
 
 
     // View lookup cache
@@ -55,11 +54,12 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     }
 
-    public DashBoardAdapter(ArrayList<DashBoardRecord> data, MainActivity context) {
+    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context, DashBoardAdapterInterface dashBoardAdapterInterface) {
         super(context, R.layout.dash_board_item, data);
         this.dataSet = data;
         this.mContext = context;
         this.db = new DbHandler(mContext);
+        mDashBoardAdapterInterface = dashBoardAdapterInterface;
     }
 
 
@@ -103,12 +103,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
             result = convertView;
         }
 
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mContext.goToAnalytics(dataModel.getText());
-            }
-        });
+        convertView.setOnClickListener(v -> mDashBoardAdapterInterface.viewOnClick(dataModel.getText()));
 
         final PopupMenu popup = new PopupMenu(mContext, viewHolder.imageView);
         //Inflating the Popup using xml file
@@ -119,16 +114,11 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.dashboardPopupDelete:
-                    db.deleteCategory(dataModel.getText().toLowerCase());
-                    mContext.runOnUiThread(() -> mContext.dashBoardUIData(false));
+                    mDashBoardAdapterInterface.deleteCategoryPopMenu(dataModel.getText());
                     break;
 
                 case R.id.dashboardPopupMT:
-                    //new AddDialog(mContext, 2, dataModel.getText().toLowerCase()).show();
-                    Intent intent = new Intent(mContext, AddActivity.class);
-                    intent.putExtra("type",2);
-                    intent.putExtra("tcategory",dataModel.getText().toLowerCase());
-                    mContext.startActivityForResult(intent,MainActivity.ADD_ACTIVITY);
+                    mDashBoardAdapterInterface.moneyTrasferPopMenu(dataModel.getText());
                     break;
             }
             return true;

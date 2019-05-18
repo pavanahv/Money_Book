@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, WelcomeActivity.class));
             finish();
         } else {
-            Toast.makeText(this, "Logged in as " + sp.getData(Utils.getEmail()), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Logged in as " + sp.getData(Utils.getEmail()), Toast.LENGTH_SHORT).show();
         }
 
         inputText = (EditText) findViewById(R.id.inputnumber);

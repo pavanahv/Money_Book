@@ -1,6 +1,6 @@
 package com.example.allakumarreddy.moneybook.Adapter;
 
-import android.content.Intent;
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -11,19 +11,15 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.Activities.GraphActivity;
+import com.example.allakumarreddy.moneybook.Activities.DashBoardFilterAdapterInterface;
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
-import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
-
-import java.util.ArrayList;
 
 public class DashBoardFilterAdapter extends RecyclerView.Adapter<DashBoardFilterAdapter.ViewHolder> {
     private static final String TAG = "DashBoardFilterAdapter";
-    private final MainActivity mContext;
+    private final Context mContext;
+    private DashBoardFilterAdapterInterface mDashBoardFilterAdapterInterface;
     private String[][] mJsonDataTitle;
 
     // Provide a reference to the views for each data item
@@ -43,6 +39,12 @@ public class DashBoardFilterAdapter extends RecyclerView.Adapter<DashBoardFilter
     public DashBoardFilterAdapter(String[][] jsonDataTitle, MainActivity context) {
         mJsonDataTitle = jsonDataTitle;
         mContext = context;
+    }
+
+    public DashBoardFilterAdapter(String[][] jsonDataTitle, Context context, DashBoardFilterAdapterInterface dashBoardFilterAdapterInterface) {
+        mJsonDataTitle = jsonDataTitle;
+        mContext = context;
+        mDashBoardFilterAdapterInterface = dashBoardFilterAdapterInterface;
     }
 
     // Create new views (invoked by the layout manager)
@@ -81,29 +83,11 @@ public class DashBoardFilterAdapter extends RecyclerView.Adapter<DashBoardFilter
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.dashboardPopupDelete:
-
-                    DbHandler db = new DbHandler(mContext);
-                    db.deleteFilter(mJsonDataTitle[position][0]);
-                    mContext.runOnUiThread(() -> mContext.dashBoardUIData(false));
+                    mDashBoardFilterAdapterInterface.delteFilter(mJsonDataTitle[position][0]);
                     break;
 
                 case R.id.dashboardPopupFullScreen:
-                    ArrayList<MBRecord> dataList = Utils.getFilterRecordsFromParelableJSONString(mJsonDataTitle[position][1], mContext);
-                    final int size = dataList.size();
-                    String[] label = new String[size];
-                    String[] data = new String[size];
-                    for (int i = 0; i < size; i++) {
-                        MBRecord mbr = dataList.get(i);
-                        label[i] = mbr.getDescription();
-                        data[i] = mbr.getAmount() + "";
-                    }
-
-                    Intent in = new Intent(mContext, GraphActivity.class);
-                    in.putExtra("label", label);
-                    in.putExtra("data", data);
-                    in.putExtra("type", Utils.getFilterGraphType(mJsonDataTitle[position][1]));
-                    in.putExtra("activateType", GlobalConstants.ACTIVATE_GRAPH_ACTIVITY_WITHOUT_ADD_TO_SCREEN_MENU);
-                    mContext.startActivity(in);
+                    mDashBoardFilterAdapterInterface.fullScreen(mJsonDataTitle[position][1]);
                     break;
             }
             return true;
