@@ -21,6 +21,7 @@ public class GlobalConstants {
     public static final String ACTION_INTERNET_CONNECTED = "ACTION_INTERNET_CONNECTED";
     public static final int ACTIVATE_GRAPH_ACTIVITY_WITHOUT_ADD_TO_SCREEN_MENU = 1;
     public static final int ACTIVATE_GRAPH_ACTIVITY_WITH_ADD_TO_SCREEN_MENU = 0;
+    public static final String ANALYTICS_FILTER_ACTIVITY = "ANALYTICS_FILTER_ACTIVITY";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

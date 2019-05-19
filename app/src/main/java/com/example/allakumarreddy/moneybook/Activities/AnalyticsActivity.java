@@ -1,5 +1,6 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import com.example.allakumarreddy.moneybook.Adapter.AnalyticsAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.XLStore;
+import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.IDate;
@@ -36,6 +38,7 @@ import java.util.Date;
 public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
     private static final String TAG = "AnalyticsActivity";
+    private static final int ANALYTICS_FILTER_ACTIVITY = 1001;
     private LinearLayout main;
     private View prevView;
     private DbHandler db;
@@ -72,6 +75,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private SubMenu menuTypeSubM;
     private SubMenu menuCategoriesSubM;
     private boolean[] CatTypeBool;
+    private AnalyticsFilterData mAnalyticsFilterData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,18 +83,35 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         setContentView(R.layout.activity_analytics);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mAnalyticsFilterData = new AnalyticsFilterData();
         main = (LinearLayout) findViewById(R.id.analyticsview);
         db = new DbHandler(this);
         format = new SimpleDateFormat("yyyy/MM/dd");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         processTabs();
+        init();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (ANALYTICS_FILTER_ACTIVITY):
+                if (resultCode == Activity.RESULT_OK) {
+                    mAnalyticsFilterData = (AnalyticsFilterData) data.getSerializableExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY);
+                    LoggerCus.d(TAG, mAnalyticsFilterData.toString());
+                    break;
+                }
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.analytics_filter:
-                startActivity(new Intent(this, FiltersAnalyticsActivity.class));
+                Intent intent = new Intent(this, FiltersAnalyticsActivity.class);
+                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY, mAnalyticsFilterData);
+                startActivityForResult(intent, ANALYTICS_FILTER_ACTIVITY);
                 break;
             case R.id.analytics_clear_all:
                 clearAllFilters();
@@ -326,6 +347,10 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     }
 
     private void showGraph() {
+        // reset to view list after returning from graph activity
+        mAnalyticsFilterData.subMenuViewByDataBool[0] = false;
+        mAnalyticsFilterData.subMenuViewByDataBool[1] = true;
+
         final int size = dataList.size();
         String[] label = new String[size];
         String[] data = new String[size];
@@ -478,16 +503,24 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             @Override
             public boolean onQueryTextChange(String qText) {
                 queryText = qText;
+                mAnalyticsFilterData.queryText = qText;
                 updateData();
                 return false;
             }
         });
         clearAllFilters();
-        init();
     }
 
     private void init() {
+        // categories initialization
+        String[] cat = db.getCategeories();
+        mAnalyticsFilterData.subMenuCatogeoryData = new String[cat.length + 1];
+        mAnalyticsFilterData.subMenuCatogeoryData[0] = "All";
+        for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++)
+            mAnalyticsFilterData.subMenuCatogeoryData[i] = cat[i - 1];
 
+        mAnalyticsFilterData.subMenuCatogeoryDataBool = new boolean[mAnalyticsFilterData.subMenuCatogeoryData.length];
+        Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, true);
     }
 
     @Override
@@ -512,10 +545,21 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
     private void updateData() {
         list.clear();
-        dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, CatTypeBool, cols);
+        /*dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool,
+                dateInterval, groupByNone, groupBy, sortBy, CatTypeBool, cols);*/
+        dataList = db.getRecordsAsList(mAnalyticsFilterData);
         list.addAll(dataList);
         analyticsAdapter.notifyDataSetChanged();
         upDateTotal();
+        if (mAnalyticsFilterData.subMenuViewByDataBool[0]) {
+            for (int i = 0; i < mAnalyticsFilterData.subMenuGraphTypeDataBool.length; i++) {
+                if (mAnalyticsFilterData.subMenuGraphTypeDataBool[i]) {
+                    graphType = i;
+                    break;
+                }
+            }
+            showGraph();
+        }
     }
 
     private void upDateTotal() {

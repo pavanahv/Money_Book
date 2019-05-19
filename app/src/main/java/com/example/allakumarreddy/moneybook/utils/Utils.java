@@ -276,7 +276,7 @@ public class Utils {
                 cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
             }
             DbHandler db = new DbHandler(context);
-            ArrayList<MBRecord> dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols);
+            ArrayList<MBRecord> dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols, 1);
             int graphType = jobj.getInt("graphType");
             final int size = dataList.size();
             String[] label = new String[size];
@@ -349,7 +349,7 @@ public class Utils {
                 cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
             }
             DbHandler db = new DbHandler(context);
-            return db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols);
+            return db.getRecordsAsList(queryText, dateAll, sDate, eDate, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols, 1);
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
         } catch (ParseException e) {

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.DateConverter;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -76,6 +77,7 @@ public class DbHandler extends SQLiteOpenHelper {
     public static final String MT_KEY_CAT_TO = "to_category";
     private static final String MT_KEY_TYPE = "4";
     private static final int MT_TYPE = 4;
+    private static final String SORTING_ORDER[] = new String[]{"ASC", "DESC"};
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
@@ -521,7 +523,10 @@ public class DbHandler extends SQLiteOpenHelper {
         return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + MT_KEY_CAT_FROM + ") AS " + MT_KEY_CAT_FROM;
     }
 
-    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, boolean[] moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool, String[] category) {
+    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate,
+                                                boolean[] moneyType, int dateInterval,
+                                                boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool,
+                                                String[] category, int sortingOrder) {
         this.total = 0;
 
         ArrayList<MBRecord> mbr = new ArrayList<>();
@@ -571,7 +576,7 @@ public class DbHandler extends SQLiteOpenHelper {
         else {
             switch (groupBy) {
                 case 0:
-                    eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE
+                    eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE
                             + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE
                             + ",count(" + KEY_DESCRIPTION + ") as ckd," + getSQLQueryForCat()
                             + " FROM " + TABLE_NAME + " WHERE ";
@@ -580,15 +585,15 @@ public class DbHandler extends SQLiteOpenHelper {
                 case 1:
                     switch (dateInterval) {
                         case 0:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                             break;
 
                         case 1:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_MONTH + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_MONTH + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                             break;
 
                         case 2:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ")," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_YEAR + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_YEAR + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
                             break;
                     }
                     break;
@@ -631,14 +636,13 @@ public class DbHandler extends SQLiteOpenHelper {
         }
         switch (sortBy) {
             case 0:
-                //todo
-                eQuery += " ORDER BY " + KEY_DATE + " DESC";
+                eQuery += " ORDER BY " + KEY_DATE + " " + SORTING_ORDER[sortingOrder];
                 break;
             case 1:
-                eQuery += " ORDER BY " + KEY_AMOUNT;
+                eQuery += " ORDER BY " + KEY_AMOUNT + " " + SORTING_ORDER[sortingOrder];
                 break;
             case 2:
-                eQuery += " ORDER BY " + KEY_DESCRIPTION;
+                eQuery += " ORDER BY " + KEY_DESCRIPTION + " " + SORTING_ORDER[sortingOrder];
                 break;
         }
         LoggerCus.d(TAG, eQuery);
@@ -684,12 +688,21 @@ public class DbHandler extends SQLiteOpenHelper {
         String eQuery = "";
         eQuery += " AND (";
         boolean notFistItem = false;
-        for (int i = 0; i < moneyType.length; i++) {
-            if (moneyType[i]) {
+        if (moneyType[0]) {
+            for (int i = 1; i < moneyType.length - 1; i++) {
                 if (notFistItem)
                     eQuery += " OR ";
-                eQuery += KEY_TYPE + " = " + i;
+                eQuery += KEY_TYPE + " = " + (i - 1);
                 notFistItem = true;
+            }
+        } else {
+            for (int i = 1; i < moneyType.length; i++) {
+                if (moneyType[i]) {
+                    if (notFistItem)
+                        eQuery += " OR ";
+                    eQuery += KEY_TYPE + " = " + (i - 1);
+                    notFistItem = true;
+                }
             }
         }
         eQuery += ")";
@@ -887,7 +900,7 @@ public class DbHandler extends SQLiteOpenHelper {
         eQuery += " AND (";
         boolean started = false;
         boolean evenOneCatTrue = false;
-        for (int i = 0; i < res.length; i++) {
+        for (int i = 1; i < res.length; i++) {
             if (res[i]) {
                 evenOneCatTrue = true;
                 if (started)
@@ -1344,5 +1357,58 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(F_TABLE_NAME, F_KEY_NAME + " = '" + s + "'", null);
         db.close();
+    }
+
+    public ArrayList<MBRecord> getRecordsAsList(AnalyticsFilterData mAnalyticsFilterData) {
+
+        // creating dateinterval var
+        int dateInterval = -1;
+        for (int i = 0; i < mAnalyticsFilterData.subMenuDateIntervalDataBool.length; i++) {
+            if (mAnalyticsFilterData.subMenuDateIntervalDataBool[i]) {
+                dateInterval = i;
+                break;
+            }
+        }
+
+        // initializing group by var
+        int groupBy = -1;
+        if (!mAnalyticsFilterData.subMenuGroupByDataBool[2]) {
+            for (int i = 0; i < mAnalyticsFilterData.subMenuGroupByDataBool.length - 1; i++) {
+                if (mAnalyticsFilterData.subMenuGroupByDataBool[i]) {
+                    groupBy = i;
+                    break;
+                }
+            }
+        }
+
+        int sortBy = -1;
+        for (int i = 0; i < mAnalyticsFilterData.subMenuSortByDataBool.length; i++) {
+            if (mAnalyticsFilterData.subMenuSortByDataBool[i]) {
+                sortBy = i;
+                break;
+            }
+        }
+
+        // intializing sorting order var
+        int sortingOrder = -1;
+        for (int i = 0; i < mAnalyticsFilterData.subMenuSortingOrderDataBool.length; i++) {
+            if (mAnalyticsFilterData.subMenuSortingOrderDataBool[i]) {
+                sortingOrder = i;
+                break;
+            }
+        }
+
+        return getRecordsAsList(mAnalyticsFilterData.queryText,
+                mAnalyticsFilterData.subMenuDateDataBool[4],
+                mAnalyticsFilterData.sDate,
+                mAnalyticsFilterData.eDate,
+                mAnalyticsFilterData.subMenuMoneyTypeDataBool,
+                dateInterval,
+                mAnalyticsFilterData.subMenuGroupByDataBool[2],
+                groupBy,
+                sortBy,
+                mAnalyticsFilterData.subMenuCatogeoryDataBool,
+                mAnalyticsFilterData.subMenuCatogeoryData,
+                sortingOrder);
     }
 }

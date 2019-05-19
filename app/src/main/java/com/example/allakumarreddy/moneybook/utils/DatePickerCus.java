@@ -4,8 +4,8 @@ package com.example.allakumarreddy.moneybook.utils;
  * Created by alla.kumarreddy on 7/25/2017.
  */
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -27,15 +27,10 @@ public class DatePickerCus extends Dialog implements android.view.View.OnClickLi
     private Button add, cancel;
     private Calendar cal = Calendar.getInstance();
 
-    public DatePickerCus(Activity activity,IDate idate) {
-        super(activity);
-        this.idate=idate;
-    }
-
-    public DatePickerCus(Activity activity,IDate idate, Date date) {
-        super(activity);
+    public DatePickerCus(Context context, IDate idate, Date date) {
+        super(context);
         this.idate = idate;
-        this.date=date;
+        this.date = date;
     }
 
     @Override
@@ -43,9 +38,9 @@ public class DatePickerCus extends Dialog implements android.view.View.OnClickLi
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.date_picker_cus);
-        dp=(DatePicker)findViewById(R.id.datePicker);
-        LoggerCus.d(TAG," "+Integer.parseInt(new SimpleDateFormat("yyyy").format(date))+" "+date.getMonth()+" "+date.getDate());
-        dp.init(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)),date.getMonth(),date.getDate(),null);
+        dp = (DatePicker) findViewById(R.id.datePicker);
+        LoggerCus.d(TAG, " " + Integer.parseInt(new SimpleDateFormat("yyyy").format(date)) + " " + date.getMonth() + " " + date.getDate());
+        dp.init(Integer.parseInt(new SimpleDateFormat("yyyy").format(date)), date.getMonth(), date.getDate(), null);
         add = (Button) findViewById(R.id.addButtonDate);
         cancel = (Button) findViewById(R.id.cancelButtonDate);
         add.setOnClickListener(this);
@@ -56,7 +51,7 @@ public class DatePickerCus extends Dialog implements android.view.View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.addButtonDate:
-                String des = dp.getYear()+"/"+(dp.getMonth()+1)+"/"+dp.getDayOfMonth();
+                String des = dp.getYear() + "/" + (dp.getMonth() + 1) + "/" + dp.getDayOfMonth();
                 LoggerCus.d(TAG, des);
                 idate.afterDateSelection(des);
                 break;
