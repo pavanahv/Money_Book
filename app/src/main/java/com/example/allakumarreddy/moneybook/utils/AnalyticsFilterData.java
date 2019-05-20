@@ -36,6 +36,7 @@ public class AnalyticsFilterData implements Serializable {
     public String queryText = "";
     public Date sDate = new Date();
     public Date eDate = new Date();
+    public String[][] filters;
 
     public void initDataAgainAfterClear() {
         subMenuDateDataBool = new boolean[]{false, false, false, false, true};
@@ -154,6 +155,14 @@ public class AnalyticsFilterData implements Serializable {
             SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
             jobj.put("sDate", jformat.format(sDate));
             jobj.put("eDate", jformat.format(eDate));
+
+            JSONArray jarrDateBool = new JSONArray();
+            for (int i = 0; i < subMenuDateDataBool.length; i++) {
+                JSONObject jobjSub = new JSONObject();
+                jobjSub.put("element" + i, subMenuDateDataBool[i]);
+                jarrDateBool.put(jobjSub);
+            }
+            jobj.put("dateDataBool", jarrDateBool);
 
             JSONArray jarrmenuTypeBool = new JSONArray();
             for (int i = 0; i < subMenuMoneyTypeDataBool.length; i++) {

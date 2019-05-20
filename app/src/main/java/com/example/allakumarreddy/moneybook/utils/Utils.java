@@ -196,120 +196,40 @@ public class Utils {
         alarmManager.cancel(sender);
     }
 
-    public static String getParcelableJSONStringForFilter(String queryText, boolean dateAll, Date sDate, Date eDate, boolean moneyTypeAll, boolean[] menuTypeBool, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean[] catTypeBool, String[] cols, int graphType) {
-        JSONObject jobj = new JSONObject();
-        try {
-            jobj.put("queryText", queryText);
-            jobj.put("dateAll", dateAll);
-            SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
-            jobj.put("sDate", jformat.format(sDate));
-            jobj.put("eDate", jformat.format(eDate));
-            jobj.put("moneyTypeAll", moneyTypeAll);
-
-            JSONArray jarrmenuTypeBool = new JSONArray();
-            for (int i = 0; i < menuTypeBool.length; i++) {
-                JSONObject jobjSub = new JSONObject();
-                jobjSub.put("element" + i, menuTypeBool[i]);
-                jarrmenuTypeBool.put(jobjSub);
-            }
-            jobj.put("menuTypeBool", jarrmenuTypeBool);
-
-            jobj.put("dateInterval", dateInterval);
-            jobj.put("groupByNone", groupByNone);
-            jobj.put("groupBy", groupBy);
-            jobj.put("sortBy", sortBy);
-
-            JSONArray jarrCatTypeBool = new JSONArray();
-            for (int i = 0; i < catTypeBool.length; i++) {
-                JSONObject jobjSub = new JSONObject();
-                jobjSub.put("element" + i, catTypeBool[i]);
-                jarrCatTypeBool.put(jobjSub);
-            }
-            jobj.put("CatTypeBool", jarrCatTypeBool);
-
-            JSONArray jarrcols = new JSONArray();
-            for (int i = 0; i < cols.length; i++) {
-                JSONObject jobjSub = new JSONObject();
-                jobjSub.put("element" + i, cols[i]);
-                jarrcols.put(jobjSub);
-            }
-            jobj.put("cols", jarrcols);
-
-            jobj.put("graphType", graphType);
-        } catch (JSONException e) {
-            LoggerCus.d(TAG, e.getMessage());
-        }
-        return jobj.toString();
-    }
-
     public static View getGraphFromParelableJSONString(String s, Context context) {
-        JSONObject jobj = null;
-        try {
-            jobj = new JSONObject(s);
-            String queryText = jobj.getString("queryText");
-            boolean dateAll = jobj.getBoolean("dateAll");
-            SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
-            Date sDate = jformat.parse(jobj.getString("sDate"));
-            Date eDate = jformat.parse(jobj.getString("eDate"));
-            boolean moneyTypeAll = jobj.getBoolean("moneyTypeAll");
 
-            JSONArray jarrmenuTypeBool = jobj.getJSONArray("menuTypeBool");
-            boolean[] menuTypeBool = new boolean[jarrmenuTypeBool.length()];
-            for (int i = 0; i < jarrmenuTypeBool.length(); i++) {
-                menuTypeBool[i] = jarrmenuTypeBool.getJSONObject(i).getBoolean("element" + i);
-            }
+        ArrayList<MBRecord> dataList = getFilterRecordsFromParelableJSONString(s, context);
+        int graphType = getFilterGraphType(s);
 
-            int dateInterval = jobj.getInt("dateInterval");
-            boolean groupByNone = jobj.getBoolean("groupByNone");
-            int groupBy = jobj.getInt("groupBy");
-            int sortBy = jobj.getInt("sortBy");
-
-            JSONArray jarrCatTypeBool = jobj.getJSONArray("CatTypeBool");
-            boolean[] catTypeBool = new boolean[jarrCatTypeBool.length()];
-            for (int i = 0; i < jarrCatTypeBool.length(); i++) {
-                catTypeBool[i] = jarrCatTypeBool.getJSONObject(i).getBoolean("element" + i);
-            }
-
-            JSONArray jarrcols = jobj.getJSONArray("cols");
-            String[] cols = new String[jarrcols.length()];
-            for (int i = 0; i < jarrcols.length(); i++) {
-                cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
-            }
-            DbHandler db = new DbHandler(context);
-            ArrayList<MBRecord> dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols, 1);
-            int graphType = jobj.getInt("graphType");
-            final int size = dataList.size();
-            String[] label = new String[size];
-            String[] data = new String[size];
-            for (int i = 0; i < size; i++) {
-                MBRecord mbr = dataList.get(i);
-                label[i] = mbr.getDescription();
-                data[i] = mbr.getAmount() + "";
-            }
-            View view = null;
-            switch (graphType) {
-                case 0:
-                    view = drawLineGraph(data.length, label, data, context);
-                    break;
-                case 1:
-                    view = drawBarGraph(data.length, label, data, context);
-                    break;
-                case 2:
-                    view = drawPieGraph(data.length, label, data, context);
-                    break;
-                case 3:
-                    view = drawRadarGraph(data.length, label, data, context);
-                    break;
-                case 4:
-                    view = drawScatterGraph(data.length, label, data, context);
-                    break;
-            }
-            return view;
-        } catch (JSONException e) {
-            LoggerCus.d(TAG, e.getMessage());
-        } catch (ParseException e) {
-            LoggerCus.d(TAG, e.getMessage());
+        final int size = dataList.size();
+        String[] label = new String[size];
+        String[] data = new String[size];
+        for (int i = 0; i < size; i++) {
+            MBRecord mbr = dataList.get(i);
+            label[i] = mbr.getDescription();
+            data[i] = mbr.getAmount() + "";
         }
+        View view = null;
+        switch (graphType) {
+            case 0:
+                view = drawLineGraph(data.length, label, data, context);
+                break;
+            case 1:
+                view = drawBarGraph(data.length, label, data, context);
+                break;
+            case 2:
+                view = drawPieGraph(data.length, label, data, context);
+                break;
+            case 3:
+                view = drawRadarGraph(data.length, label, data, context);
+                break;
+            case 4:
+                view = drawScatterGraph(data.length, label, data, context);
+                break;
+        }
+        if (view != null)
+            return view;
+
         TextView tv = new TextView(context);
         tv.setText("No Filters Yet");
         return tv;
@@ -324,9 +244,14 @@ public class Utils {
             SimpleDateFormat jformat = new SimpleDateFormat("yyyy/MM/dd");
             Date sDate = jformat.parse(jobj.getString("sDate"));
             Date eDate = jformat.parse(jobj.getString("eDate"));
-            boolean moneyTypeAll = jobj.getBoolean("moneyTypeAll");
 
-            JSONArray jarrmenuTypeBool = jobj.getJSONArray("menuTypeBool");
+            JSONArray jarrDataDataBool = jobj.getJSONArray("dateDataBool");
+            boolean dateDataBool[] = new boolean[jarrDataDataBool.length()];
+            for (int i = 0; i < jarrDataDataBool.length(); i++) {
+                dateDataBool[i] = jarrDataDataBool.getJSONObject(i).getBoolean("element" + i);
+            }
+
+            JSONArray jarrmenuTypeBool = jobj.getJSONArray("moneyTypeBool");
             boolean[] menuTypeBool = new boolean[jarrmenuTypeBool.length()];
             for (int i = 0; i < jarrmenuTypeBool.length(); i++) {
                 menuTypeBool[i] = jarrmenuTypeBool.getJSONObject(i).getBoolean("element" + i);
@@ -336,6 +261,7 @@ public class Utils {
             boolean groupByNone = jobj.getBoolean("groupByNone");
             int groupBy = jobj.getInt("groupBy");
             int sortBy = jobj.getInt("sortBy");
+            int sortingOrder = jobj.getInt("sortingOrder");
 
             JSONArray jarrCatTypeBool = jobj.getJSONArray("CatTypeBool");
             boolean[] catTypeBool = new boolean[jarrCatTypeBool.length()];
@@ -349,7 +275,9 @@ public class Utils {
                 cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
             }
             DbHandler db = new DbHandler(context);
-            return db.getRecordsAsList(queryText, dateAll, sDate, eDate, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols, 1);
+            return db.getRecordsAsList(queryText, dateDataBool, sDate, eDate,
+                    menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols,
+                    sortingOrder);
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
         } catch (ParseException e) {

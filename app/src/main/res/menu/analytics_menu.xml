@@ -10,6 +10,13 @@
         app:showAsAction="always"></item>
 
     <item
+        android:id="@+id/save_filter"
+        android:orderInCategory="100"
+        android:title="Save Filter"
+        android:icon="@drawable/ic_save_filter"
+        app:showAsAction="always"></item>
+
+    <item
         android:id="@+id/analytics_save_xl"
         android:orderInCategory="100"
         android:title="Save To XL"

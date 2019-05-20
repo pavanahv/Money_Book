@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_add_to_home_screen"
-        app:showAsAction="always"
-        android:icon="@mipmap/icon_add_to_home_screen"
+        android:icon="@drawable/ic_save_filter"
         android:orderInCategory="100"
-        android:title="Add To Home Screen" />
+        android:title="Add To Home Screen"
+        app:showAsAction="always" />
 </menu>

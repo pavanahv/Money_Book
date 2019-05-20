@@ -39,6 +39,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
     private static final String TAG = "AnalyticsActivity";
     private static final int ANALYTICS_FILTER_ACTIVITY = 1001;
+    private static final int ADD_ACTIVITY = 1002;
     private LinearLayout main;
     private View prevView;
     private DbHandler db;
@@ -99,9 +100,20 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             case (ANALYTICS_FILTER_ACTIVITY):
                 if (resultCode == Activity.RESULT_OK) {
                     mAnalyticsFilterData = (AnalyticsFilterData) data.getSerializableExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY);
-                    LoggerCus.d(TAG, mAnalyticsFilterData.toString());
                     break;
                 }
+                break;
+            case ADD_ACTIVITY:
+                if (resultCode == Activity.RESULT_OK) {
+                    String name = data.getExtras().getString("fdes");
+                    String jsonStrFiltr = mAnalyticsFilterData.getParcelableJSONStringForFilter();
+                    boolean res = db.insertFilterRecord(name, jsonStrFiltr, false);
+                    if (res) {
+                        initFilters();
+                        Toast.makeText(this, "Filter Saved Successfully!", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
         }
     }
 
@@ -113,9 +125,10 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
                 intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY, mAnalyticsFilterData);
                 startActivityForResult(intent, ANALYTICS_FILTER_ACTIVITY);
                 break;
-            case R.id.analytics_clear_all:
-                clearAllFilters();
-                updateData();
+            case R.id.save_filter:
+                Intent lIntent = new Intent(AnalyticsActivity.this, AddActivity.class);
+                lIntent.putExtra("type", 3);
+                startActivityForResult(lIntent, ADD_ACTIVITY);
                 break;
 
             case R.id.analytics_save_xl:
@@ -125,7 +138,6 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
                 } catch (IOException e) {
                     LoggerCus.d("analyticsactivity", e.getMessage());
                     Toast.makeText(AnalyticsActivity.this, "Error in Saving ! " + e.getMessage(), Toast.LENGTH_SHORT).show();
-
                 }
                 break;
 
@@ -359,7 +371,7 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             label[i] = mbr.getDescription();
             data[i] = mbr.getAmount() + "";
         }
-        String jsonStrFiltr = Utils.getParcelableJSONStringForFilter(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, CatTypeBool, cols, graphType);
+        String jsonStrFiltr = mAnalyticsFilterData.getParcelableJSONStringForFilter();
 
         Intent in = new Intent(this, GraphActivity.class);
         in.putExtra("label", label);
@@ -520,7 +532,34 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             mAnalyticsFilterData.subMenuCatogeoryData[i] = cat[i - 1];
 
         mAnalyticsFilterData.subMenuCatogeoryDataBool = new boolean[mAnalyticsFilterData.subMenuCatogeoryData.length];
-        Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, true);
+
+        Intent intent = getIntent();
+        String tempCat = intent.getStringExtra("name");
+        if (tempCat != null) {
+            Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, false);
+            for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++) {
+                if (mAnalyticsFilterData.subMenuCatogeoryData[i].compareToIgnoreCase(tempCat) == 0) {
+                    mAnalyticsFilterData.subMenuCatogeoryDataBool[i] = true;
+                    break;
+                }
+            }
+        } else {
+            Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, true);
+        }
+
+        initFilters();
+    }
+
+    private void initFilters() {
+        mAnalyticsFilterData.filters = db.getFilterRecords();
+        mAnalyticsFilterData.subMenuFilterData = new String[mAnalyticsFilterData.filters.length + 1];
+        mAnalyticsFilterData.subMenuFilterData[0] = "None";
+        for (int i = 0; i < mAnalyticsFilterData.subMenuFilterData.length - 1; i++) {
+            mAnalyticsFilterData.subMenuFilterData[i + 1] = mAnalyticsFilterData.filters[i][0];
+        }
+        mAnalyticsFilterData.subMenuFilterDataBool = new boolean[mAnalyticsFilterData.subMenuFilterData.length];
+        Arrays.fill(mAnalyticsFilterData.subMenuFilterDataBool, false);
+        mAnalyticsFilterData.subMenuFilterDataBool[0] = true;
     }
 
     @Override
@@ -545,8 +584,6 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
     private void updateData() {
         list.clear();
-        /*dataList = db.getRecordsAsList(queryText, dateAll, sDate, eDate, moneyTypeAll, menuTypeBool,
-                dateInterval, groupByNone, groupBy, sortBy, CatTypeBool, cols);*/
         dataList = db.getRecordsAsList(mAnalyticsFilterData);
         list.addAll(dataList);
         analyticsAdapter.notifyDataSetChanged();

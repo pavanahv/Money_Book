@@ -23,7 +23,6 @@ import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.IDate;
-import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -199,7 +198,6 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     }
 
     public void apply(View view) {
-        LoggerCus.d(TAG, mAnalyticsFilterData.toString());
         Intent resultIntent = new Intent();
         resultIntent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY, mAnalyticsFilterData);
         setResult(Activity.RESULT_OK, resultIntent);

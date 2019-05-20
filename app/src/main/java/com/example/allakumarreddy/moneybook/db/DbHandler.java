@@ -523,7 +523,7 @@ public class DbHandler extends SQLiteOpenHelper {
         return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + MT_KEY_CAT_FROM + ") AS " + MT_KEY_CAT_FROM;
     }
 
-    public ArrayList<MBRecord> getRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate,
+    public ArrayList<MBRecord> getRecordsAsList(String query, boolean[] dateBool, Date sDate, Date eDate,
                                                 boolean[] moneyType, int dateInterval,
                                                 boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool,
                                                 String[] category, int sortingOrder) {
@@ -542,23 +542,41 @@ public class DbHandler extends SQLiteOpenHelper {
             return mbr;
         }
 
+        int date = -1;
+        for (int i = 0; i < dateBool.length; i++) {
+            if (dateBool[i]) {
+                date = i;
+                break;
+            }
+        }
+
+        if (date != 3 && date != 4) {
+            sDate = new Date();
+            eDate = new Date();
+            switch (date) {
+                case 2:
+                    sDate = intializeSDateForYear(sDate);
+                    eDate = intializeEDateForYear(eDate);
+                case 1:
+                    sDate = intializeSDateForMonth(sDate);
+                    eDate = intializeEDateForMonth(eDate);
+                case 0:
+                    sDate = intializeSDateForDay(sDate);
+                    eDate = intializeEDateForDay(eDate);
+                    break;
+            }
+        }
+
         DateConverter dcs = new DateConverter(intializeSDateForDay(sDate));
         DateConverter dce = new DateConverter(intializeSDateForDay(eDate));
-        switch (dateInterval) {
-            case 1:
-                sDate.setDate(1);
-                int tempMon = eDate.getMonth() + 1;
-                eDate.setMonth(tempMon);
-                eDate.setDate(0);
-                LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-                break;
 
+        switch (dateInterval) {
             case 2:
-                sDate.setMonth(0);
-                sDate.setDate(1);
-                eDate.setYear(eDate.getYear() + 1);
-                eDate.setMonth(0);
-                eDate.setDate(0);
+                sDate = intializeSDateForYear(sDate);
+                eDate = intializeEDateForYear(eDate);
+            case 1:
+                sDate = intializeSDateForMonth(intializeSDateForDay(sDate));
+                eDate = intializeEDateForMonth(intializeEDateForDay(eDate));
                 LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
                 break;
 
@@ -600,17 +618,21 @@ public class DbHandler extends SQLiteOpenHelper {
             }
         }
         eQuery += KEY_DESCRIPTION + " LIKE '%" + query + "%'";
-        if (!isAllDate) {
-            eQuery += " AND " + KEY_DATE + " >= " + dcs.getdDate().getTime() + " AND " + KEY_DATE + " <= " + dce.getdDate().getTime();
+
+        switch (date) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                eQuery += " AND " + KEY_DATE + " >= " + dcs.getdDate().getTime() + " AND " + KEY_DATE + " <= " + dce.getdDate().getTime();
+                break;
+            case 4:
+                // this is date all so everything should come
+                break;
         }
         eQuery += getQueryForMoneyType(moneyType);
 
         eQuery += getCategoryQueryString(categoryBool, category);
-
-        /*if (moneyTypeVal == 3)
-            eQuery += " UNION ALL " + getMTRecordsAsListQueryString(query, isAllDate, sDate, eDate,
-                    isAllMoneyType, 4, dateInterval, groupByNone,
-                    groupBy, sortBy, categoryBool, category);*/
 
         if (!groupByNone) {
             switch (groupBy) {
@@ -709,168 +731,6 @@ public class DbHandler extends SQLiteOpenHelper {
         return eQuery;
     }
 
-    private ArrayList<MBRecord> getMTRecordsAsList(String query, boolean isAllDate, Date sDate, Date eDate, boolean isAllMoneyType, int moneyType, int dateInterval, boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool, String[] category) {
-
-        ArrayList<MBRecord> mbr = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        String eQuery = getMTRecordsAsListQueryString(query, isAllDate, sDate, eDate,
-                isAllMoneyType, moneyType, dateInterval, groupByNone,
-                groupBy, sortBy, categoryBool, category);
-        eQuery += getMTRecordsAsListQueryStringAddOrderGroupBy(query, isAllDate, sDate, eDate,
-                isAllMoneyType, moneyType, dateInterval, groupByNone,
-                groupBy, sortBy, categoryBool, category);
-        LoggerCus.d(TAG, eQuery);
-        try {
-            Cursor cursor = db.rawQuery(eQuery, null);
-            if (cursor != null) {
-                final int len = cursor.getCount();
-                for (int i = 0; i < len; i++) {
-                    cursor.moveToPosition(i);
-                    int numSpent = Integer.parseInt(cursor.getString(1));
-                    this.total += numSpent;
-                    if (!groupByNone) {
-                        switch (groupBy) {
-                            case 0:
-                                mbr.add(new MBRecord(cursor.getString(0) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
-                                break;
-                            case 1:
-                                switch (dateInterval) {
-                                    case 0:
-                                        mbr.add(new MBRecord(new SimpleDateFormat("dd - MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
-                                        break;
-
-                                    case 1:
-                                        mbr.add(new MBRecord(new SimpleDateFormat("MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
-                                        break;
-
-                                    case 2:
-                                        mbr.add(new MBRecord(new SimpleDateFormat("yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
-                                        break;
-                                }
-                                break;
-                        }
-                    } else {
-                        mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(6)));
-                    }
-                }
-                cursor.close();
-            }
-            // return contact
-            return mbr;
-        } catch (Exception e) {
-            LoggerCus.d(TAG, e.getMessage());
-        }
-        return mbr;
-    }
-
-    private String getMTRecordsAsListQueryStringAddOrderGroupBy(String query, boolean isAllDate, Date sDate,
-                                                                Date eDate, boolean isAllMoneyType, int moneyType,
-                                                                int dateInterval, boolean groupByNone, int groupBy,
-                                                                int sortBy, boolean[] categoryBool, String[] category) {
-        String eQuery = "";
-        if (!groupByNone) {
-            switch (groupBy) {
-                case 0:
-                    eQuery += " GROUP BY " + MT_KEY_DESCRIPTION;
-                    break;
-                case 1:
-                    //todo
-                    switch (dateInterval) {
-                        case 0:
-                            eQuery += " GROUP BY " + MT_KEY_DATE;
-                            break;
-
-                        case 1:
-                            eQuery += " GROUP BY " + MT_KEY_DATE_MONTH;
-                            break;
-
-                        case 2:
-                            eQuery += " GROUP BY " + MT_KEY_DATE_YEAR;
-                            break;
-                    }
-                    break;
-            }
-        }
-        switch (sortBy) {
-            case 0:
-                //todo
-                eQuery += " ORDER BY " + MT_KEY_DATE + " DESC";
-                break;
-            case 1:
-                eQuery += " ORDER BY " + MT_KEY_AMOUNT;
-                break;
-            case 2:
-                eQuery += " ORDER BY " + MT_KEY_DESCRIPTION;
-                break;
-        }
-        return eQuery;
-    }
-
-    private String getMTRecordsAsListQueryString(String query, boolean isAllDate, Date sDate,
-                                                 Date eDate, boolean isAllMoneyType, int moneyType,
-                                                 int dateInterval, boolean groupByNone, int groupBy,
-                                                 int sortBy, boolean[] categoryBool, String[] category) {
-        DateConverter dcs = new DateConverter(intializeSDateForDay(sDate));
-        DateConverter dce = new DateConverter(intializeSDateForDay(eDate));
-        switch (dateInterval) {
-            case 1:
-                sDate.setDate(1);
-                int tempMon = eDate.getMonth() + 1;
-                eDate.setMonth(tempMon);
-                eDate.setDate(0);
-                LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-                break;
-
-            case 2:
-                sDate.setMonth(0);
-                sDate.setDate(1);
-                eDate.setYear(eDate.getYear() + 1);
-                eDate.setMonth(0);
-                eDate.setDate(0);
-                LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-                break;
-
-            default:
-                break;
-        }
-
-        String eQuery = "";
-        if (groupByNone)
-            eQuery = "SELECT " + MT_KEY_DESCRIPTION + "," + MT_KEY_AMOUNT + "," + MT_KEY_DATE + "," + MT_KEY_TYPE + "," + MT_KEY_DATE_MONTH + "," + MT_KEY_DATE_YEAR + "," + getSQLQueryForCatMT() + " FROM " + MT_TABLE_NAME + " WHERE ";
-        else {
-            switch (groupBy) {
-                case 0:
-                    //todo
-                    eQuery = "SELECT " + MT_KEY_DESCRIPTION + ",sum(" + MT_KEY_AMOUNT + ")," + MT_KEY_DATE + "," + MT_KEY_DATE_MONTH + "," + MT_KEY_DATE_YEAR + "," + MT_KEY_TYPE + ",count(" + MT_KEY_DESCRIPTION + ") as ckd," + getSQLQueryForCatMT() + " FROM " + MT_TABLE_NAME + " WHERE ";
-                    break;
-
-                case 1:
-                    switch (dateInterval) {
-                        case 0:
-                            eQuery = "SELECT " + MT_KEY_DESCRIPTION + ",sum(" + MT_KEY_AMOUNT + ")," + MT_KEY_DATE + "," + MT_KEY_DATE_MONTH + "," + MT_KEY_DATE_YEAR + "," + MT_KEY_TYPE + ",count(" + MT_KEY_DATE + ") as ckd," + getSQLQueryForCatMT() + " FROM " + MT_TABLE_NAME + " WHERE ";
-                            break;
-
-                        case 1:
-                            eQuery = "SELECT " + MT_KEY_DESCRIPTION + ",sum(" + MT_KEY_AMOUNT + ")," + MT_KEY_DATE + "," + MT_KEY_DATE_MONTH + "," + MT_KEY_DATE_YEAR + "," + MT_KEY_TYPE + ",count(" + MT_KEY_DATE_MONTH + ") as ckd," + getSQLQueryForCatMT() + " FROM " + MT_TABLE_NAME + " WHERE ";
-                            break;
-
-                        case 2:
-                            eQuery = "SELECT " + MT_KEY_DESCRIPTION + ",sum(" + MT_KEY_AMOUNT + ")," + MT_KEY_DATE + "," + MT_KEY_DATE_MONTH + "," + MT_KEY_DATE_YEAR + "," + MT_KEY_TYPE + ",count(" + MT_KEY_DATE_YEAR + ") as ckd," + getSQLQueryForCatMT() + " FROM " + MT_TABLE_NAME + " WHERE ";
-                            break;
-                    }
-                    break;
-            }
-        }
-        eQuery += MT_KEY_DESCRIPTION + " LIKE '%" + query + "%'";
-        if (!isAllDate) {
-            eQuery += " AND " + MT_KEY_DATE + " >= " + dcs.getdDate().getTime() + " AND " + MT_KEY_DATE + " <= " + dce.getdDate().getTime();
-        }
-
-        eQuery += getCategoryQueryStringMT(categoryBool, category);
-
-        return eQuery;
-    }
-
     public int getTotal() {
         return this.total;
     }
@@ -895,6 +755,34 @@ public class DbHandler extends SQLiteOpenHelper {
         return cal.getTime();
     }
 
+    private Date intializeSDateForMonth(Date sDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sDate);
+        cal.set(Calendar.DATE, cal.getMinimum(Calendar.DATE));
+        return cal.getTime();
+    }
+
+    private Date intializeEDateForMonth(Date eDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(eDate);
+        cal.set(Calendar.DATE, cal.getMaximum(Calendar.DATE));
+        return cal.getTime();
+    }
+
+    private Date intializeSDateForYear(Date sDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sDate);
+        cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
+        return cal.getTime();
+    }
+
+    private Date intializeEDateForYear(Date eDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(eDate);
+        cal.set(Calendar.MONTH, cal.getMaximum(Calendar.MONTH));
+        return cal.getTime();
+    }
+
     private String getCategoryQueryString(boolean[] res, String[] s) {
         String eQuery = "";
         eQuery += " AND (";
@@ -914,28 +802,6 @@ public class DbHandler extends SQLiteOpenHelper {
             return eQuery;
         else
             return "";
-    }
-
-    private String getCategoryQueryStringMT(boolean[] res, String[] s) {
-        String eQuery = "";
-        eQuery += " AND (";
-        boolean started = false;
-        boolean evenOneCatTrue = false;
-        for (int i = 0; i < res.length; i++) {
-            if (res[i]) {
-                evenOneCatTrue = true;
-                if (started)
-                    eQuery += " OR ";
-                eQuery += "(" + MT_KEY_CAT_FROM + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s[i] + "')) ";
-                started = true;
-            }
-        }
-        eQuery += ")";
-        if (evenOneCatTrue)
-            return eQuery;
-        else
-            return "";
-        //return " AND (" + MT_KEY_CAT_FROM + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
     }
 
     public DashBoardRecord getDashBoardRecord(String s) {
@@ -1399,7 +1265,7 @@ public class DbHandler extends SQLiteOpenHelper {
         }
 
         return getRecordsAsList(mAnalyticsFilterData.queryText,
-                mAnalyticsFilterData.subMenuDateDataBool[4],
+                mAnalyticsFilterData.subMenuDateDataBool,
                 mAnalyticsFilterData.sDate,
                 mAnalyticsFilterData.eDate,
                 mAnalyticsFilterData.subMenuMoneyTypeDataBool,
@@ -1410,5 +1276,22 @@ public class DbHandler extends SQLiteOpenHelper {
                 mAnalyticsFilterData.subMenuCatogeoryDataBool,
                 mAnalyticsFilterData.subMenuCatogeoryData,
                 sortingOrder);
+    }
+
+    public String[][] getFilterRecords() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[][] records = null;
+        Cursor cursor = db.rawQuery("SELECT " + F_KEY_NAME + ", " + F_KEY_FILTER + " FROM " + F_TABLE_NAME + " WHERE " + F_KEY_SHOW_DASH + " = 0", null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            records = new String[len][2];
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                records[i][0] = cursor.getString(0);
+                records[i][1] = decode(cursor.getString(1));
+            }
+            cursor.close();
+        }
+        return records;
     }
 }
