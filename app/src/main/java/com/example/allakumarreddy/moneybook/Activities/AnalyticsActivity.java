@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -21,21 +20,17 @@ import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.XLStore;
 import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
-import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
-import com.example.allakumarreddy.moneybook.utils.IDate;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 
-public class AnalyticsActivity extends AppCompatActivity implements IDate {
+public class AnalyticsActivity extends AppCompatActivity {
 
     private static final String TAG = "AnalyticsActivity";
     private static final int ANALYTICS_FILTER_ACTIVITY = 1001;
@@ -44,39 +39,14 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     private View prevView;
     private DbHandler db;
     private ArrayList<MBRecord> list;
-    private boolean currentDateSorE, dateAll = true;
     private SimpleDateFormat format;
-    private Date sDate = new Date();
-    private Date eDate = new Date();
     private AnalyticsAdapter analyticsAdapter;
     private TextView totalTv;
-    private String queryText = "";
-    private int MENU_TYPE_SPENT = 121;
-    private int MENU_TYPE = 120;
-    String menuDate[] = new String[]{"Start Date", "End Date", "All"};
-    String menuType[] = new String[]{"All", "Spent", "Earn", "Due", "Loan", "Money Transfer"};
-    boolean menuTypeBool[] = new boolean[5];
-    String menuInterval[] = new String[]{"Day", "Month", "Year"};
-    String menuGOTType[] = new String[]{"List", "Graph"};
-    String menuGraphType[] = new String[]{"Line", "Bar", "Pie", "Radar", "Scatter"};
-    String menuGroupType[] = new String[]{"Item", "Date", "None"};
-    String menuSortType[] = new String[]{"Date", "Price", "Item"};
-    boolean moneyTypeAll = true;
-    int moneyTypeInstance = -1;
-    private int dateInterval = 0;
     private SearchView searchView;
     private ArrayList<MBRecord> dataList;
     private int graphType = 0;
-    private boolean groupByNone = true;
-    private int groupBy;
-    private int sortBy = 0;
-    private String[] cols = null;
-    private String category = null;
-    private boolean categoryNone = true;
-    private SubMenu menuTypeSubM;
-    private SubMenu menuCategoriesSubM;
-    private boolean[] CatTypeBool;
     private AnalyticsFilterData mAnalyticsFilterData;
+    private boolean mStartItemDetailActivity = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,207 +125,18 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.analytics_menu, menu);
-
-        SubMenu menuDateSubM = menu.addSubMenu("Date");
-        for (int i = 0; i < menuDate.length; i++) {
-            final int itemNum = i;
-            menuDateSubM.add(menuDate[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    setDate(itemNum);
-                    return false;
-                }
-            });
-        }
-
-        menuTypeSubM = menu.addSubMenu("Money Type");
-        for (int i = 0; i < menuType.length; i++) {
-            final int itemNum = i;
-            menuTypeSubM.add(menuType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if (item.isChecked()) {
-                        item.setChecked(false);
-                        setMoneyType(itemNum, false);
-                    } else {
-                        item.setChecked(true);
-                        setMoneyType(itemNum, true);
-                    }
-                    return false;
-                }
-            });
-        }
-        initMoneyTypeAfterOptionMenuCreation();
-
-        SubMenu menuIntervalSubM = menu.addSubMenu("Interval");
-        for (int i = 0; i < menuInterval.length; i++) {
-            final int itemNum = i;
-            menuIntervalSubM.add(menuInterval[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    setDateInterval(itemNum);
-                    return false;
-                }
-            });
-        }
-
-        SubMenu menuGOTSubM = menu.addSubMenu("View By");
-        for (int i = 0; i < menuGOTType.length; i++) {
-            final int itemNum = i;
-            menuGOTSubM.add(menuGOTType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    showGraph();
-                    return false;
-                }
-            });
-        }
-
-        SubMenu menuGraphTypeSubM = menu.addSubMenu("Graph Type");
-        for (int i = 0; i < menuGraphType.length; i++) {
-            final int itemNum = i;
-            menuGraphTypeSubM.add(menuGraphType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    setGraphType(itemNum);
-                    return false;
-                }
-            });
-        }
-
-        SubMenu menuGroupBySubM = menu.addSubMenu("Group By");
-        for (int i = 0; i < menuGroupType.length; i++) {
-            final int itemNum = i;
-            menuGroupBySubM.add(menuGroupType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    setGroupBy(itemNum);
-                    return false;
-                }
-            });
-        }
-
-        SubMenu menuSortBySubM = menu.addSubMenu("Sort By");
-        for (int i = 0; i < menuSortType.length; i++) {
-            final int itemNum = i;
-            menuSortBySubM.add(menuSortType[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    setSortBy(itemNum);
-                    return false;
-                }
-            });
-        }
-
-        menuCategoriesSubM = menu.addSubMenu("Category");
-        menuCategoriesSubM.add("All").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    setCategory(0, false);
-                } else {
-                    item.setChecked(true);
-                    setCategory(0, true);
-                }
-                return false;
-            }
-        });
-        for (int i = 0; i < cols.length; i++) {
-            final int itemNum = i + 1;
-            menuCategoriesSubM.add(cols[i]).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    if (item.isChecked()) {
-                        item.setChecked(false);
-                        setCategory(itemNum, false);
-                    } else {
-                        item.setChecked(true);
-                        setCategory(itemNum, true);
-                    }
-                    return false;
-                }
-            });
-        }
-        initCategoryAfterOptionMenuCreation();
-
         return true;
     }
 
-    private void initMoneyTypeAfterOptionMenuCreation() {
-        int len = menuTypeSubM.size();
-        for (int i = 0; i < len; i++) {
-            MenuItem menuItem = menuTypeSubM.getItem(i);
-            // making menu item as checkbox
-            menuItem.setCheckable(true);
-            // initiating it checked since all records should be shown while starting activity
-            menuItem.setChecked(true);
-        }
-    }
-
-    private void initCategoryAfterOptionMenuCreation() {
-        int len = menuCategoriesSubM.size();
-        for (int i = 0; i < len; i++) {
-            MenuItem menuItem = menuCategoriesSubM.getItem(i);
-            // making menu item as checkbox
-            menuItem.setCheckable(true);
-        }
-
-        len = cols.length;
-        for (int i = 1; i <= len; i++) {
-            MenuItem menuItem = menuCategoriesSubM.getItem(i);
-            // initiating it checked since all records should be shown while starting activity
-            if (CatTypeBool[i - 1])
-                menuItem.setChecked(true);
-            else
-                menuItem.setChecked(false);
-        }
-    }
-
     public void startDetailActivity(int pos) {
-        MBRecord mbr = dataList.get(pos);
-        Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
-        intent.putExtra("desc", mbr.getDescription());
-        intent.putExtra("amount", mbr.getAmount());
-        intent.putExtra("date", format.format(mbr.getDate()));
-        intent.putExtra("type", mbr.getType());
-        intent.putExtra("category", mbr.getCategory());
-        startActivity(intent);
-    }
-
-    private void setCategory(int itemNum, boolean check) {
-        if (itemNum == 0) {
-            this.categoryNone = check;
-            this.category = null;
-            checkMenuItemsOfCategory(check);
+        if (mStartItemDetailActivity) {
+            MBRecord mbr = dataList.get(pos);
+            Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
+            intent.putExtra("MBRecord", mbr);
+            startActivity(intent);
         } else {
-            this.category = cols[itemNum - 1];
-            this.categoryNone = false;
-            checkMenuItemsOfCategory(check, itemNum);
+            Toast.makeText(this, "Record can't be edited when GROUPBY filter is selected", Toast.LENGTH_LONG).show();
         }
-        LoggerCus.d(TAG, Arrays.toString(CatTypeBool));
-        updateData();
-    }
-
-    private void setSortBy(int itemNum) {
-        this.sortBy = itemNum;
-        updateData();
-    }
-
-    private void setGroupBy(int itemNum) {
-        if (itemNum == 2) {
-            this.groupByNone = true;
-            this.groupBy = -1;
-        } else {
-            this.groupByNone = false;
-            this.groupBy = itemNum;
-        }
-        updateData();
-    }
-
-    private void setGraphType(int itemNum) {
-        this.graphType = itemNum;
-        showGraph();
     }
 
     private void showGraph() {
@@ -382,117 +163,6 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         startActivity(in);
     }
 
-    private void setDate(int itemNum) {
-        switch (itemNum) {
-            case 0:
-                currentDateSorE = false;
-                dateAll = false;
-                new DatePickerCus(this, this, sDate).show();
-                break;
-            case 1:
-                currentDateSorE = true;
-                dateAll = false;
-                new DatePickerCus(this, this, eDate).show();
-                break;
-            case 2:
-                dateAll = true;
-                updateData();
-                break;
-        }
-    }
-
-    private void clearAllFilters() {
-        searchView.setQuery("", false);
-        searchView.clearFocus();
-        queryText = "";
-        dateAll = true;
-        initMoneyType();
-        moneyTypeInstance = -1;
-        dateInterval = 0;
-        graphType = 0;
-        groupByNone = true;
-        groupBy = -1;
-        sortBy = 0;
-        initCategory();
-    }
-
-    private void initMoneyType() {
-        moneyTypeAll = true;
-        // setting boolean array to true to load all records of meneytype
-        Arrays.fill(menuTypeBool, true);
-    }
-
-    private void initCategory() {
-        cols = db.getCategeories();
-        CatTypeBool = new boolean[cols.length];
-
-        Intent intent = getIntent();
-        String tempCat = intent.getStringExtra("name");
-        if (tempCat.compareToIgnoreCase("0") != 0) {
-            this.categoryNone = false;
-            this.category = tempCat.toLowerCase();
-            for (int i = 0; i < cols.length; i++) {
-                if (cols[i].compareToIgnoreCase(category) == 0) {
-                    CatTypeBool[i] = true;
-                    break;
-                }
-            }
-        } else {
-            // setting boolean array to true to load all records of meneytype
-            Arrays.fill(CatTypeBool, true);
-        }
-    }
-
-    private void setDateInterval(int itemNum) {
-        this.dateInterval = itemNum;
-        updateData();
-    }
-
-    private void setMoneyType(int itemNum, boolean check) {
-        if (itemNum == 0) {
-            this.moneyTypeAll = check;
-            this.moneyTypeInstance = -1;
-            checkMenuItemsOfMoneyType(check);
-        } else {
-            this.moneyTypeInstance = itemNum - 1;
-            this.moneyTypeAll = false;
-            checkMenuItemsOfMoneyType(check, itemNum);
-        }
-        //LoggerCus.d(TAG, Arrays.toString(menuTypeBool));
-        updateData();
-    }
-
-    private void checkMenuItemsOfMoneyType(boolean check, int itemNum) {
-        menuTypeBool[itemNum - 1] = check;
-        menuTypeSubM.getItem(0).setChecked(false);
-    }
-
-    private void checkMenuItemsOfCategory(boolean check, int itemNum) {
-        CatTypeBool[itemNum - 1] = check;
-        menuCategoriesSubM.getItem(0).setChecked(false);
-    }
-
-    private void checkMenuItemsOfCategory(boolean all) {
-        int len = menuCategoriesSubM.size();
-        // started from 1 because 0th item is all
-        for (int i = 1; i < len; i++) {
-            MenuItem menuItem = menuCategoriesSubM.getItem(i);
-            menuItem.setChecked(all);
-            CatTypeBool[i - 1] = all;
-        }
-    }
-
-    private void checkMenuItemsOfMoneyType(boolean all) {
-        int len = menuTypeSubM.size();
-        // started from 1 because 0th item is all
-        for (int i = 1; i < len; i++) {
-            MenuItem menuItem = menuTypeSubM.getItem(i);
-            menuItem.setChecked(all);
-            menuTypeBool[i - 1] = all;
-        }
-    }
-
-
     public void processTabs() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.item, null);
@@ -514,13 +184,11 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
 
             @Override
             public boolean onQueryTextChange(String qText) {
-                queryText = qText;
                 mAnalyticsFilterData.queryText = qText;
                 updateData();
                 return false;
             }
         });
-        clearAllFilters();
     }
 
     private void init() {
@@ -568,20 +236,6 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
         updateData();
     }
 
-    @Override
-    public void afterDateSelection(String date) {
-        try {
-            if (currentDateSorE)
-                eDate = format.parse(date);
-            else
-                sDate = format.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        LoggerCus.d("analytics activity", format.format(sDate) + " " + format.format(eDate));
-        updateData();
-    }
-
     private void updateData() {
         list.clear();
         dataList = db.getRecordsAsList(mAnalyticsFilterData);
@@ -597,6 +251,10 @@ public class AnalyticsActivity extends AppCompatActivity implements IDate {
             }
             showGraph();
         }
+        if (mAnalyticsFilterData.subMenuGroupByDataBool[2])
+            mStartItemDetailActivity = true;
+        else
+            mStartItemDetailActivity = false;
     }
 
     private void upDateTotal() {

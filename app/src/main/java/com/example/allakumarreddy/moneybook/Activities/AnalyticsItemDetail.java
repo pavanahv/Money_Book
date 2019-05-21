@@ -10,12 +10,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
-import com.example.allakumarreddy.moneybook.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,6 +32,8 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private DbHandler db;
     private Spinner cate;
     private String[] catArr;
+    private int recType;
+    private Spinner tcate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,29 +83,20 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private void init() {
         Intent intent = getIntent();
         db = new DbHandler(this);
-        LoggerCus.d("analyticsitemdetail", intent.getStringExtra("category"));
-        try {
-            mbrOld = new MBRecord(intent.getStringExtra("desc"), intent.getIntExtra("amount", -1), format.parse(intent.getStringExtra("date")), intent.getIntExtra("type", -1), intent.getStringExtra("category"));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        mbrOld = (MBRecord) intent.getSerializableExtra("MBRecord");
+        recType = mbrOld.getType();
+
         des = (EditText) findViewById(R.id.descitem);
         amount = (EditText) findViewById(R.id.amountitem);
         date = (EditText) findViewById(R.id.dateitem);
         type = (Spinner) findViewById(R.id.typeitem);
-        ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new String[]{"Spent", "Earn", "Due", "Loan"});
-        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        type.setAdapter(aa);
-        type.setSelection(mbrOld.getType());
 
         cate = (Spinner) findViewById(R.id.catitem);
         catArr = db.getCategeories();
-        int curind=-1;
-        for (int i=0;i<catArr.length;i++)
-        {
-            if(catArr[i].compareToIgnoreCase(intent.getStringExtra("category"))==0)
-            {
-                curind=i;
+        int curind = -1;
+        for (int i = 0; i < catArr.length; i++) {
+            if (catArr[i].compareToIgnoreCase(mbrOld.getCategory()) == 0) {
+                curind = i;
                 break;
             }
         }
@@ -111,7 +105,34 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         cate.setAdapter(caa);
         cate.setSelection(curind);
 
-        des.setText(mbrOld.getDescription());
+        if (recType == 4) {
+            des.setVisibility(View.GONE);
+            findViewById(R.id.descitemtext).setVisibility(View.GONE);
+            type.setVisibility(View.GONE);
+            findViewById(R.id.typeitemtext).setVisibility(View.GONE);
+            ((TextView) findViewById(R.id.catfromitemtext)).setText("From Category");
+
+            tcate = (Spinner) findViewById(R.id.cattoitem);
+            curind = -1;
+            for (int i = 0; i < catArr.length; i++) {
+                if (catArr[i].compareToIgnoreCase(mbrOld.getDescription()) == 0) {
+                    curind = i;
+                    break;
+                }
+            }
+            ArrayAdapter tcaa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+            tcaa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            tcate.setAdapter(tcaa);
+            tcate.setSelection(curind);
+        } else {
+            findViewById(R.id.cattoitem).setVisibility(View.GONE);
+            findViewById(R.id.cattoitemtext).setVisibility(View.GONE);
+            des.setText(mbrOld.getDescription());
+            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new String[]{"Spent", "Earn", "Due", "Loan"});
+            aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            type.setAdapter(aa);
+            type.setSelection(mbrOld.getType());
+        }
         amount.setText(mbrOld.getAmount() + "");
         date.setText(format.format(mbrOld.getDate()));
     }
@@ -124,18 +145,24 @@ public class AnalyticsItemDetail extends AppCompatActivity {
 
     private void save() {
         try {
-            MBRecord mbrNew = new MBRecord(des.getText().toString(), Integer.parseInt(amount.getText().toString()), format.parse(date.getText().toString()), type.getSelectedItemPosition(), catArr[cate.getSelectedItemPosition()]);
-            LoggerCus.d("analyticsitemdetail", mbrNew.getDescription());
-            LoggerCus.d("analyticsitemdetail", mbrNew.getAmount() + "");
-            LoggerCus.d("analyticsitemdetail", mbrNew.getDate().toString());
-            LoggerCus.d("analyticsitemdetail", mbrNew.getType() + "");
-            LoggerCus.d("analyticsitemdetail", mbrNew.getCategory() + "");
-            boolean result = db.updateRecord(mbrOld, mbrNew);
+            boolean result = false;
+            if (recType == 4) {
+                MBRecord mbrNew = new MBRecord(catArr[tcate.getSelectedItemPosition()],
+                        Integer.parseInt(amount.getText().toString()),
+                        format.parse(date.getText().toString()), mbrOld.getType(),
+                        catArr[cate.getSelectedItemPosition()]);
+                result = db.updateMTRecord(mbrOld, mbrNew);
+            } else {
+                MBRecord mbrNew = new MBRecord(des.getText().toString(),
+                        Integer.parseInt(amount.getText().toString()),
+                        format.parse(date.getText().toString()), type.getSelectedItemPosition(),
+                        catArr[cate.getSelectedItemPosition()]);
+                result = db.updateRecord(mbrOld, mbrNew);
+            }
             if (result)
                 Toast.makeText(this, "Updated Successfully !", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(this, "Updation Error !", Toast.LENGTH_SHORT).show();
-            finish();
         } catch (ParseException e) {
             LoggerCus.d("analyticsdetailactivity", e.getMessage());
         }

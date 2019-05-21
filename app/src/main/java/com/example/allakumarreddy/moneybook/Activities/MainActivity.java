@@ -58,7 +58,7 @@ import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface {
+        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface, HomeAdapterInterface {
 
     final static String TAG = "MainActivity";
     private static final int REQUESTCODE_PICK_JSON = 504;
@@ -405,7 +405,7 @@ public class MainActivity extends AppCompatActivity
             mRecyclerView[i] = (ListView) findViewById(o[i]);
             mTextViewTotal[i] = (TextView) findViewById(t[i]);
             mbr[i] = new ArrayList<>();
-            mAdapter[i] = new MyAdapter(mbr[i], this, i);
+            mAdapter[i] = new MyAdapter(mbr[i], this, i, this);
             mRecyclerView[i].setAdapter(mAdapter[i]);
         }
     }
@@ -536,4 +536,14 @@ public class MainActivity extends AppCompatActivity
         mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
     }
 
+    @Override
+    public void onClickItem(MBRecord mbr) {
+        startDetailActivity(mbr);
+    }
+
+    public void startDetailActivity(MBRecord mbr) {
+        Intent intent = new Intent(MainActivity.this, AnalyticsItemDetail.class);
+        intent.putExtra("MBRecord", mbr);
+        startActivity(intent);
+    }
 }

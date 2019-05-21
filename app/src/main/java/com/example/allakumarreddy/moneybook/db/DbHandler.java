@@ -1294,4 +1294,24 @@ public class DbHandler extends SQLiteOpenHelper {
         }
         return records;
     }
+
+    public boolean updateMTRecord(MBRecord mbrOld, MBRecord mbrNew) {
+        if (deleteMTRecord(mbrOld) > 0) {
+            return addRecord(mbrNew, mbrNew.getType());
+        } else
+            return false;
+    }
+
+    private int deleteMTRecord(MBRecord mbr) {
+        DateConverter dc = new DateConverter(mbr.getDate());
+        Date sDate = dc.getdDate();
+        Date eDate = (Date) sDate.clone();
+        sDate = intializeSDateForDay(sDate);
+        eDate = intializeEDateForDay(eDate);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        int n = db.delete(TABLE_NAME, KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime(), null);
+        db.close();
+        return n;
+    }
 }

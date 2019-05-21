@@ -10,8 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.utils.MBRecord;
+import com.example.allakumarreddy.moneybook.Activities.HomeAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
 import java.util.ArrayList;
 
@@ -19,9 +20,10 @@ import java.util.ArrayList;
  * Created by alla.kumarreddy on 7/19/2017.
  */
 
-public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickListener {
+public class MyAdapter extends ArrayAdapter<MBRecord> {
 
     private final int type;
+    private final HomeAdapterInterface mHomeAdapterInterface;
     private ArrayList<MBRecord> dataSet;
     Context mContext;
 
@@ -33,18 +35,12 @@ public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickLis
         ImageView imageView;
     }
 
-    public MyAdapter(ArrayList<MBRecord> data, Context context, int type) {
+    public MyAdapter(ArrayList<MBRecord> data, Context context, int type, HomeAdapterInterface homeAdapterInterface) {
         super(context, R.layout.record, data);
         this.dataSet = data;
         this.mContext = context;
         this.type = type;
-    }
-
-    @Override
-    public void onClick(View v) {
-        int position = (Integer) v.getTag();
-        Object object = getItem(position);
-        MBRecord dataModel = (MBRecord) object;
+        mHomeAdapterInterface = homeAdapterInterface;
     }
 
     private int lastPosition = -1;
@@ -101,6 +97,13 @@ public class MyAdapter extends ArrayAdapter<MBRecord> implements View.OnClickLis
                 break;
         }
         // Return the completed view to render on screen
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MBRecord mbr = getItem(position);
+                mHomeAdapterInterface.onClickItem(mbr);
+            }
+        });
         return convertView;
     }
 }

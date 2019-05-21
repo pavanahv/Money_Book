@@ -1,12 +1,13 @@
 package com.example.allakumarreddy.moneybook.utils;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by alla.kumarreddy on 7/20/2017.
  */
 
-public class MBRecord {
+public class MBRecord implements Serializable {
 
     private String Description;
     private int amount;
@@ -41,7 +42,7 @@ public class MBRecord {
         this.balLeft = balLeft;
     }
 
-    private int balLeft=0;
+    private int balLeft = 0;
 
     public MBRecord(String description, int amount, Date date, String category) {
         this.Description = description;
@@ -49,7 +50,7 @@ public class MBRecord {
         this.date = date;
         this.type = -1;
         this.category = category;
-        LoggerCus.d("MBRecord",description+":"+amount+":"+date+":"+category+";"+type);
+        LoggerCus.d("MBRecord", description + ":" + amount + ":" + date + ":" + category + ";" + type);
     }
 
     public MBRecord() {

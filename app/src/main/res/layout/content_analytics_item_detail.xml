@@ -20,6 +20,7 @@
             android:background="@color/white" />
 
         <TextView
+            android:id="@+id/descitemtext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
@@ -68,6 +69,7 @@
             android:textSize="25dp" />
 
         <TextView
+            android:id="@+id/typeitemtext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
@@ -81,6 +83,7 @@
             android:layout_height="wrap_content" />
 
         <TextView
+            android:id="@+id/catfromitemtext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
@@ -90,6 +93,20 @@
 
         <Spinner
             android:id="@+id/catitem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/cattoitemtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="To Category"
+            android:paddingLeft="5dp"
+            android:textColor="@color/white" />
+
+        <Spinner
+            android:id="@+id/cattoitem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
