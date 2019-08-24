@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_add_to_queue_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_fingerprint_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -67,9 +67,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_add_to_home_screen" />
+                                      <entry key="outputName" value="ic_finger_print" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="208a1d" />
+                                      <entry key="themeColor" value="070406" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -154,7 +154,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_add_to_queue_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_fingerprint_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -185,7 +185,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputIconType" value="NOTIFICATION" />
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>
