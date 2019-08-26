@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     private ListView[] mRecyclerView;
     private List<String>[] des, amount, date;
     private MyAdapter[] mAdapter;
-    private int currentScreen;
+    private int currentScreen = 0;
     private SimpleDateFormat format;
     public DbHandler db;
     private LinearLayout mDashBoard;
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         // To check whether it is launched from login activity or not. if not just finish this.
-        boolean loginCrt = getIntent().getBooleanExtra("login", false);
+        boolean loginCrt = getIntent().getBooleanExtra(GlobalConstants.LOGIN_CHECK, false);
         if (!loginCrt)
             finish();
 
@@ -114,9 +114,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 //showDialog();
                 //new AddDialog(MainActivity.this, currentScreen).show();
-                Intent intent = new Intent(MainActivity.this, AddActivity.class);
-                intent.putExtra("type", currentScreen);
-                startActivityForResult(intent, ADD_ACTIVITY);
+                startAddActivity();
             }
         });
 
@@ -133,6 +131,12 @@ public class MainActivity extends AppCompatActivity
         View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
         ((TextView) headerView.findViewById(R.id.mail)).setText(sp.getData(Utils.getEmail()));
         init();
+    }
+
+    private void startAddActivity() {
+        Intent intent = new Intent(MainActivity.this, AddActivity.class);
+        intent.putExtra("type", currentScreen);
+        startActivityForResult(intent, ADD_ACTIVITY);
     }
 
     @Override
@@ -350,16 +354,24 @@ public class MainActivity extends AppCompatActivity
 
         showProgressBar();
         if (id == R.id.dash) {
-            currentScreen = 1;
-            updateUI();
+            showDashBoard();
         } else if (id == R.id.home) {
-            currentScreen = 0;
-            switchScreen();
-            homeUIData();
+            showHome();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showDashBoard() {
+        currentScreen = 1;
+        updateUI();
+    }
+
+    private void showHome() {
+        currentScreen = 0;
+        switchScreen();
+        homeUIData();
     }
 
     private void showProgressBar() {
@@ -440,6 +452,16 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(mDashBoardViewPagerAdapter);
     }
 
+    private void performPendingTasks(){
+        dashBoard();
+
+        boolean isSmartRemainderNoti = getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI,false);
+        if(isSmartRemainderNoti) {
+            showHome();
+            startAddActivity();
+        }
+    }
+
     private void init() {
         db = new DbHandler(this);
         mainLayout = (FrameLayout) findViewById(R.id.main);
@@ -456,7 +478,7 @@ public class MainActivity extends AppCompatActivity
             intent.setAction(ACTION_MSG_PARSE_BY_DATE);
             intent.putExtra(GlobalConstants.HANDLER_NAME, new Messenger(new MoneyBookIntentServiceHandler(msg -> {
                 if (msg.what == GlobalConstants.MSG_PARSING_COMPLETED) {
-                    dashBoard();
+                    performPendingTasks();
                 }
             })));
             startService(intent);

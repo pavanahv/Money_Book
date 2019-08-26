@@ -44,6 +44,11 @@
             android:exported="true"
             android:process=":remote" />
         <receiver
+            android:name=".broadcastreceivers.SmartRemainderAlarmReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote" />
+        <receiver
             android:name=".broadcastreceivers.NetworkConnectionReceiver"
             android:enabled="true"
             android:exported="true" />

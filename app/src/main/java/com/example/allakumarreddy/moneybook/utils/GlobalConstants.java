@@ -22,6 +22,12 @@ public class GlobalConstants {
     public static final int ACTIVATE_GRAPH_ACTIVITY_WITHOUT_ADD_TO_SCREEN_MENU = 1;
     public static final int ACTIVATE_GRAPH_ACTIVITY_WITH_ADD_TO_SCREEN_MENU = 0;
     public static final String ANALYTICS_FILTER_ACTIVITY = "ANALYTICS_FILTER_ACTIVITY";
+    public static final String PREF_REPORTS_SWITCH = "PREF_REPORTS_SWITCH";
+    public static final String PREF_REPORTS_TIME = "PREF_REPORTS_TIME";
+    public static final String PREF_REPORTS_REMAINDER_SWITCH = "PREF_REPORTS_REMAINDER_SWITCH";
+    public static final String PREF_REPORTS_REMAINDER_TIME = "PREF_REPORTS_REMAINDER_TIME";
+    public static final String SMART_REMAINDER_NOTI = "SMART_REMAINDER_NOTI";
+    public static final String LOGIN_CHECK = "LOGIN_CHECK";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

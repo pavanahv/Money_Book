@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.fingerPrint.FingerPrintInterface;
 import com.example.allakumarreddy.moneybook.fingerPrint.FingerprintHandler;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -85,7 +86,7 @@ public class FingerPrintLoginActivity extends AppCompatActivity implements Finge
 
                         if (cipherInit()) {
                             FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(cipher);
-                            FingerprintHandler helper = new FingerprintHandler(this,this);
+                            FingerprintHandler helper = new FingerprintHandler(this, this);
                             helper.startAuth(fingerprintManager, cryptoObject);
                         }
                     }
@@ -157,11 +158,16 @@ public class FingerPrintLoginActivity extends AppCompatActivity implements Finge
     public void update(boolean isSuccess, String message) {
         ImageView fingerPringImage = (ImageView) findViewById(R.id.finger_print_image);
         mStatusTextView.setText(message);
-        if(isSuccess) {
+        if (isSuccess) {
             fingerPringImage.setImageResource(R.drawable.ic_finger_print_success);
-            startActivity(new Intent(this, MainActivity.class).putExtra("login", true));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(GlobalConstants.LOGIN_CHECK, true);
+            if (getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false)) {
+                intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
+            }
+            startActivity(intent);
             finish();
-        }else{
+        } else {
             fingerPringImage.setImageResource(R.drawable.ic_finger_print_error);
             findViewById(R.id.login_other_methods).setVisibility(View.VISIBLE);
         }

@@ -9,6 +9,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
+import com.example.allakumarreddy.moneybook.broadcastreceivers.SmartRemainderAlarmReceiver;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.github.mikephil.charting.charts.BarChart;
@@ -391,5 +395,29 @@ public class Utils {
             LoggerCus.d(TAG, e.getMessage());
         }
         return graphType;
+    }
+
+    public static void cancelAlarmForReportsRemainder(Context context) {
+        Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pi);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void setAlarmForReportsRemainder(Context context) {
+        long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_REMAINDER_TIME,-1);
+        if(time!=-1) {
+            Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
+            PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+            int millsec = 1000 * 60 * 60;
+            millsec *= 24;
+
+            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
+            Toast.makeText(context, "Smart Remainder Set Successfully!", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(context, "Not Able To Set Smart Remainder ", Toast.LENGTH_LONG).show();
+        }
     }
 }

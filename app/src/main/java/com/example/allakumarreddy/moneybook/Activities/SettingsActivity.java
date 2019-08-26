@@ -15,12 +15,15 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.preference.SwitchPreference;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.example.allakumarreddy.moneybook.utils.TimePreference;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.List;
@@ -44,6 +47,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * to reflect its new value.
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
@@ -60,12 +64,38 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 ? listPreference.getEntries()[index]
                                 : null);
 
-                if (prefInit && (preference.getKey().compareToIgnoreCase(GlobalConstants.PREF_BACKUP_FREQUENCY) == 0)) {
-                    Utils.cancelAlarmForGoogleDriveBackup(context);
-                    Utils.setAlarmForGoogleDriveBackup(context);
+                if (prefInit) {
+                    switch (preference.getKey()) {
+                        case GlobalConstants.PREF_BACKUP_FREQUENCY:
+                            Utils.cancelAlarmForGoogleDriveBackup(context);
+                            Utils.setAlarmForGoogleDriveBackup(context);
+                            break;
+                    }
                 }
-
-            } else if (preference instanceof RingtonePreference) {
+            }else if(preference instanceof TimePreference){
+                if (prefInit) {
+                    switch (preference.getKey()) {
+                        case GlobalConstants.PREF_REPORTS_REMAINDER_TIME:
+                            Utils.cancelAlarmForReportsRemainder(context);
+                            Utils.setAlarmForReportsRemainder(context);
+                            break;
+                    }
+                }
+            }else if(preference instanceof SwitchPreference){
+                if (prefInit){
+                    switch (preference.getKey()){
+                        case GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH:
+                            boolean reportsRemainderSwitchVal = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH,false);
+                            if(reportsRemainderSwitchVal){
+                                Utils.setAlarmForReportsRemainder(context);
+                            }else {
+                                Utils.cancelAlarmForReportsRemainder(context);
+                            }
+                            break;
+                    }
+                }
+            }
+            else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
                 // using RingtoneManager.
                 if (TextUtils.isEmpty(stringValue)) {
@@ -127,6 +157,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+        prefInit = true;
+    }
+
+    private static void bindPreferenceSummaryToLongValue(Preference preference) {
+        // Set the listener to watch for value changes.
+        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+        // Trigger the listener immediately with the preference's
+        // current value.
+        prefInit = false;
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getLong(preference.getKey(), -1));
         prefInit = true;
     }
 
@@ -236,7 +280,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+            bindPreferenceSummaryToValueBool(findPreference(GlobalConstants.PREF_REPORTS_SWITCH));
+            bindPreferenceSummaryToLongValue(findPreference(GlobalConstants.PREF_REPORTS_TIME));
+            bindPreferenceSummaryToValueBool(findPreference(GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH));
+            bindPreferenceSummaryToLongValue(findPreference(GlobalConstants.PREF_REPORTS_REMAINDER_TIME));
         }
 
         @Override
