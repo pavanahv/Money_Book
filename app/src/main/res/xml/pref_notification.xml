@@ -3,7 +3,7 @@
     <!-- A 'parent' preference, which enables/disables child preferences (below)
          when checked/unchecked. -->
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="PREF_REPORTS_SWITCH"
         android:title="@string/reports_switch_name" />
 
@@ -17,7 +17,7 @@
 
     <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="PREF_REPORTS_REMAINDER_SWITCH"
         android:title="@string/record_remainder_name" />
 

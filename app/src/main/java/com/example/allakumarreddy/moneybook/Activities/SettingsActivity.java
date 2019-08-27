@@ -20,8 +20,11 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.SettingsLock.CreatePinActivity;
+import com.example.allakumarreddy.moneybook.SettingsLock.FingerPrintManager;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.TimePreference;
 import com.example.allakumarreddy.moneybook.utils.Utils;
@@ -70,6 +73,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             Utils.cancelAlarmForGoogleDriveBackup(context);
                             Utils.setAlarmForGoogleDriveBackup(context);
                             break;
+                        case GlobalConstants.PREF_LOCK_TYPE:
+                            String lockType = (String) value;
+                            if (lockType != null) {
+                                switch (Integer.parseInt(lockType)) {
+                                    case 2:
+                                        // no lock
+                                        Toast.makeText(context, "No Lock Selected!\n For your Privacy We Recommend You To Set Lock", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case 0:
+                                        // pin lock
+                                        context.startActivity(new Intent(context, CreatePinActivity.class));
+                                        break;
+                                    case 1:
+                                        // smart lock
+                                        break;
+                                }
+                            }
+                            break;
                     }
                 }
             } else if (preference instanceof TimePreference) {
@@ -89,8 +110,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 if (prefInit) {
                     switch (preference.getKey()) {
                         case GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH:
-                            boolean reportsRemainderSwitchVal = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH, false);
-                            if (reportsRemainderSwitchVal) {
+                            if ((boolean)value) {
                                 Utils.setAlarmForReportsRemainder(context);
                             } else {
                                 Utils.cancelAlarmForReportsRemainder(context);
@@ -98,11 +118,28 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             break;
 
                         case GlobalConstants.PREF_REPORTS_SWITCH:
-                            boolean reportsSwitchVal = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GlobalConstants.PREF_REPORTS_SWITCH, false);
-                            if (reportsSwitchVal) {
+                            if ((boolean)value) {
                                 Utils.setAlarmForReportsNotification(context);
                             } else {
                                 Utils.cancelAlarmForReportsNotification(context);
+                            }
+                            break;
+
+                        case GlobalConstants.PREF_LOCK_FINGERPRINT:
+                            if ((boolean)value) {
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                                    FingerPrintManager fm = new FingerPrintManager(context, null);
+                                    boolean res = fm.init();
+                                    if (!res) {
+                                        Toast.makeText(context, fm.getErrorText(), Toast.LENGTH_LONG).show();
+                                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(GlobalConstants.PREF_LOCK_FINGERPRINT, false).apply();
+                                    } else {
+                                        Toast.makeText(context, "Fingerprint Successfully Enabled !", Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Unsupported OS for FingerPrint Login. Minimum OS should be \"M\"", Toast.LENGTH_LONG).show();
+                                }
+
                             }
                             break;
                     }
@@ -325,7 +362,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            bindPreferenceSummaryToValueBool(findPreference(GlobalConstants.PREF_LOCK_FINGERPRINT));
+            bindPreferenceSummaryToValue(findPreference(GlobalConstants.PREF_LOCK_TYPE));
         }
 
         @Override

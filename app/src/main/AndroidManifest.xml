@@ -21,14 +21,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.FingerPrintLoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Activities.FiltersAnalyticsActivity"></activity>
+        <activity android:name=".SettingsLock.CreatePinActivity"></activity>
+        <activity android:name=".Activities.FiltersAnalyticsActivity" />
 
         <receiver
             android:name=".broadcastreceivers.BootUpCompleteReceiver"
@@ -86,10 +80,13 @@
         <activity
             android:name=".Activities.MessageParseActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".Activities.LoginActivity">
+        <activity android:name=".SettingsLock.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <activity android:name=".Activities.LoginSettingsActivity" />
         <activity
             android:name=".Activities.MainActivity"
             android:label="@string/app_name"

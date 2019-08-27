@@ -11,8 +11,8 @@ import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 
-import com.example.allakumarreddy.moneybook.Activities.FingerPrintLoginActivity;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.SettingsLock.LoginActivity;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
@@ -43,7 +43,7 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
     private void showNotification(Context context) {
 
         int reqCode = (int)System.currentTimeMillis();
-        Intent intent = new Intent(context, FingerPrintLoginActivity.class);
+        Intent intent = new Intent(context, LoginActivity.class);
         intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -53,6 +53,7 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
                 .setContentTitle("Smart Remainder")
                 .setContentText("It's Time To Log Expenses")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
@@ -62,7 +63,7 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
             channel.setDescription(GlobalConstants.NOTIFICATION_CHANNLE_DESCRIPTION);
             notificationManager.createNotificationChannel(channel);
         }
-        notificationManager.notify(reqCode,builder.build());
+        notificationManager.notify(GlobalConstants.SMART_REMAINDER_NOTIFICATION_ID,builder.build());
 
     }
 

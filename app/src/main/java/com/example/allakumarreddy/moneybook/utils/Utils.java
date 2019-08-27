@@ -172,7 +172,7 @@ public class Utils {
     public static void setAlarmForGoogleDriveBackup(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int)System.currentTimeMillis(), i, 0);
         int freq = new PreferencesCus(context).getGoogleDriveBackupFrequency();
         if (freq != -1) {
             int millsec = 1000 * 60 * 60;
@@ -430,7 +430,7 @@ public class Utils {
 
     public static void cancelAlarmForReportsNotification(Context context) {
         Intent i = new Intent(context, ReportsAlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int)System.currentTimeMillis(), i, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pi);
     }
@@ -440,7 +440,7 @@ public class Utils {
         long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_TIME,-1);
         if(time!=-1) {
             Intent i = new Intent(context, ReportsAlarmReceiver.class);
-            PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+            PendingIntent pi = PendingIntent.getBroadcast(context, (int)System.currentTimeMillis(), i, 0);
             int millsec = 1000 * 60 * 60;
             millsec *= 24;
 

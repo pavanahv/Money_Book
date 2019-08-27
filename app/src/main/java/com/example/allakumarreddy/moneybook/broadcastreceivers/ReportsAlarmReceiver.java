@@ -17,10 +17,10 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
-import com.example.allakumarreddy.moneybook.Activities.FingerPrintLoginActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
+import com.example.allakumarreddy.moneybook.SettingsLock.LoginActivity;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -77,7 +77,7 @@ public class ReportsAlarmReceiver extends BroadcastReceiver {
     private void performPendingTasks() {
         int[] res = getTotal();
         LoggerCus.d(TAG, Arrays.toString(res));
-        int icons[] = new int[]{R.drawable.spent, R.drawable.earn, R.drawable.due, R.drawable.loan};
+        int icons[] = new int[]{R.drawable.spent, R.drawable.earn, R.drawable.due, R.drawable.ic_loan};
         String titles[] = new String[]{"Spent", "Earn", "Due", "Loan"};
         int colors[] = new int[]{Color.parseColor("#d9534f"),
                 Color.parseColor("#5bc0de"),
@@ -92,7 +92,7 @@ public class ReportsAlarmReceiver extends BroadcastReceiver {
 
     private void createNotification(int countValue, int icon, String title, int index, int color) {
         int reqCode = (int) System.currentTimeMillis();
-        Intent intent = new Intent(mContext, FingerPrintLoginActivity.class);
+        Intent intent = new Intent(mContext, LoginActivity.class);
         intent.putExtra(GlobalConstants.REPORTS_NOTI[index], true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -113,6 +113,7 @@ public class ReportsAlarmReceiver extends BroadcastReceiver {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
                 .setStyle(bigText)
+                .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = null;
@@ -125,7 +126,7 @@ public class ReportsAlarmReceiver extends BroadcastReceiver {
             channel.setDescription(GlobalConstants.NOTIFICATION_CHANNLE_DESCRIPTION);
             notificationManager.createNotificationChannel(channel);
         }
-        notificationManager.notify(reqCode, builder.build());
+        notificationManager.notify(GlobalConstants.TYPE_NOTIFICATION_ID[index], builder.build());
     }
 
     private int[] getTotal() {

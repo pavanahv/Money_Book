@@ -4,45 +4,156 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
-    tools:context=".Activities.LoginActivity">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <TextView
-            android:textColor="@color/colorPrimary"
-            android:id="@+id/number"
-            android:layout_gravity="center"
-            android:gravity="center_horizontal|center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="36"
-            android:textSize="100dp" />
-    </FrameLayout>
+    tools:context=".SettingsLock.LoginActivity">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="6"
+        android:visibility="gone"
+        android:id="@+id/finger_print"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="10dp"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/inputnumber"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="number" />
+        <ImageView
+            android:id="@+id/finger_print_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_finger_print" />
 
-        <ImageButton
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text=""
+            android:textColor="#FF0000"
+            android:textSize="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/smart_lock"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/number"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="36"
+            android:textColor="@color/colorPrimary"
+            android:textSize="100dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/smart_lock_status_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text=""
+                android:layout_marginBottom="10dp"
+                android:textColor="#FF0000"
+                android:textSize="20dp" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary">
+
+                <EditText
+                    android:id="@+id/inputnumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:hint="Enter PIN"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:padding="10dp"
+                    android:textAlignment="center"
+                    android:textSize="20dp" />
+
+            </FrameLayout>
+
+            <android.support.v7.widget.AppCompatButton
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="login"
+                android:text="Login" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/pin_lock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/pin_status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text=""
+            android:layout_marginBottom="10dp"
+            android:textColor="#FF0000"
+            android:textSize="20dp" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            android:onClick="login"
-            app:srcCompat="@android:drawable/ic_menu_upload_you_tube" />
+            android:background="@color/colorPrimary">
+
+            <EditText
+                android:id="@+id/input_pin_number"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/white"
+                android:ems="10"
+                android:hint="Enter 4-Digit PIN"
+                android:inputType="numberPassword"
+                android:maxLength="4"
+                android:padding="10dp"
+                android:textAlignment="center"
+                android:textSize="20dp" />
+
+        </FrameLayout>
+
+        <android.support.v7.widget.AppCompatButton
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="pinLogin"
+            android:text="Login" />
     </LinearLayout>
 </LinearLayout>

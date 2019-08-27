@@ -2,22 +2,15 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -25,10 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,12 +35,9 @@ import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
+import com.example.allakumarreddy.moneybook.SettingsLock.CreatePinActivity;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.home.HomeDueFragment;
-import com.example.allakumarreddy.moneybook.home.HomeEarnFragment;
-import com.example.allakumarreddy.moneybook.home.HomeLoanFragment;
-import com.example.allakumarreddy.moneybook.home.HomeSpentFragment;
 import com.example.allakumarreddy.moneybook.home.HomeViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
@@ -213,54 +199,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void test() {
-        Intent intent = new Intent(this, FingerPrintLoginActivity.class);
-        intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
-
-        String spentSpan = "Spent : " + 1000 + "\n";
-        String earnSpan = "Earn : " + 0 + "\n";
-        String dueSpan = "Due : " + 0 + "\n";
-        String loanSpan = "Loan : " + 200 + "\n";
-        Spannable wordtoSpan = new SpannableString(spentSpan + earnSpan + dueSpan + loanSpan);
-        //red #d9534f
-        //earn #5bc0de
-        //due #f0ad4e
-        //loan #FFFF00
-        wordtoSpan.setSpan(new ForegroundColorSpan(Color.parseColor("")), 0, spentSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, spentSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLUE), spentSpan.length(), spentSpan.length() + earnSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLACK), spentSpan.length() + earnSpan.length(), spentSpan.length() + earnSpan.length() + dueSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new ForegroundColorSpan(Color.YELLOW), spentSpan.length() + earnSpan.length() + dueSpan.length(), spentSpan.length() + earnSpan.length() + dueSpan.length() + loanSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        bigText.bigText(wordtoSpan);
-        bigText.setSummaryText("Reports By MoneyBook");
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channelid")
-                .setSmallIcon(R.drawable.ic_report)
-                .setContentTitle("Daily Report")
-                .setContentText("content")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.earn))
-                .setStyle(bigText)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            notificationManager = getSystemService(NotificationManager.class);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "MoneyBook Channel Name";
-            String description = "MoneyBook Channel Description";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("channelid", name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            notificationManager.createNotificationChannel(channel);
-        }
-        notificationManager.notify(1001, builder.build());
+        startActivity(new Intent(this, CreatePinActivity.class));
     }
 
     private void backupToGoogleDrive() {
@@ -517,7 +456,7 @@ public class MainActivity extends AppCompatActivity
         }
         if (type != -1) {
             LoggerCus.d(TAG,""+type);
-            mHomeViewPager.setCurrentItem(type,true);
+            mHomeViewPager.setCurrentItem(type,false);
             showHome();
         }
     }

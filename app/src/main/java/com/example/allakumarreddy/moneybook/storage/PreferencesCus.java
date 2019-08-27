@@ -89,4 +89,12 @@ public class PreferencesCus {
             return -1;
         }
     }
+
+    public void setLockPinData(int pin) {
+        mSharedPreference.edit().putInt(GlobalConstants.PREF_LOCK_PIN, pin).apply();
+    }
+
+    public int getLockPinData() {
+        return mSharedPreference.getInt(GlobalConstants.PREF_LOCK_PIN, -1);
+    }
 }

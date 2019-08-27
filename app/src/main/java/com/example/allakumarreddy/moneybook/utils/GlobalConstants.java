@@ -37,6 +37,11 @@ public class GlobalConstants {
     public static final int TYPE_EARN = 1;
     public static final int TYPE_DUE = 2;
     public static final int TYPE_LOAN = 3;
+    public static final int[] TYPE_NOTIFICATION_ID = new int[]{20191,20192,20193,20194};
+    public static final int SMART_REMAINDER_NOTIFICATION_ID = 20195;
+    public static final String PREF_LOCK_FINGERPRINT = "PREF_LOCK_FINGERPRINT";
+    public static final String PREF_LOCK_TYPE = "PREF_LOCK_TYPE";
+    public static final String PREF_LOCK_PIN = "PREF_LOCK_PIN";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

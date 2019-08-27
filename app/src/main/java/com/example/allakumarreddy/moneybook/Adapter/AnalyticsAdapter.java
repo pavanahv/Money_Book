@@ -102,7 +102,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
                 break;
 
             case 3:
-                viewHolder.im.setImageResource(R.drawable.loan);
+                viewHolder.im.setImageResource(R.drawable.ic_loan);
                 break;
 
             case 4:

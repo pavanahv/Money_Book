@@ -93,7 +93,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
                 break;
 
             case 3:
-                viewHolder.imageView.setImageResource(R.drawable.loan);
+                viewHolder.imageView.setImageResource(R.drawable.ic_loan);
                 break;
         }
         // Return the completed view to render on screen
