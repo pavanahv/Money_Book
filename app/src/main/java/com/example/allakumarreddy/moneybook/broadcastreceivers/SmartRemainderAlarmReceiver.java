@@ -42,9 +42,11 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void showNotification(Context context) {
 
+        int reqCode = (int)System.currentTimeMillis();
         Intent intent = new Intent(context, FingerPrintLoginActivity.class);
         intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_smart_remainder)
@@ -55,16 +57,12 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
 
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "MoneyBook Channel Name";
-            String description = "MoneyBook Channel Description";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+            NotificationChannel channel = new NotificationChannel(GlobalConstants.NOTIFICATION_CHANNLE_ID, GlobalConstants.NOTIFICATION_CHANNLE_NAME, importance);
+            channel.setDescription(GlobalConstants.NOTIFICATION_CHANNLE_DESCRIPTION);
             notificationManager.createNotificationChannel(channel);
         }
-        notificationManager.notify(NOTIFICATION_ID,builder.build());
+        notificationManager.notify(reqCode,builder.build());
 
     }
 

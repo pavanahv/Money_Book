@@ -72,30 +72,42 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             break;
                     }
                 }
-            }else if(preference instanceof TimePreference){
+            } else if (preference instanceof TimePreference) {
                 if (prefInit) {
                     switch (preference.getKey()) {
                         case GlobalConstants.PREF_REPORTS_REMAINDER_TIME:
                             Utils.cancelAlarmForReportsRemainder(context);
                             Utils.setAlarmForReportsRemainder(context);
                             break;
+                        case GlobalConstants.PREF_REPORTS_TIME:
+                            Utils.cancelAlarmForReportsNotification(context);
+                            Utils.setAlarmForReportsNotification(context);
+                            break;
                     }
                 }
-            }else if(preference instanceof SwitchPreference){
-                if (prefInit){
-                    switch (preference.getKey()){
+            } else if (preference instanceof SwitchPreference) {
+                if (prefInit) {
+                    switch (preference.getKey()) {
                         case GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH:
-                            boolean reportsRemainderSwitchVal = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH,false);
-                            if(reportsRemainderSwitchVal){
+                            boolean reportsRemainderSwitchVal = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH, false);
+                            if (reportsRemainderSwitchVal) {
                                 Utils.setAlarmForReportsRemainder(context);
-                            }else {
+                            } else {
                                 Utils.cancelAlarmForReportsRemainder(context);
+                            }
+                            break;
+
+                        case GlobalConstants.PREF_REPORTS_SWITCH:
+                            boolean reportsSwitchVal = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GlobalConstants.PREF_REPORTS_SWITCH, false);
+                            if (reportsSwitchVal) {
+                                Utils.setAlarmForReportsNotification(context);
+                            } else {
+                                Utils.cancelAlarmForReportsNotification(context);
                             }
                             break;
                     }
                 }
-            }
-            else if (preference instanceof RingtonePreference) {
+            } else if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value
                 // using RingtoneManager.
                 if (TextUtils.isEmpty(stringValue)) {

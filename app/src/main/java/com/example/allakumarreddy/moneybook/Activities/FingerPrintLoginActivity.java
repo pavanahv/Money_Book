@@ -42,6 +42,7 @@ import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_NAME;
 
 public class FingerPrintLoginActivity extends AppCompatActivity implements FingerPrintInterface {
 
+    private static final String TAG = "FingerPrintLoginActivity";
     private TextView mStatusTextView;
     private KeyStore keyStore;
     private Cipher cipher;
@@ -164,6 +165,12 @@ public class FingerPrintLoginActivity extends AppCompatActivity implements Finge
             intent.putExtra(GlobalConstants.LOGIN_CHECK, true);
             if (getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false)) {
                 intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
+            }
+            for (int i=0;i<GlobalConstants.REPORTS_NOTI.length;i++){
+                if(getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI[i], false)){
+                    intent.putExtra(GlobalConstants.REPORTS_NOTI[i], true);
+                    break;
+                }
             }
             startActivity(intent);
             finish();

@@ -49,6 +49,11 @@
             android:exported="true"
             android:process=":remote" />
         <receiver
+            android:name=".broadcastreceivers.ReportsAlarmReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote" />
+        <receiver
             android:name=".broadcastreceivers.NetworkConnectionReceiver"
             android:enabled="true"
             android:exported="true" />

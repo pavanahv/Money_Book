@@ -386,6 +386,36 @@ public class DbHandler extends SQLiteOpenHelper {
         return mbr;
     }
 
+    public int getTotalOfType(String date, int type) {
+        LoggerCus.d(TAG, date);
+        DateConverter dc = null;
+        dc = new DateConverter(date);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dc.getdDate());
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        Date temp1 = cal.getTime();
+        cal.set(Calendar.AM_PM, Calendar.PM);
+        cal.set(Calendar.HOUR, 11);
+        Date temp2 = cal.getTime();
+
+        int total = -1;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        cursor = db.rawQuery("SELECT SUM(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime() + " AND " + KEY_DATE + " <= " + temp2.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                total = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        // return contact
+        return total;
+    }
+
     public String getRecords() {
         ArrayList<MBRecord> mbr = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();

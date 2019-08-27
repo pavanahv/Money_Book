@@ -28,6 +28,15 @@ public class GlobalConstants {
     public static final String PREF_REPORTS_REMAINDER_TIME = "PREF_REPORTS_REMAINDER_TIME";
     public static final String SMART_REMAINDER_NOTI = "SMART_REMAINDER_NOTI";
     public static final String LOGIN_CHECK = "LOGIN_CHECK";
+    public static final String REPORTS_NOTI[] = new String[]{"REPORTS_NOTI_SPENT","REPORTS_NOTI_EARN","REPORTS_NOTI_DUE","REPORTS_NOTI_LOAN"};
+    public static final String NOTIFICATION_CHANNLE_ID = "NOTIFICATION_CHANNLE_ID";
+    public static final String  NOTIFICATION_CHANNLE_NAME = "NOTIFICATION_CHANNLE_NAME";
+    public static final String NOTIFICATION_CHANNLE_DESCRIPTION = "NOTIFICATION_CHANNLE_DESCRIPTION";
+    public static final int NOTIFICATION_ID = 2019;
+    public static final int TYPE_SPENT = 0;
+    public static final int TYPE_EARN = 1;
+    public static final int TYPE_DUE = 2;
+    public static final int TYPE_LOAN = 3;
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

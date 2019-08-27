@@ -9,179 +9,26 @@
     tools:context="com.example.allakumarreddy.moneybook.Activities.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <TabHost
-        android:id="@+id/tabHost"
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/home"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <android.support.design.widget.TabLayout
+            android:id="@+id/home_tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></android.support.design.widget.TabLayout>
 
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/home_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></android.support.v4.view.ViewPager>
 
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:id="@+id/tab1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:text="Total"
-                        android:textColor="@color/colorPrimary" />
-
-                    <TextView
-                        android:id="@+id/homespenttotal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingBottom="10dp"
-                        android:text="TextView"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="25dp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@color/colorPrimaryDark" />
-
-                    <ListView
-                        android:id="@+id/my_recycler_view1"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/tab2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:text="Total"
-                        android:textColor="@color/colorPrimary" />
-
-                    <TextView
-                        android:id="@+id/homeearntotal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingBottom="10dp"
-                        android:text="TextView"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="25dp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@color/colorPrimaryDark" />
-
-                    <ListView
-                        android:id="@+id/my_recycler_view2"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/tab3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:text="Total"
-                        android:textColor="@color/colorPrimary" />
-
-                    <TextView
-                        android:id="@+id/homeduetotal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingBottom="10dp"
-                        android:text="TextView"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="25dp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@color/colorPrimaryDark" />
-
-
-                    <ListView
-                        android:id="@+id/my_recycler_view3"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/tab4"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:text="Total"
-                        android:textColor="@color/colorPrimary" />
-
-                    <TextView
-                        android:id="@+id/homeloantotal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:paddingBottom="10dp"
-                        android:text="TextView"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="25dp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@color/colorPrimaryDark" />
-
-
-                    <ListView
-                        android:id="@+id/my_recycler_view4"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </LinearLayout>
-            </FrameLayout>
-        </LinearLayout>
-    </TabHost>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/dashboard"
@@ -214,10 +61,10 @@
 
     <LinearLayout
         android:id="@+id/mainlayoutProgressBar"
-        android:background="@color/white"
-        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:gravity="center">
 
         <ProgressBar
             style="?android:attr/progressBarStyle"

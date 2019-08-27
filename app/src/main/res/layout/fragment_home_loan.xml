@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".home.HomeLoanFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:text="Total"
+            android:textColor="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/total_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:text="TextView"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/colorPrimaryDark" />
+
+        <ListView
+            android:id="@+id/lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+</FrameLayout>

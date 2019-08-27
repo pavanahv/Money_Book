@@ -2,14 +2,22 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -17,6 +25,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +48,11 @@ import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.home.HomeDueFragment;
+import com.example.allakumarreddy.moneybook.home.HomeEarnFragment;
+import com.example.allakumarreddy.moneybook.home.HomeLoanFragment;
+import com.example.allakumarreddy.moneybook.home.HomeSpentFragment;
+import com.example.allakumarreddy.moneybook.home.HomeViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -93,6 +110,10 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView dashBoardFilterList;
     private ViewPager mViewPager;
     private DashboardViewPagerAdapter mDashBoardViewPagerAdapter;
+    private View mHome;
+    private ViewPager mHomeViewPager;
+    private HomeViewPagerAdapter mHomeViewPagerAdapter;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,9 +206,61 @@ public class MainActivity extends AppCompatActivity
                 //db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
+                test();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void test() {
+        Intent intent = new Intent(this, FingerPrintLoginActivity.class);
+        intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
+
+        String spentSpan = "Spent : " + 1000 + "\n";
+        String earnSpan = "Earn : " + 0 + "\n";
+        String dueSpan = "Due : " + 0 + "\n";
+        String loanSpan = "Loan : " + 200 + "\n";
+        Spannable wordtoSpan = new SpannableString(spentSpan + earnSpan + dueSpan + loanSpan);
+        //red #d9534f
+        //earn #5bc0de
+        //due #f0ad4e
+        //loan #FFFF00
+        wordtoSpan.setSpan(new ForegroundColorSpan(Color.parseColor("")), 0, spentSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, spentSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLUE), spentSpan.length(), spentSpan.length() + earnSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLACK), spentSpan.length() + earnSpan.length(), spentSpan.length() + earnSpan.length() + dueSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new ForegroundColorSpan(Color.YELLOW), spentSpan.length() + earnSpan.length() + dueSpan.length(), spentSpan.length() + earnSpan.length() + dueSpan.length() + loanSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        bigText.bigText(wordtoSpan);
+        bigText.setSummaryText("Reports By MoneyBook");
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channelid")
+                .setSmallIcon(R.drawable.ic_report)
+                .setContentTitle("Daily Report")
+                .setContentText("content")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.earn))
+                .setStyle(bigText)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            notificationManager = getSystemService(NotificationManager.class);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "MoneyBook Channel Name";
+            String description = "MoneyBook Channel Description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("channelid", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            notificationManager.createNotificationChannel(channel);
+        }
+        notificationManager.notify(1001, builder.build());
     }
 
     private void backupToGoogleDrive() {
@@ -370,8 +443,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showHome() {
         currentScreen = 0;
-        switchScreen();
-        homeUIData();
+        homeUIUpdate();
     }
 
     private void showProgressBar() {
@@ -381,10 +453,10 @@ public class MainActivity extends AppCompatActivity
     public void switchScreen() {
         closeOtherScreens();
         if (currentScreen == 1) {
-            host.setVisibility(View.INVISIBLE);
+            mHome.setVisibility(View.INVISIBLE);
             mDashBoard.setVisibility(View.VISIBLE);
         } else {
-            host.setVisibility(View.VISIBLE);
+            mHome.setVisibility(View.VISIBLE);
             mDashBoard.setVisibility(View.INVISIBLE);
         }
     }
@@ -399,44 +471,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void home() {
-        Date curDate = new Date();
-        format = new SimpleDateFormat("yyyy/MM/dd");
-        String curDateStr = format.format(curDate);
-        tablesDate = curDateStr;
+        mHome = findViewById(R.id.home);
+        mHomeViewPager = (ViewPager) findViewById(R.id.home_pager);
+        mHomeViewPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
+        mHomeViewPager.setAdapter(mHomeViewPagerAdapter);
 
-        mDashBoard = (LinearLayout) findViewById(R.id.dashboard);
-        int[] o = {R.id.my_recycler_view1, R.id.my_recycler_view2, R.id.my_recycler_view3, R.id.my_recycler_view4};
-        int[] t = {R.id.homespenttotal, R.id.homeearntotal, R.id.homeduetotal, R.id.homeloantotal};
-        mRecyclerView = new ListView[4];
-        mTextViewTotal = new TextView[4];
-
-
-        mAdapter = new MyAdapter[4];
-        mbr = new ArrayList[4];
-        for (int i = 0; i < 4; i++) {
-            mRecyclerView[i] = (ListView) findViewById(o[i]);
-            mTextViewTotal[i] = (TextView) findViewById(t[i]);
-            mbr[i] = new ArrayList<>();
-            mAdapter[i] = new MyAdapter(mbr[i], this, i, this);
-            mRecyclerView[i].setAdapter(mAdapter[i]);
-        }
+        tabLayout = (TabLayout) findViewById(R.id.home_tab_layout);
+        tabLayout.setupWithViewPager(mHomeViewPager);
     }
 
-    private void homeUIData() {
-        new Thread(() -> {
-            for (int i = 0; i < 4; i++) {
-                mbr[i] = db.getRecords(tablesDate, i);
-            }
-
-            runOnUiThread(() -> {
-                for (int i = 0; i < 4; i++) {
-                    mAdapter[i].clear();
-                    mAdapter[i].addAll(mbr[i]);
-                    mAdapter[i].notifyDataSetChanged();
-                    mTextViewTotal[i].setText(Utils.getFormattedNumber(getTotalAmount(i)));
-                }
-            });
-        }).start();
+    private void homeUIUpdate() {
+        switchScreen();
     }
 
     private int getTotalAmount(int i) {
@@ -447,18 +492,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void dashBoard() {
+        mDashBoard = (LinearLayout) findViewById(R.id.dashboard);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mDashBoardViewPagerAdapter = new DashboardViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mDashBoardViewPagerAdapter);
     }
 
-    private void performPendingTasks(){
+    private void performPendingTasks() {
+        home();
         dashBoard();
 
-        boolean isSmartRemainderNoti = getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI,false);
-        if(isSmartRemainderNoti) {
+        boolean isSmartRemainderNoti = getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false);
+        if (isSmartRemainderNoti) {
+            LoggerCus.d(TAG,""+isSmartRemainderNoti);
             showHome();
             startAddActivity();
+        }
+        int type = -1;
+        for (int i = 0; i < GlobalConstants.REPORTS_NOTI.length; i++) {
+            if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI[i], false)) {
+                type = i;
+                break;
+            }
+        }
+        if (type != -1) {
+            LoggerCus.d(TAG,""+type);
+            mHomeViewPager.setCurrentItem(type,true);
+            showHome();
         }
     }
 
@@ -466,8 +526,10 @@ public class MainActivity extends AppCompatActivity
         db = new DbHandler(this);
         mainLayout = (FrameLayout) findViewById(R.id.main);
         currentScreen = 1;
-        createTabs(R.id.tabHost, R.id.tab1, R.id.tab2, R.id.tab3, R.id.tab4, 0);
-        home();
+        Date curDate = new Date();
+        format = new SimpleDateFormat("yyyy/MM/dd");
+        String curDateStr = format.format(curDate);
+        tablesDate = curDateStr;
         startMsgParserService();
     }
 
@@ -537,10 +599,9 @@ public class MainActivity extends AppCompatActivity
     public void afterCallingAddDialog(String[] s, int type) {
         if (this.currentScreen == 0) {
             if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
-                final int pos = host.getCurrentTab();
+                final int pos = mHomeViewPager.getCurrentItem();
                 MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2]);
                 db.addRecord(mbr, pos);
-                addItem(pos);
             }
         } else {
             if (type == 1) {

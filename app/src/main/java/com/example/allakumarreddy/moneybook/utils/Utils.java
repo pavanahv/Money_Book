@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
+import com.example.allakumarreddy.moneybook.broadcastreceivers.ReportsAlarmReceiver;
 import com.example.allakumarreddy.moneybook.broadcastreceivers.SmartRemainderAlarmReceiver;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
@@ -50,6 +51,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -188,7 +190,12 @@ public class Utils {
                     millsec *= 24 * 7;
                     break;
             }
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), millsec, pi); // Millisec * Second * Minute
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+            cal.set(Calendar.HOUR,6);
+            cal.set(Calendar.MINUTE,0);
+            cal.set(Calendar.SECOND,0);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), millsec, pi); // Millisec * Second * Minute
             Toast.makeText(context, "Backup Frequency Set Successfully!", Toast.LENGTH_LONG).show();
         }
     }
@@ -418,6 +425,30 @@ public class Utils {
             Toast.makeText(context, "Smart Remainder Set Successfully!", Toast.LENGTH_LONG).show();
         }else{
             Toast.makeText(context, "Not Able To Set Smart Remainder ", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static void cancelAlarmForReportsNotification(Context context) {
+        Intent i = new Intent(context, ReportsAlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pi);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void setAlarmForReportsNotification(Context context) {
+        long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_TIME,-1);
+        if(time!=-1) {
+            Intent i = new Intent(context, ReportsAlarmReceiver.class);
+            PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+            int millsec = 1000 * 60 * 60;
+            millsec *= 24;
+
+            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
+            Toast.makeText(context, "Reports Set Successfully!", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(context, "Not Able To Set Reports", Toast.LENGTH_LONG).show();
         }
     }
 }

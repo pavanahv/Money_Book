@@ -19,5 +19,6 @@ public class BootUpCompleteReceiver extends BroadcastReceiver {
         LoggerCus.d(TAG, "bootup completed");
         Utils.setAlarmForGoogleDriveBackup(context);
         Utils.setAlarmForReportsRemainder(context);
+        Utils.setAlarmForReportsNotification(context);
     }
 }
