@@ -71,6 +71,8 @@ public class LoginActivity extends AppCompatActivity {
                     enableSmartLock();
                     break;
             }
+        }else{
+            loginSuccess();
         }
     }
 
