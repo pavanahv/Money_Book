@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_event_note_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_home_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -67,10 +67,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="TEXT" />
-                                      <entry key="outputName" value="ic_loan" />
+                                      <entry key="outputName" value="ic_home" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="8f8f00" />
+                                      <entry key="themeColor" value="040407" />
                                     </map>
                                   </option>
                                 </PersistentState>

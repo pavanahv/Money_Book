@@ -21,7 +21,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SettingsLock.CreatePinActivity"></activity>
+        <activity android:name=".SettingsLock.CreateSmartPinActivity"></activity>
+        <activity android:name=".SettingsLock.CreatePinActivity" />
         <activity android:name=".Activities.FiltersAnalyticsActivity" />
 
         <receiver

@@ -16,52 +16,38 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.DashboardViewPagerAdapter;
-import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
-import com.example.allakumarreddy.moneybook.SettingsLock.CreatePinActivity;
-import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.home.HomeViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_IMPORT;
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface, HomeAdapterInterface {
+        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface {
 
     final static String TAG = "MainActivity";
     private static final int REQUESTCODE_PICK_JSON = 504;
@@ -69,31 +55,12 @@ public class MainActivity extends AppCompatActivity
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE = 1001;
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
     public static final int ADD_ACTIVITY = 1001;
-    private TabHost host;
-    private ListView[] mRecyclerView;
-    private List<String>[] des, amount, date;
-    private MyAdapter[] mAdapter;
     private int currentScreen = 0;
-    private SimpleDateFormat format;
     public DbHandler db;
     private LinearLayout mDashBoard;
-    private ListView dashBoardList;
-    private DashBoardAdapter dashBoardAdapter;
-    private ArrayList<DashBoardRecord> dbr;
-    private TextView totalD;
-    private TextView[] mTextViewTotal;
-    private FrameLayout mainLayout;
-    private String tablesDate;
-    private GoogleSignInClient mGoogleSignInClient;
     private PreferencesCus sp;
-    public File mBackupFile;
-    private GoogleDriveBackup gdb;
-    private TextView totalM;
-    private TextView totalY;
     private View mProgressBAr;
-    private ArrayList<MBRecord>[] mbr;
     private String bfrPermissionAction;
-    private RecyclerView dashBoardFilterList;
     private ViewPager mViewPager;
     private DashboardViewPagerAdapter mDashBoardViewPagerAdapter;
     private View mHome;
@@ -119,8 +86,6 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //showDialog();
-                //new AddDialog(MainActivity.this, currentScreen).show();
                 startAddActivity();
             }
         });
@@ -188,19 +153,19 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case R.id.action_test:
+            /*case R.id.action_test:
                 //db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
                 test();
-                break;
+                break;*/
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void test() {
-        startActivity(new Intent(this, CreatePinActivity.class));
-    }
+    /*private void test() {
+        startActivity(new Intent(this, CreateSmartPinActivity.class));
+    }*/
 
     private void backupToGoogleDrive() {
         Intent intent = new Intent(MainActivity.this, BackupToGoogleDriveService.class);
@@ -307,7 +272,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUESTCODE_PICK_JSON:
@@ -338,7 +302,6 @@ public class MainActivity extends AppCompatActivity
             case REQUEST_CODE_SIGN_IN:
                 if (resultCode == RESULT_OK) {
                     LoggerCus.d(TAG, "Signed in successfully.");
-                    //mDriveClientbackupToDrive();
                 } else {
                     LoggerCus.d(TAG, "error in sign in");
                 }
@@ -423,13 +386,6 @@ public class MainActivity extends AppCompatActivity
         switchScreen();
     }
 
-    private int getTotalAmount(int i) {
-        int total = 0;
-        for (MBRecord n : mbr[i])
-            total += n.getAmount();
-        return total;
-    }
-
     private void dashBoard() {
         mDashBoard = (LinearLayout) findViewById(R.id.dashboard);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -463,12 +419,7 @@ public class MainActivity extends AppCompatActivity
 
     private void init() {
         db = new DbHandler(this);
-        mainLayout = (FrameLayout) findViewById(R.id.main);
         currentScreen = 1;
-        Date curDate = new Date();
-        format = new SimpleDateFormat("yyyy/MM/dd");
-        String curDateStr = format.format(curDate);
-        tablesDate = curDateStr;
         startMsgParserService();
     }
 
@@ -505,36 +456,6 @@ public class MainActivity extends AppCompatActivity
         switchScreen();
     }
 
-    private void createTabs(final int hostId, final int t1, final int t2, final int t3, final int t4, final int position) {
-        host = (TabHost) findViewById(hostId);
-        host.setup();
-
-        //Tab 1
-        TabHost.TabSpec spec = host.newTabSpec("Spent");
-        spec.setContent(t1);
-        spec.setIndicator("Spent");
-        host.addTab(spec);
-
-        //Tab 2
-        spec = host.newTabSpec("Earn");
-        spec.setContent(t2);
-        spec.setIndicator("Earn");
-        host.addTab(spec);
-
-        //Tab 3
-        spec = host.newTabSpec("Due");
-        spec.setContent(t3);
-        spec.setIndicator("Due");
-        host.addTab(spec);
-
-        //Tab 4
-        spec = host.newTabSpec("Loan");
-        spec.setContent(t4);
-        spec.setIndicator("Loan");
-        host.addTab(spec);
-        host.setVisibility(View.INVISIBLE);
-    }
-
     public void afterCallingAddDialog(String[] s, int type) {
         if (this.currentScreen == 0) {
             if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
@@ -550,22 +471,4 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void addItem(final int position) {
-        mAdapter[position].clear();
-        mbr[position] = db.getRecords(tablesDate, position);
-        mAdapter[position].addAll(mbr[position]);
-        mAdapter[position].notifyDataSetChanged();
-        mTextViewTotal[position].setText(Utils.getFormattedNumber(getTotalAmount(position)));
-    }
-
-    @Override
-    public void onClickItem(MBRecord mbr) {
-        startDetailActivity(mbr);
-    }
-
-    public void startDetailActivity(MBRecord mbr) {
-        Intent intent = new Intent(MainActivity.this, AnalyticsItemDetail.class);
-        intent.putExtra("MBRecord", mbr);
-        startActivity(intent);
-    }
 }

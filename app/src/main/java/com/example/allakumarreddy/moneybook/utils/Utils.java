@@ -9,9 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
@@ -172,7 +170,7 @@ public class Utils {
     public static void setAlarmForGoogleDriveBackup(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int)System.currentTimeMillis(), i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), i, 0);
         int freq = new PreferencesCus(context).getGoogleDriveBackupFrequency();
         if (freq != -1) {
             int millsec = 1000 * 60 * 60;
@@ -192,9 +190,9 @@ public class Utils {
             }
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
-            cal.set(Calendar.HOUR,6);
-            cal.set(Calendar.MINUTE,0);
-            cal.set(Calendar.SECOND,0);
+            cal.set(Calendar.HOUR, 6);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
             am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), millsec, pi); // Millisec * Second * Minute
             Toast.makeText(context, "Backup Frequency Set Successfully!", Toast.LENGTH_LONG).show();
         }
@@ -411,44 +409,40 @@ public class Utils {
         alarmManager.cancel(pi);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public static void setAlarmForReportsRemainder(Context context) {
-        long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_REMAINDER_TIME,-1);
-        if(time!=-1) {
-            Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
-            PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-            int millsec = 1000 * 60 * 60;
-            millsec *= 24;
-
-            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
-            Toast.makeText(context, "Smart Remainder Set Successfully!", Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(context, "Not Able To Set Smart Remainder ", Toast.LENGTH_LONG).show();
+        long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_REMAINDER_TIME, -1);
+        if (time != -1) {
+            time = System.currentTimeMillis();
         }
+        Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        int millsec = 1000 * 60 * 60;
+        millsec *= 24;
+
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
+        Toast.makeText(context, "Smart Remainder Set Successfully!", Toast.LENGTH_LONG).show();
     }
 
     public static void cancelAlarmForReportsNotification(Context context) {
         Intent i = new Intent(context, ReportsAlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int)System.currentTimeMillis(), i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), i, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pi);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public static void setAlarmForReportsNotification(Context context) {
-        long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_TIME,-1);
-        if(time!=-1) {
-            Intent i = new Intent(context, ReportsAlarmReceiver.class);
-            PendingIntent pi = PendingIntent.getBroadcast(context, (int)System.currentTimeMillis(), i, 0);
-            int millsec = 1000 * 60 * 60;
-            millsec *= 24;
-
-            AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
-            Toast.makeText(context, "Reports Set Successfully!", Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(context, "Not Able To Set Reports", Toast.LENGTH_LONG).show();
+        long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_TIME, -1);
+        if (time != -1) {
+            time = System.currentTimeMillis();
         }
+        Intent i = new Intent(context, ReportsAlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), i, 0);
+        int millsec = 1000 * 60 * 60;
+        millsec *= 24;
+
+        AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
+        Toast.makeText(context, "Reports Set Successfully!", Toast.LENGTH_LONG).show();
     }
 }

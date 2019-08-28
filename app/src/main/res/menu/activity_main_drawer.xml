@@ -3,12 +3,13 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:checked="true"
             android:id="@+id/dash"
             android:icon="@android:drawable/ic_dialog_dialer"
             android:title="DashBoard" />
         <item
             android:id="@+id/home"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_home"
             android:title="Home" />
 
     </group>
