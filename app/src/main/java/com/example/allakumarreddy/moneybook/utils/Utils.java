@@ -404,7 +404,7 @@ public class Utils {
 
     public static void cancelAlarmForReportsRemainder(Context context) {
         Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, GlobalConstants.REQ_CODE_PENDING_INTENT_SMART_REMAINDER, i, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pi);
     }
@@ -415,7 +415,7 @@ public class Utils {
             time = System.currentTimeMillis();
         }
         Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, GlobalConstants.REQ_CODE_PENDING_INTENT_SMART_REMAINDER, i, 0);
         int millsec = 1000 * 60 * 60;
         millsec *= 24;
 
@@ -426,7 +426,7 @@ public class Utils {
 
     public static void cancelAlarmForReportsNotification(Context context) {
         Intent i = new Intent(context, ReportsAlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, GlobalConstants.REQ_CODE_PENDING_INTENT_REPORTS, i, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pi);
     }
@@ -437,7 +437,7 @@ public class Utils {
             time = System.currentTimeMillis();
         }
         Intent i = new Intent(context, ReportsAlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(context, GlobalConstants.REQ_CODE_PENDING_INTENT_REPORTS, i, 0);
         int millsec = 1000 * 60 * 60;
         millsec *= 24;
 

@@ -29,6 +29,7 @@ import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
+import com.example.allakumarreddy.moneybook.SettingsLock.CreateSmartPinActivity;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.home.HomeViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
@@ -163,9 +164,9 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    /*private void test() {
+    private void test() {
         startActivity(new Intent(this, CreateSmartPinActivity.class));
-    }*/
+    }
 
     private void backupToGoogleDrive() {
         Intent intent = new Intent(MainActivity.this, BackupToGoogleDriveService.class);

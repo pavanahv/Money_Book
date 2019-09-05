@@ -42,6 +42,10 @@ public class GlobalConstants {
     public static final String PREF_LOCK_FINGERPRINT = "PREF_LOCK_FINGERPRINT";
     public static final String PREF_LOCK_TYPE = "PREF_LOCK_TYPE";
     public static final String PREF_LOCK_PIN = "PREF_LOCK_PIN";
+    public static final String ACTION_SMART_REMAINDER_NOTIFICATION = "ACTION_SMART_REMAINDER_NOTIFICATION";
+    public static final String ACTION_REPORT_NOTIFICATION = "ACTION_REPORT_NOTIFICATION";
+    public static final int REQ_CODE_PENDING_INTENT_SMART_REMAINDER = 201991;
+    public static final int REQ_CODE_PENDING_INTENT_REPORTS = 201992;
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

@@ -1,70 +1,30 @@
 package com.example.allakumarreddy.moneybook.broadcastreceivers;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 
-import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.SettingsLock.LoginActivity;
+import com.example.allakumarreddy.moneybook.Services.SmartRemainderIntentService;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
 public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
 
     private static final String TAG = "SmartRemainderAlarmReceiver";
-    private static final String CHANNEL_ID = "MoneyBookNotification";
-    private static final int NOTIFICATION_ID = 1001;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceive(Context context, Intent intent) {
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = null;
-        if (pm != null) {
-            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MoneyBook:SmartRemainderAlarmReceiver");
-            wl.acquire();
-        }
-
-        // Put here YOUR code.
         LoggerCus.d(TAG, "onreceive");
-        showNotification(context);
-
-        wl.release();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void showNotification(Context context) {
-
-        int reqCode = (int)System.currentTimeMillis();
-        Intent intent = new Intent(context, LoginActivity.class);
-        intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_smart_remainder)
-                .setContentTitle("Smart Remainder")
-                .setContentText("It's Time To Log Expenses")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        Intent sIntent = new Intent(context, SmartRemainderIntentService.class);
+        sIntent.setAction(GlobalConstants.ACTION_SMART_REMAINDER_NOTIFICATION);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(GlobalConstants.NOTIFICATION_CHANNLE_ID, GlobalConstants.NOTIFICATION_CHANNLE_NAME, importance);
-            channel.setDescription(GlobalConstants.NOTIFICATION_CHANNLE_DESCRIPTION);
-            notificationManager.createNotificationChannel(channel);
+            context.startForegroundService(sIntent);
+        } else {
+            context.startService(sIntent);
         }
-        notificationManager.notify(GlobalConstants.SMART_REMAINDER_NOTIFICATION_ID,builder.build());
-
     }
 
 }
