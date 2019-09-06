@@ -411,16 +411,29 @@ public class Utils {
 
     public static void setAlarmForReportsRemainder(Context context) {
         long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_REMAINDER_TIME, -1);
-        if (time != -1) {
+        LoggerCus.d(TAG, time + "");
+
+        if (time == -1) {
             time = System.currentTimeMillis();
         }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        Calendar calOrg = Calendar.getInstance();
+        calOrg.setTimeInMillis(System.currentTimeMillis());
+        calOrg.set(Calendar.HOUR, cal.get(Calendar.HOUR));
+        calOrg.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        calOrg.set(Calendar.SECOND, 0);
+        calOrg.set(Calendar.AM_PM, cal.get(Calendar.AM_PM));
+        LoggerCus.d(TAG, calOrg.getTimeInMillis() + "");
+        LoggerCus.d(TAG, cal.get(Calendar.HOUR) + " " + cal.get(Calendar.MINUTE) + " " + cal.get(Calendar.SECOND) + " " + cal.get(Calendar.AM_PM));
+        LoggerCus.d(TAG, calOrg.get(Calendar.HOUR) + " " + calOrg.get(Calendar.MINUTE) + " " + calOrg.get(Calendar.SECOND) + " " + calOrg.get(Calendar.AM_PM));
+
         Intent i = new Intent(context, SmartRemainderAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, GlobalConstants.REQ_CODE_PENDING_INTENT_SMART_REMAINDER, i, 0);
-        int millsec = 1000 * 60 * 60;
-        millsec *= 24;
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, calOrg.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
         Toast.makeText(context, "Smart Remainder Set Successfully!", Toast.LENGTH_LONG).show();
     }
 
@@ -433,16 +446,27 @@ public class Utils {
 
     public static void setAlarmForReportsNotification(Context context) {
         long time = PreferenceManager.getDefaultSharedPreferences(context).getLong(GlobalConstants.PREF_REPORTS_TIME, -1);
-        if (time != -1) {
+
+        if (time == -1) {
             time = System.currentTimeMillis();
         }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        Calendar calOrg = Calendar.getInstance();
+        calOrg.setTimeInMillis(System.currentTimeMillis());
+        calOrg.set(Calendar.HOUR, cal.get(Calendar.HOUR));
+        calOrg.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        calOrg.set(Calendar.SECOND, 0);
+        calOrg.set(Calendar.AM_PM, cal.get(Calendar.AM_PM));
+        LoggerCus.d(TAG, calOrg.getTimeInMillis() + "");
+        LoggerCus.d(TAG, cal.get(Calendar.HOUR) + " " + cal.get(Calendar.MINUTE) + " " + cal.get(Calendar.SECOND) + " " + cal.get(Calendar.AM_PM));
+        LoggerCus.d(TAG, calOrg.get(Calendar.HOUR) + " " + calOrg.get(Calendar.MINUTE) + " " + calOrg.get(Calendar.SECOND) + " " + calOrg.get(Calendar.AM_PM));
         Intent i = new Intent(context, ReportsAlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, GlobalConstants.REQ_CODE_PENDING_INTENT_REPORTS, i, 0);
-        int millsec = 1000 * 60 * 60;
-        millsec *= 24;
 
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP, time, millsec, pi);
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, calOrg.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
         Toast.makeText(context, "Reports Set Successfully!", Toast.LENGTH_LONG).show();
     }
 }

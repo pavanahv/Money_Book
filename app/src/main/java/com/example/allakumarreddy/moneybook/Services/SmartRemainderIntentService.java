@@ -1,20 +1,23 @@
 package com.example.allakumarreddy.moneybook.Services;
 
-import android.app.IntentService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
+import com.example.allakumarreddy.moneybook.MessageParser.MessageParserBase;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.SettingsLock.LoginActivity;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
@@ -25,17 +28,39 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-public class SmartRemainderIntentService extends IntentService {
+public class SmartRemainderIntentService extends Service {
 
     private static final String TAG = "SmartRemainderIntentService";
 
-    public SmartRemainderIntentService() {
-        super("SmartRemainderIntentService");
+    @Override
+    public void onDestroy() {
+        LoggerCus.d(TAG, "stopped...");
+        super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            putNotification();
+            final String action = intent.getAction();
+            if (GlobalConstants.ACTION_SMART_REMAINDER_NOTIFICATION.equals(action)) {
+                handleActionSmartRemainder();
+            } else if (GlobalConstants.ACTION_REPORT_NOTIFICATION.equals(action)) {
+                handleActionReports();
+            }
+            stopForeground(true);
+            stopSelf();
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void putNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Context context = getApplicationContext();
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, GlobalConstants.NOTIFICATION_CHANNLE_ID)
@@ -59,26 +84,8 @@ public class SmartRemainderIntentService extends IntentService {
         LoggerCus.d(TAG, "started...");
     }
 
-    @Override
-    public void onDestroy() {
-        LoggerCus.d(TAG, "stopped...");
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (GlobalConstants.ACTION_SMART_REMAINDER_NOTIFICATION.equals(action)) {
-                handleActionSmartRemainder();
-            } else if (GlobalConstants.ACTION_REPORT_NOTIFICATION.equals(action)) {
-                handleActionReports();
-            }
-        }
-    }
-
     private void handleActionReports() {
-        //new MessageParserBase(getApplicationContext()).handleActionMsgParse();
+        new MessageParserBase(getApplicationContext()).handleActionMsgParse();
         performPendingTasks();
     }
 
@@ -94,6 +101,7 @@ public class SmartRemainderIntentService extends IntentService {
         for (int i = 0; i < res.length; i++) {
             //if (res[i] > 0) {
                 createNotification(res[i], icons[i], titles[i], i, colors[i]);
+                break;
             //}
         }
     }

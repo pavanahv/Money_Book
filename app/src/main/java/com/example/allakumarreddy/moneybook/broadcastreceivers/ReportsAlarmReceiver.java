@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.PowerManager;
 
 import com.example.allakumarreddy.moneybook.Services.SmartRemainderIntentService;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -18,6 +19,14 @@ public class ReportsAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = null;
+        if (pm != null) {
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MoneyBook:SmartRemainderAlarmReceiver");
+            wl.acquire();
+        }
+
         mContext = context;
         LoggerCus.d(TAG, "onreceive");
         Intent sIntent = new Intent(context, SmartRemainderIntentService.class);
@@ -27,5 +36,8 @@ public class ReportsAlarmReceiver extends BroadcastReceiver {
         } else {
             context.startService(sIntent);
         }
+
+        wl.release();
     }
+
 }

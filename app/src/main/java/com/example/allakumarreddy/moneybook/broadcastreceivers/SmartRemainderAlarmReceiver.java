@@ -4,7 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
+import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Services.SmartRemainderIntentService;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -17,6 +19,14 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceive(Context context, Intent intent) {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = null;
+        if (pm != null) {
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MoneyBook:SmartRemainderAlarmReceiver");
+            wl.acquire();
+        }
+
+        // Put here YOUR code.
         LoggerCus.d(TAG, "onreceive");
         Intent sIntent = new Intent(context, SmartRemainderIntentService.class);
         sIntent.setAction(GlobalConstants.ACTION_SMART_REMAINDER_NOTIFICATION);
@@ -25,6 +35,9 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
         } else {
             context.startService(sIntent);
         }
+        Toast.makeText(context, "Smart Remainder on receive", Toast.LENGTH_LONG).show();
+
+        wl.release();
     }
 
 }
