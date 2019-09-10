@@ -7,8 +7,8 @@
         android:title="@string/pref_title_social_recommendations" />
 
     <EditTextPreference
-        android:dependency="backup_to_google_drive"
         android:capitalize="words"
+        android:dependency="backup_to_google_drive"
         android:enabled="false"
         android:inputType="textCapWords"
         android:key="EMAIL"
@@ -18,21 +18,21 @@
         android:title="@string/pref_title_display_name" />
 
     <EditTextPreference
-        android:dependency="backup_to_google_drive"
         android:capitalize="words"
+        android:defaultValue="@string/pref_def_title_file_size_google_drive"
+        android:dependency="backup_to_google_drive"
         android:enabled="false"
         android:inputType="textCapWords"
         android:key="PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE"
         android:maxLines="1"
         android:selectAllOnFocus="true"
-        android:defaultValue="@string/pref_def_title_file_size_google_drive"
         android:singleLine="true"
         android:title="@string/pref_title_file_size_google_drive" />
 
     <EditTextPreference
-        android:dependency="backup_to_google_drive"
         android:capitalize="words"
         android:defaultValue="@string/pref_def_title_file_date_google_drive"
+        android:dependency="backup_to_google_drive"
         android:enabled="false"
         android:inputType="textCapWords"
         android:key="PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE"
@@ -42,11 +42,20 @@
         android:title="@string/pref_title_file_date_google_drive" />
 
     <ListPreference
-        android:dependency="backup_to_google_drive"
         android:defaultValue="3"
+        android:dependency="backup_to_google_drive"
         android:entries="@array/pref_backup_to_google_drive_list_titles"
         android:entryValues="@array/pref_backup_to_google_drive_list_values"
         android:key="backup_frequency"
         android:title="@string/pref_title_add_friends_to_messages" />
+
+    <Preference
+        android:capitalize="words"
+        android:defaultValue="@string/pref_def_title_local_backup"
+        android:key="PREF_LOCAL_BACKUP_DATA"
+        android:maxLines="3"
+        android:minLines="3"
+        android:selectAllOnFocus="true"
+        android:title="@string/pref_title_local_backup_title" />
 
 </PreferenceScreen>

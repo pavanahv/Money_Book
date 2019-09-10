@@ -47,11 +47,17 @@ public class DbHandler extends SQLiteOpenHelper {
     public static final String KEY_DATE_MONTH = "month";
     public static final String KEY_DATE_YEAR = "year";
     public static final String KEY_CAT = "category";
+    private static final String KEY_PAYMENT_METHOD = "payment_method";
 
     public static final String CAT_TABLE_NAME = "Catageories";
     public static final String KEY_NAME = "name";
     public static final String KEY_CAT_ID = "id";
-    public static final String KEY_CAT_BAL = "balance_left";
+    public static final String KEY_CAT_TYPE = "type";
+
+    public static final String PAY_METH_TABLE_NAME = "PaymentMethod";
+    public static final String KEY_PAY_METH_NAME = "name";
+    public static final String KEY_PAY_METH_ID = "id";
+    public static final String KEY_PAY_METH_BAL = "balance_left";
 
     public static final String MSG_TABLE_NAME = "Message";
     public static final String MSG_KEY_TYPE = "type";
@@ -78,6 +84,8 @@ public class DbHandler extends SQLiteOpenHelper {
     private static final String MT_KEY_TYPE = "4";
     private static final int MT_TYPE = 4;
     private static final String SORTING_ORDER[] = new String[]{"ASC", "DESC"};
+    public static final String KEY_CAT_BAL = "balance_left";
+    public static final String MSG_KEY_PAYMENT_METHOD = "payment_method";
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
@@ -96,17 +104,24 @@ public class DbHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + KEY_TYPE + " INTEGER," + KEY_DESCRIPTION + " TEXT,"
-                + KEY_AMOUNT + " INTEGER," + KEY_DATE + " INTEGER," + KEY_DATE_MONTH + " INTEGER," + KEY_DATE_YEAR + " INTEGER," + KEY_CAT + " INTEGER)";
+                + KEY_AMOUNT + " INTEGER," + KEY_DATE + " INTEGER," + KEY_DATE_MONTH + " INTEGER,"
+                + KEY_DATE_YEAR + " INTEGER," + KEY_CAT + " INTEGER, " + KEY_PAYMENT_METHOD + " INTEGER)";
         db.execSQL(CREATE_CONTACTS_TABLE);
 
         String CREATE_CAT_TABLE = "CREATE TABLE " + CAT_TABLE_NAME + "("
                 + KEY_CAT_ID + " INTEGER PRIMARY KEY,"
-                + KEY_NAME + " TEXT," + KEY_CAT_BAL + " INTEGER)";
+                + KEY_NAME + " TEXT," + KEY_CAT_TYPE + " INTEGER)";
         db.execSQL(CREATE_CAT_TABLE);
+
+        String CREATE_PAY_METH_TABLE = "CREATE TABLE " + PAY_METH_TABLE_NAME + "("
+                + KEY_PAY_METH_ID + " INTEGER PRIMARY KEY,"
+                + KEY_PAY_METH_NAME + " TEXT," + KEY_PAY_METH_BAL + " INTEGER)";
+        db.execSQL(CREATE_PAY_METH_TABLE);
 
         String CREATE_MESSAGE_TABLE = "CREATE TABLE " + MSG_TABLE_NAME + "("
                 + MSG_KEY_TYPE + " INTEGER," + MSG_KEY_DESCRIPTION + " TEXT,"
                 + MSG_KEY_AMOUNT + " TEXT," + MSG_KEY_CAT + " INTEGER,"
+                + MSG_KEY_PAYMENT_METHOD + " INTEGER,"
                 + MSG_KEY_LEFT_BAL + " TEXT," + MSG_KEY_NAME + " TEXT,"
                 + MSG_KEY_MSG + " TEXT)";
         db.execSQL(CREATE_MESSAGE_TABLE);
@@ -133,6 +148,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + CAT_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MSG_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MT_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PAY_METH_TABLE_NAME);
         // Create tables again
         onCreate(db);
     }
@@ -171,6 +187,23 @@ public class DbHandler extends SQLiteOpenHelper {
         return result;
     }
 
+    public String getNameOfPaymentMethod(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String result = "";
+        Cursor cursor = db.rawQuery("SELECT " + KEY_PAY_METH_NAME + " FROM " + PAY_METH_TABLE_NAME + " WHERE " + KEY_PAY_METH_ID + " = " + id + "", null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                result = cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return result;
+    }
+
     public boolean checkCatNameExists(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
         boolean result = false;
@@ -187,10 +220,11 @@ public class DbHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public void addCategory(String name) {
+    public void addCategory(String name, int type) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, name.toLowerCase());
+        values.put(KEY_CAT_TYPE, type);
         db.insert(CAT_TABLE_NAME, null, values);
         db.close();
     }
@@ -205,6 +239,8 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
         values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
         values.put(KEY_CAT, getIdOfCategory(mbr.getCategory()));
+        values.put(KEY_PAYMENT_METHOD, getIdOfPaymentMethod(mbr.getPaymentMethod()));
+        LoggerCus.d(TAG, values.toString());
 
         SQLiteDatabase db = this.getWritableDatabase();
         // Inserting Row
@@ -214,6 +250,23 @@ public class DbHandler extends SQLiteOpenHelper {
             return true;
         else
             return false;
+    }
+
+    private long getIdOfPaymentMethod(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long result = -1L;
+        Cursor cursor = db.rawQuery("SELECT " + KEY_PAY_METH_ID + " FROM " + PAY_METH_TABLE_NAME + " WHERE " + KEY_PAY_METH_NAME + " = '" + name + "'", null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                result = cursor.getLong(0);
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return result;
     }
 
     public boolean addRecordWithCatAsID(MBRecord mbr, int type) {
@@ -237,12 +290,12 @@ public class DbHandler extends SQLiteOpenHelper {
             return false;
     }
 
-    public boolean updateBalLeft(long catId, int bal) {
+    public boolean updateBalLeft(long payId, int bal) {
         ContentValues values = new ContentValues();
-        values.put(KEY_CAT_BAL, bal);
+        values.put(KEY_PAY_METH_BAL, bal);
 
         SQLiteDatabase db = this.getWritableDatabase();
-        int result = db.update(CAT_TABLE_NAME, values, KEY_CAT_ID + "=" + catId, null);
+        int result = db.update(PAY_METH_TABLE_NAME, values, KEY_PAY_METH_ID + "=" + payId, null);
         db.close();
         if (result > 0)
             return true;
@@ -276,7 +329,8 @@ public class DbHandler extends SQLiteOpenHelper {
                 values.put(KEY_DATE, dc.getdDate().getTime());
                 values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
                 values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
-                values.put(KEY_CAT, jsonObj.getLong(KEY_CAT));
+                values.put(KEY_CAT, 1);
+                values.put(KEY_PAYMENT_METHOD, jsonObj.getLong(KEY_CAT));
 
                 // Inserting Row
                 db.insert(TABLE_NAME, null, values);
@@ -286,11 +340,11 @@ public class DbHandler extends SQLiteOpenHelper {
             for (int i = 0; i < len1; i++) {
                 JSONObject jsonObj = jsonArrayc.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(KEY_NAME, jsonObj.getString(KEY_NAME));
-                values.put(KEY_CAT_ID, jsonObj.getLong(KEY_CAT_ID));
-                values.put(KEY_CAT_BAL, jsonObj.getLong(KEY_CAT_BAL));
+                values.put(KEY_PAY_METH_NAME, jsonObj.getString(KEY_NAME));
+                values.put(KEY_PAY_METH_ID, jsonObj.getLong(KEY_CAT_ID));
+                values.put(KEY_PAY_METH_BAL, jsonObj.getLong(KEY_CAT_BAL));
                 // Inserting Row
-                db.insert(CAT_TABLE_NAME, null, values);
+                db.insert(PAY_METH_TABLE_NAME, null, values);
             }
 
             final int lenm = jsonArraym.length();
@@ -348,9 +402,10 @@ public class DbHandler extends SQLiteOpenHelper {
         sDate = intializeSDateForDay(sDate);
         eDate = intializeEDateForDay(eDate);
 
-        SQLiteDatabase db = this.getWritableDatabase();
         LoggerCus.d(TAG, KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime());
-        int n = db.delete(TABLE_NAME, KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime(), null);
+        String query = KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_CAT + " = " + getIdOfCategory(mbr.getCategory()) + " AND " + KEY_PAYMENT_METHOD + " = " + getIdOfPaymentMethod(mbr.getPaymentMethod()) + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime();
+        SQLiteDatabase db = this.getWritableDatabase();
+        int n = db.delete(TABLE_NAME, query, null);
         db.close();
         return n;
     }
@@ -373,12 +428,17 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime() + " AND " + KEY_DATE + " <= " + temp2.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+        String query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime() + " AND " + KEY_DATE + " <= " + temp2.getTime() + " AND " + KEY_TYPE + "=" + type;
+        LoggerCus.d(TAG, query);
+        cursor = db.rawQuery(query, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                mbr.add(new MBRecord(cursor.getString(0), Integer.parseInt(cursor.getString(1)), new Date(cursor.getLong(2)), cursor.getString(3)));
+                mbr.add(new MBRecord(cursor.getString(0),
+                        Integer.parseInt(cursor.getString(1)),
+                        new Date(cursor.getLong(2)), cursor.getString(3),
+                        cursor.getString(4)));
             }
             cursor.close();
         }
@@ -446,7 +506,7 @@ public class DbHandler extends SQLiteOpenHelper {
         }
 
         JSONArray jsonArrayc = new JSONArray();
-        cursor = db.rawQuery("SELECT " + KEY_NAME + "," + KEY_CAT_ID + "," + KEY_CAT_BAL + " FROM " + CAT_TABLE_NAME, null);
+        cursor = db.rawQuery("SELECT " + KEY_NAME + "," + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -455,7 +515,6 @@ public class DbHandler extends SQLiteOpenHelper {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(KEY_NAME, cursor.getString(0));
                     jsonObject.put(KEY_CAT_ID, cursor.getLong(1));
-                    jsonObject.put(KEY_CAT_BAL, cursor.getLong(2));
                     jsonArrayc.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
@@ -530,14 +589,16 @@ public class DbHandler extends SQLiteOpenHelper {
         this.total = 0;
         JSONArray jsonArray = new JSONArray();
 
-        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT
+                + "," + KEY_DATE + "," + KEY_TYPE + "," + getSQLQueryForCat() + ","
+                + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
                 int numSpent = Integer.parseInt(cursor.getString(1));
                 this.total += numSpent;
-                mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(4)));
+                mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(4), cursor.getString(5)));
             }
             cursor.close();
         }
@@ -546,7 +607,13 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     private String getSQLQueryForCat() {
-        return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_CAT_ID + " = " + KEY_CAT + ") AS " + KEY_CAT;
+        return "(SELECT " + KEY_NAME + " FROM " + CAT_TABLE_NAME
+                + " WHERE " + KEY_CAT_ID + " = " + KEY_CAT + ") AS " + KEY_CAT;
+    }
+
+    private String getSQLQueryForPayMeth() {
+        return "(SELECT " + KEY_PAY_METH_NAME + " FROM " + PAY_METH_TABLE_NAME
+                + " WHERE " + KEY_PAY_METH_ID + " = " + KEY_PAYMENT_METHOD + ") AS " + KEY_PAYMENT_METHOD;
     }
 
     private String getSQLQueryForCatMT() {
@@ -617,31 +684,43 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String eQuery = "";
         if (groupByNone)
-            //todo
             eQuery = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + ","
                     + KEY_TYPE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + ","
-                    + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                    + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                    + " FROM " + TABLE_NAME + " WHERE ";
         else {
             switch (groupBy) {
                 case 0:
                     eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE
                             + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE
                             + ",count(" + KEY_DESCRIPTION + ") as ckd," + getSQLQueryForCat()
-                            + " FROM " + TABLE_NAME + " WHERE ";
+                            + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " WHERE ";
                     break;
 
                 case 1:
                     switch (dateInterval) {
                         case 0:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS "
+                                    + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + ","
+                                    + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE + ") as ckd,"
+                                    + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                                    + " FROM " + TABLE_NAME + " WHERE ";
                             break;
 
                         case 1:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_MONTH + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT
+                                    + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + ","
+                                    + KEY_TYPE + ",count(" + KEY_DATE_MONTH + ") as ckd,"
+                                    + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                                    + " FROM " + TABLE_NAME + " WHERE ";
                             break;
 
                         case 2:
-                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE + ",count(" + KEY_DATE_YEAR + ") as ckd," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE ";
+                            eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT
+                                    + "," + KEY_DATE + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + ","
+                                    + KEY_TYPE + ",count(" + KEY_DATE_YEAR + ") as ckd,"
+                                    + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                                    + " FROM " + TABLE_NAME + " WHERE ";
                             break;
                     }
                     break;
@@ -708,26 +787,42 @@ public class DbHandler extends SQLiteOpenHelper {
                 if (!groupByNone) {
                     switch (groupBy) {
                         case 0:
-                            mbr.add(new MBRecord(cursor.getString(0) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
+                            mbr.add(new MBRecord(cursor.getString(0)
+                                    + " (" + cursor.getLong(6) + ")", numSpent,
+                                    new Date(cursor.getLong(2)), cursor.getInt(5),
+                                    cursor.getString(7), cursor.getString(8)));
                             break;
                         case 1:
                             switch (dateInterval) {
                                 case 0:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("dd - MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
+                                    mbr.add(new MBRecord(new SimpleDateFormat("dd - MM - yyyy")
+                                            .format(new Date(cursor.getLong(2))) + " ("
+                                            + cursor.getLong(6) + ")", numSpent,
+                                            new Date(cursor.getLong(2)), cursor.getInt(5),
+                                            cursor.getString(7), cursor.getString(8)));
                                     break;
 
                                 case 1:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("MM - yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
+                                    mbr.add(new MBRecord(new SimpleDateFormat("MM - yyyy")
+                                            .format(new Date(cursor.getLong(2))) + " ("
+                                            + cursor.getLong(6) + ")", numSpent,
+                                            new Date(cursor.getLong(2)), cursor.getInt(5),
+                                            cursor.getString(7), cursor.getString(8)));
                                     break;
 
                                 case 2:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("yyyy").format(new Date(cursor.getLong(2))) + " (" + cursor.getLong(6) + ")", numSpent, new Date(cursor.getLong(2)), cursor.getInt(5), cursor.getString(7)));
+                                    mbr.add(new MBRecord(new SimpleDateFormat("yyyy")
+                                            .format(new Date(cursor.getLong(2))) + " ("
+                                            + cursor.getLong(6) + ")", numSpent,
+                                            new Date(cursor.getLong(2)), cursor.getInt(5),
+                                            cursor.getString(7), cursor.getString(8)));
                                     break;
                             }
                             break;
                     }
                 } else {
-                    mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)), cursor.getInt(3), cursor.getString(6)));
+                    mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)),
+                            cursor.getInt(3), cursor.getString(6), cursor.getString(7)));
                 }
             }
             cursor.close();
@@ -896,7 +991,8 @@ public class DbHandler extends SQLiteOpenHelper {
         dbr.setTotald(getTotalMoneySpentInCurrentDay());
         dbr.setTotalm(getTotalMoneySpentInCurrentMonth());
         dbr.setTotaly(getTotalMoneySpentInCurrentYear());
-        dbr.setBalanceLeft(getBalanceLeft(s));
+        //dbr.setBalanceLeft(getBalanceLeft(s));
+        dbr.setBalanceLeft(0);
         dbr.setText(s.toUpperCase());
         db.close();
         return dbr;
@@ -906,11 +1002,15 @@ public class DbHandler extends SQLiteOpenHelper {
         return " AND (" + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'))";
     }
 
+    private String getPaymentMethodQueryString(String s) {
+        return " AND (" + KEY_PAYMENT_METHOD + " = (SELECT " + KEY_PAY_METH_ID + " FROM " + PAY_METH_TABLE_NAME + " WHERE " + KEY_PAY_METH_NAME + " = '" + s + "'))";
+    }
+
     private int getBalanceLeft(String s) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
         int balLeft = -1;
-        cursor = db.rawQuery("SELECT " + KEY_CAT_BAL + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s + "'", null);
+        cursor = db.rawQuery("SELECT " + KEY_PAY_METH_BAL + " FROM " + PAY_METH_TABLE_NAME + " WHERE " + KEY_PAY_METH_NAME + " = '" + s + "'", null);
         if ((cursor != null) && (cursor.getCount() > 0)) {
             cursor.moveToPosition(0);
             balLeft = cursor.getInt(0);
@@ -1024,6 +1124,106 @@ public class DbHandler extends SQLiteOpenHelper {
         return dbr;
     }
 
+    public ArrayList<DashBoardRecord> getPaymentMethodRecords() {
+        ArrayList<DashBoardRecord> dbr = new ArrayList<>();
+        String cols[] = getPaymentMethods();
+        final int len = cols.length;
+        for (int i = 0; i < len; i++) {
+            dbr.add(getPaymentMethodRecord(cols[i]));
+        }
+        return dbr;
+    }
+
+    private DashBoardRecord getPaymentMethodRecord(String s) {
+        DashBoardRecord dbr = new DashBoardRecord();
+        Date sDate = new Date();
+        Date eDate = new Date();
+        sDate = intializeSDateForDay(sDate);
+        eDate = intializeEDateForDay(eDate);
+        int type = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        // getting day
+        LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type + getPaymentMethodQueryString(s), null);
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            String temp = cursor.getString(0);
+            if (temp != null)
+                dbr.setDay(Integer.parseInt(temp));
+            else
+                dbr.setDay(0);
+            cursor.close();
+        }
+
+        // getting month
+        sDate.setDate(1);
+        int tempMon = eDate.getMonth() + 1;
+        eDate.setMonth(tempMon);
+        eDate.setDate(0);
+        LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+
+        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type + getPaymentMethodQueryString(s), null);
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            String temp = cursor.getString(0);
+            if (temp != null)
+                dbr.setMonth(Integer.parseInt(temp));
+            else
+                dbr.setMonth(0);
+            cursor.close();
+        }
+
+        // getting year
+        sDate.setMonth(0);
+        eDate.setYear(eDate.getYear() + 1);
+        eDate.setMonth(0);
+        eDate.setDate(0);
+
+        LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+
+        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type + getPaymentMethodQueryString(s), null);
+        if ((cursor != null) && (cursor.getCount() > 0)) {
+            cursor.moveToPosition(0);
+            String temp = cursor.getString(0);
+            if (temp != null)
+                dbr.setYear(Integer.parseInt(temp));
+            else
+                dbr.setYear(0);
+            cursor.close();
+        }
+        dbr.setTotald(getTotalMoneySpentInCurrentDay());
+        dbr.setTotalm(getTotalMoneySpentInCurrentMonth());
+        dbr.setTotaly(getTotalMoneySpentInCurrentYear());
+        dbr.setBalanceLeft(getBalanceLeft(s));
+        dbr.setText(s.toUpperCase());
+        db.close();
+        return dbr;
+    }
+
+    public String[] getPaymentMethods() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int type = 0;
+        Cursor cursor = null;
+        cursor = db.rawQuery("SELECT " + KEY_PAY_METH_NAME + " FROM " + PAY_METH_TABLE_NAME + " ORDER BY " + KEY_PAY_METH_ID, null);
+        String cols[] = null;
+        int len = 0;
+        if (cursor != null) {
+            len = cursor.getCount();
+            cols = new String[len];
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                cols[i] = cursor.getString(0);
+            }
+            cursor.close();
+        }
+        db.close();
+
+        LoggerCus.d(TAG, Arrays.toString(cols));
+        return cols;
+    }
+
     public String[] getCategeories() {
         SQLiteDatabase db = this.getReadableDatabase();
         int type = 0;
@@ -1053,19 +1253,24 @@ public class DbHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void exec() {
+    public void deletePaymentMethod(String s) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(F_TABLE_NAME, null, null);
+        db.execSQL("UPDATE " + TABLE_NAME + " SET " + KEY_PAYMENT_METHOD + " = (SELECT " + KEY_PAY_METH_ID + " FROM " + PAY_METH_TABLE_NAME + " WHERE " + KEY_PAY_METH_NAME + " = 'others') WHERE " + KEY_PAYMENT_METHOD + " = (SELECT " + KEY_PAY_METH_ID + " FROM " + PAY_METH_TABLE_NAME + " WHERE " + KEY_PAY_METH_NAME + " = '" + s + "')");
+        db.delete(PAY_METH_TABLE_NAME, KEY_PAY_METH_NAME + " = '" + s + "'", null);
         db.close();
     }
 
-    public boolean insertMsgRecord(String des, String amount, int type, String cate, String balLeft, String msgStr, String name) {
+    public void exec() {
+    }
+
+    public boolean insertMsgRecord(String des, String amount, int type, String cate, String balLeft, String msgStr, String name, String payStr) {
         ContentValues values = new ContentValues();
         values.put(MSG_KEY_NAME, name);
         values.put(MSG_KEY_DESCRIPTION, des);
         values.put(MSG_KEY_AMOUNT, amount);
         values.put(MSG_KEY_TYPE, type);
         values.put(MSG_KEY_CAT, getIdOfCategory(cate));
+        values.put(MSG_KEY_PAYMENT_METHOD, getIdOfPaymentMethod(payStr));
         values.put(MSG_KEY_LEFT_BAL, balLeft);
         values.put(MSG_KEY_MSG, encode(msgStr));
 
@@ -1120,7 +1325,7 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         ArrayList<String> list = new ArrayList<>();
-        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_DESCRIPTION + "," + MSG_KEY_AMOUNT + "," + MSG_KEY_TYPE + "," + MSG_KEY_CAT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_MSG + " FROM " + MSG_TABLE_NAME + " WHERE " + MSG_KEY_NAME + " = '" + msgName + "'", null);
+        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_DESCRIPTION + "," + MSG_KEY_AMOUNT + "," + MSG_KEY_TYPE + "," + MSG_KEY_CAT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_MSG + "," + MSG_KEY_PAYMENT_METHOD + " FROM " + MSG_TABLE_NAME + " WHERE " + MSG_KEY_NAME + " = '" + msgName + "'", null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -1131,6 +1336,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 list.add("" + getNameOfCategory(cursor.getInt(3)));
                 list.add(cursor.getString(4));
                 list.add(decode(cursor.getString(5)));
+                list.add("" + getNameOfPaymentMethod(cursor.getInt(6)));
             }
             cursor.close();
         }
@@ -1155,7 +1361,7 @@ public class DbHandler extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + "," + MSG_KEY_DESCRIPTION + ","
                 + MSG_KEY_AMOUNT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_TYPE + "," + MSG_KEY_CAT
-                + "," + MSG_KEY_MSG + " FROM " + MSG_TABLE_NAME, null);
+                + "," + MSG_KEY_MSG + "," + MSG_KEY_PAYMENT_METHOD + " FROM " + MSG_TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -1168,6 +1374,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 map.put(MSG_KEY_TYPE, "" + cursor.getInt(4));
                 map.put(MSG_KEY_CAT, "" + cursor.getLong(5));
                 map.put(MSG_KEY_MSG, decode(cursor.getString(6)));
+                map.put(MSG_KEY_PAYMENT_METHOD, "" + cursor.getLong(7));
                 list.add(map);
             }
             cursor.close();
@@ -1202,12 +1409,12 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<MBRecord> list = new ArrayList<>();
 
-        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + getSQLQueryForCat() + " FROM " + TABLE_NAME + " WHERE " + KEY_DESCRIPTION + " LIKE '%" + s + "%' LIMIT 5", null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " WHERE " + KEY_DESCRIPTION + " LIKE '%" + s + "%' LIMIT 5", null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                list.add(new MBRecord(cursor.getString(0), cursor.getInt(1), null, cursor.getString(2)));
+                list.add(new MBRecord(cursor.getString(0), cursor.getInt(1), null, cursor.getString(2), cursor.getString(3)));
             }
             cursor.close();
         }
@@ -1343,5 +1550,13 @@ public class DbHandler extends SQLiteOpenHelper {
         int n = db.delete(TABLE_NAME, KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime(), null);
         db.close();
         return n;
+    }
+
+    public void addPaymentMethod(String name) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_PAY_METH_NAME, name.toLowerCase());
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insert(PAY_METH_TABLE_NAME, null, values);
+        db.close();
     }
 }

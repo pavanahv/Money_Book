@@ -103,7 +103,7 @@ public class MessageParserBase {
             int balLeft = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, bal));
             LoggerCus.d(TAG, des + " -> " + amount + " -> " + balLeft + " -> " + rawMsgMap.get("date") + " -> " + new Date(Long.parseLong(rawMsgMap.get("date"))).toString());
 
-            MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT));
+            MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT),dbMsgMap.get(DbHandler.MSG_KEY_PAYMENT_METHOD));
             boolean res = db.addRecordWithCatAsID(mbRecord, Integer.parseInt(dbMsgMap.get(DbHandler.MSG_KEY_TYPE)));
             if (res) {
                 res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_CAT)), balLeft);
@@ -114,7 +114,7 @@ public class MessageParserBase {
             int amount = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, dbMsgMap.get(DbHandler.MSG_KEY_AMOUNT)));
             LoggerCus.d(TAG, des + " -> " + amount);
 
-            MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT));
+            MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT),dbMsgMap.get(DbHandler.MSG_KEY_PAYMENT_METHOD));
             boolean res = db.addRecordWithCatAsID(mbRecord, Integer.parseInt(dbMsgMap.get(DbHandler.MSG_KEY_TYPE)));
         } else if ((desc.compareToIgnoreCase("") == 0) && (bal.compareToIgnoreCase("") != 0)) {
             int balLeft = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, bal));

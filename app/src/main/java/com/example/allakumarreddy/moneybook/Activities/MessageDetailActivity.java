@@ -6,8 +6,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
@@ -26,7 +26,7 @@ public class MessageDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
     }
 
@@ -47,26 +47,32 @@ public class MessageDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Error !\nSomething Went Wrong", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case android.R.id.home:
+                finish();
+                return true;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void init() {
         msgName = getIntent().getStringExtra("name");
         db = new DbHandler(this);
         ArrayList<String> list = db.getMsgDetails(msgName);
-        ((EditText) findViewById(R.id.nameitem)).setText(msgName);
-        ((EditText) findViewById(R.id.msgitem)).setText(list.get(5));
-        ((EditText) findViewById(R.id.descitem)).setText(list.get(0));
-        ((EditText) findViewById(R.id.amountitem)).setText(list.get(1));
-        ((EditText) findViewById(R.id.leftOutBalance)).setText(list.get(4));
-        ((EditText) findViewById(R.id.catitem)).setText(list.get(3));
+        ((TextView) findViewById(R.id.nameitem)).setText(msgName);
+        ((TextView) findViewById(R.id.msgitem)).setText(list.get(5));
+        ((TextView) findViewById(R.id.descitem)).setText(list.get(0));
+        ((TextView) findViewById(R.id.amountitem)).setText(list.get(1));
+        ((TextView) findViewById(R.id.leftOutBalance)).setText(list.get(4));
+        ((TextView) findViewById(R.id.catitem)).setText(list.get(3));
+        ((TextView) findViewById(R.id.payitem)).setText(list.get(6));
+
         Spinner type = (Spinner) findViewById(R.id.typeitem);
         ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new String[]{"Spent", "Earn", "Due", "Loan"});
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         type.setAdapter(aa);
         type.setSelection(Integer.parseInt(list.get(2)));
         type.setEnabled(false);
+
     }
 
 }

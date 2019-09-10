@@ -46,6 +46,13 @@ public class GlobalConstants {
     public static final String ACTION_REPORT_NOTIFICATION = "ACTION_REPORT_NOTIFICATION";
     public static final int REQ_CODE_PENDING_INTENT_SMART_REMAINDER = 201991;
     public static final int REQ_CODE_PENDING_INTENT_REPORTS = 201992;
+    public static final int HOME_SCREEN = 0;
+    public static final int PAYMENT_METHOD_MONEY_TRANSFER_SCREEN = 10;
+    public static final int SAVE_FILTER_SCREEN = 11;
+    public static final int CATERGORY_SCREEN = 1;
+    public static final int PAYMENT_METHOD_SCREEN = 2;
+    public static final String PREF_LOCAL_BACKUP_DATA = "PREF_LOCAL_BACKUP_DATA";
+    public static final String OTHERS_CAT = "others";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

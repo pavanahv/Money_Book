@@ -99,10 +99,10 @@ public class SmartRemainderIntentService extends Service {
                 Color.parseColor("#f0ad4e"),
                 Color.parseColor("#8f8f00")};
         for (int i = 0; i < res.length; i++) {
-            //if (res[i] > 0) {
+            if (res[i] > 0) {
                 createNotification(res[i], icons[i], titles[i], i, colors[i]);
                 break;
-            //}
+            }
         }
     }
 

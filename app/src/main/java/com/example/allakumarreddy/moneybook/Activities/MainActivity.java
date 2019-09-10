@@ -2,11 +2,13 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Messenger;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -30,6 +32,7 @@ import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.SettingsLock.CreateSmartPinActivity;
+import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.home.HomeViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
@@ -41,6 +44,7 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
@@ -68,6 +72,8 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mHomeViewPager;
     private HomeViewPagerAdapter mHomeViewPagerAdapter;
     private TabLayout tabLayout;
+    private LinearLayout mPaymentMethod;
+    private PaymentMethodFragment mPaymentMethodFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,10 +161,10 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             /*case R.id.action_test:
-                //db.exec();
+                db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
-                test();
+                //test();
                 break;*/
         }
         return super.onOptionsItemSelected(item);
@@ -314,7 +320,8 @@ public class MainActivity extends AppCompatActivity
                     afterCallingAddDialog(new String[]{data.getStringExtra("fdes"),
                                     data.getStringExtra("famount"),
                                     data.getStringExtra("fcategory"),
-                                    data.getStringExtra("tcategory")},
+                                    data.getStringExtra("tcategory"),
+                                    data.getStringExtra("payment_method")},
                             data.getIntExtra("type", -1));
                 }
                 break;
@@ -333,15 +340,35 @@ public class MainActivity extends AppCompatActivity
             showDashBoard();
         } else if (id == R.id.home) {
             showHome();
+        } else if (id == R.id.payment_method) {
+            showPaymentMethod();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    private void showPaymentMethod() {
+        currentScreen = 2;
+        updatePaymentMethodUI();
+    }
+
+    private void showPaymentMethodActionBar() {
+        getSupportActionBar().setTitle("Payment Method");
+    }
+
+    private void updatePaymentMethodUI() {
+        mPaymentMethodFragment.dashBoardUIData();
+        switchScreen();
+    }
+
     private void showDashBoard() {
         currentScreen = 1;
         updateUI();
+    }
+
+    private void showCategoryActionBar() {
+        getSupportActionBar().setTitle("Category");
     }
 
     private void showHome() {
@@ -356,11 +383,14 @@ public class MainActivity extends AppCompatActivity
     public void switchScreen() {
         closeOtherScreens();
         if (currentScreen == 1) {
-            mHome.setVisibility(View.INVISIBLE);
+            showCategoryActionBar();
             mDashBoard.setVisibility(View.VISIBLE);
-        } else {
+        } else if (currentScreen == 2) {
+            showPaymentMethodActionBar();
+            mPaymentMethod.setVisibility(View.VISIBLE);
+        } else if (currentScreen == 0) {
+            setHomeActionBar();
             mHome.setVisibility(View.VISIBLE);
-            mDashBoard.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -371,6 +401,9 @@ public class MainActivity extends AppCompatActivity
     private void closeOtherScreens() {
         if (mProgressBAr.getVisibility() == View.VISIBLE)
             mProgressBAr.setVisibility(View.GONE);
+        mHome.setVisibility(View.INVISIBLE);
+        mDashBoard.setVisibility(View.INVISIBLE);
+        mPaymentMethod.setVisibility(View.INVISIBLE);
     }
 
     private void home() {
@@ -387,6 +420,10 @@ public class MainActivity extends AppCompatActivity
         switchScreen();
     }
 
+    private void setHomeActionBar() {
+        getSupportActionBar().setTitle("Home");
+    }
+
     private void dashBoard() {
         mDashBoard = (LinearLayout) findViewById(R.id.dashboard);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -394,13 +431,22 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(mDashBoardViewPagerAdapter);
     }
 
+    private void paymentMethod() {
+        mPaymentMethod = (LinearLayout) findViewById(R.id.payment_method_home);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        mPaymentMethodFragment = new PaymentMethodFragment();
+        transaction.add(R.id.payment_method_frag, mPaymentMethodFragment);
+        transaction.commit();
+    }
+
     private void performPendingTasks() {
         home();
         dashBoard();
+        paymentMethod();
 
         boolean isSmartRemainderNoti = getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false);
         if (isSmartRemainderNoti) {
-            LoggerCus.d(TAG,""+isSmartRemainderNoti);
+            LoggerCus.d(TAG, "" + isSmartRemainderNoti);
             showHome();
             startAddActivity();
         }
@@ -412,15 +458,33 @@ public class MainActivity extends AppCompatActivity
             }
         }
         if (type != -1) {
-            LoggerCus.d(TAG,""+type);
-            mHomeViewPager.setCurrentItem(type,false);
+            LoggerCus.d(TAG, "" + type);
+            mHomeViewPager.setCurrentItem(type, false);
             showHome();
         }
+        makeLocalBackup();
+    }
+
+    private void makeLocalBackup() {
+        new Thread(() -> {
+            Backup backup = new Backup(MainActivity.this);
+            if (backup.send()) {
+                runOnUiThread(() -> {
+                    final String summary = "Tap To Make Local Backup\nLast Local Backup Date : "
+                            + new SimpleDateFormat("yyyy - MM - dd  H : m : s : S").format(new Date())
+                            + "\nLast Local Backup File Size : "
+                            + backup.getBackupFile().length() + " Bytes";
+                    PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
+                            .putString(GlobalConstants.PREF_LOCAL_BACKUP_DATA, summary)
+                            .apply();
+                });
+            }
+        }).start();
     }
 
     private void init() {
         db = new DbHandler(this);
-        currentScreen = 1;
+        currentScreen = 0;
         startMsgParserService();
     }
 
@@ -458,17 +522,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void afterCallingAddDialog(String[] s, int type) {
-        if (this.currentScreen == 0) {
-            if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
-                final int pos = mHomeViewPager.getCurrentItem();
-                MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2]);
-                db.addRecord(mbr, pos);
-            }
-        } else {
-            if (type == 1) {
+        switch (this.currentScreen) {
+            case GlobalConstants.HOME_SCREEN:
+                if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
+                    final int pos = mHomeViewPager.getCurrentItem();
+                    MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2], s[4]);
+                    db.addRecord(mbr, pos);
+                }
+                break;
+            case GlobalConstants.CATERGORY_SCREEN:
                 DashboardFragment dashboardFragment = (DashboardFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(0);
-                dashboardFragment.addCategory(s[0]);
-            }
+                dashboardFragment.addCategory(s[0], 0);
+                break;
+            case GlobalConstants.PAYMENT_METHOD_SCREEN:
+                mPaymentMethodFragment.addPaymentMethod(s[0]);
+                break;
         }
     }
 

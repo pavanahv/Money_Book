@@ -7,8 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,11 @@ public class ItemDetailFragment extends Fragment {
     private String[] catArr;
     private DbHandler db;
     private EditText balLeft;
+    private Spinner payMeth;
+    private String[] payArr;
+    private ListView chunksListView;
+    private View chunksListHeader;
+    private EditText[] viewArr;
 
     public String getChunkText() {
         return chunkText;
@@ -64,7 +70,18 @@ public class ItemDetailFragment extends Fragment {
     private String amountStr;
     private int typeStr;
     private String cateStr;
+
+    public String getPayStr() {
+        return payStr;
+    }
+
+    public void setPayStr(String payStr) {
+        this.payStr = payStr;
+    }
+
+    private String payStr;
     private String balLeftStr;
+
 
     public String getDesStr() {
         return desStr;
@@ -145,6 +162,10 @@ public class ItemDetailFragment extends Fragment {
         amount = (EditText) view.findViewById(R.id.amountitem);
         type = (Spinner) view.findViewById(R.id.typeitem);
         balLeft = (EditText) view.findViewById(R.id.leftOutBalance);
+
+        chunksListView = (ListView) view.findViewById(R.id.chunks_list);
+        chunksListHeader = view.findViewById(R.id.chunks_list_header);
+
         ArrayAdapter aa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, new String[]{"Spent", "Earn", "Due", "Loan"});
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         type.setAdapter(aa);
@@ -154,6 +175,12 @@ public class ItemDetailFragment extends Fragment {
         ArrayAdapter caa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, catArr);
         caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cate.setAdapter(caa);
+
+        payMeth = (Spinner) view.findViewById(R.id.payitem);
+        payArr = db.getPaymentMethods();
+        ArrayAdapter paa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, payArr);
+        paa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        payMeth.setAdapter(paa);
 
         if (typeActivate == 1) {
             chunks.setText("Please observe the fields captured below are same as what you have defined in previous steps. If they are correct please save else go back and perform steps correctly.");
@@ -167,15 +194,42 @@ public class ItemDetailFragment extends Fragment {
             balLeft.setHint("");
             type.setEnabled(false);
             cate.setEnabled(false);
+            payMeth.setEnabled(false);
+            chunksListHeader.setVisibility(View.GONE);
 
             // fill the data
             compareParseData();
-        } else if (typeActivate == 0) {
-            chunks.append("\n" + chunkText);
-        }
-        ((ImageButton) view.findViewById(R.id.savbtn)).setOnClickListener(v -> save());
 
+            ((Button) view.findViewById(R.id.savbtn)).setText("Save");
+        } else if (typeActivate == 0) {
+            ArrayAdapter laa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, chunkText.split("\n"));
+            chunksListView.setAdapter(laa);
+            chunksListView.setOnItemClickListener((parent, view1, position, id) -> {
+                clickedItem(position);
+            });
+        }
+        ((Button) view.findViewById(R.id.savbtn)).setOnClickListener(v -> save());
+
+        viewArr = new EditText[]{des, amount, balLeft};
         return view;
+    }
+
+    private void clickedItem(int pos) {
+        EditText focusedView = null;
+        for (int i = 0; i < viewArr.length; i++) {
+            if (viewArr[i].isFocused()) {
+                focusedView = viewArr[i];
+                break;
+            }
+        }
+
+        if (focusedView != null) {
+            String s = focusedView.getText().toString();
+            focusedView.setText(s + "{{" + (pos + 1) + "}}");
+            focusedView.setSelection(focusedView.getText().length());
+        } else {
+            Toast.makeText(getContext(), "Please select either description or amount or left out balance to use !", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void compareParseData() {
@@ -225,6 +279,14 @@ public class ItemDetailFragment extends Fragment {
         for (int i = 0; i < catArr.length; i++) {
             if (catArr[i].compareToIgnoreCase(cateStr) == 0) {
                 cate.setSelection(i);
+                break;
+            }
+        }
+
+        // for selecting correct item in category array
+        for (int i = 0; i < payArr.length; i++) {
+            if (payArr[i].compareToIgnoreCase(payStr) == 0) {
+                payMeth.setSelection(i);
                 break;
             }
         }
@@ -282,8 +344,9 @@ public class ItemDetailFragment extends Fragment {
             String amountStr = amount.getText().toString();
             int typeInt = type.getSelectedItemPosition();
             String cateStr = catArr[cate.getSelectedItemPosition()];
+            String paymStr = payArr[payMeth.getSelectedItemPosition()];
             String balLeftStr = balLeft.getText().toString();
-            mListener.saveFields(desStr, amountStr, typeInt, cateStr, balLeftStr);
+            mListener.saveFields(desStr, amountStr, typeInt, cateStr, balLeftStr, paymStr);
         } else {
             mListener.saveEverything();
         }

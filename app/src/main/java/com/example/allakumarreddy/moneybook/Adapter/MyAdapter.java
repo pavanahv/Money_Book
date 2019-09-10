@@ -29,6 +29,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
 
     // View lookup cache
     private static class ViewHolder {
+        TextView paymentMethod;
         TextView catName;
         TextView txtName;
         TextView txtRs;
@@ -63,6 +64,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.txtRs = (TextView) convertView.findViewById(R.id.price);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.homeiv);
             viewHolder.catName = (TextView) convertView.findViewById(R.id.categoryhome);
+            viewHolder.paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
 
             result = convertView;
 
@@ -79,6 +81,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         viewHolder.txtName.setText(dataModel.getDescription());
         viewHolder.txtRs.setText("Rs. " + dataModel.getAmount());
         viewHolder.catName.setText(dataModel.getCategory());
+        viewHolder.paymentMethod.setText(dataModel.getPaymentMethod());
         switch (this.type) {
             case 0:
                 viewHolder.imageView.setImageResource(R.drawable.spent);

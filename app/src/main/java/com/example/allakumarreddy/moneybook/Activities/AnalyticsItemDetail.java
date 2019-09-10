@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
@@ -34,6 +35,8 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private String[] catArr;
     private int recType;
     private Spinner tcate;
+    private Spinner paymentMethodView;
+    private String[] payMethArr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +97,14 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         cate = (Spinner) findViewById(R.id.catitem);
         catArr = db.getCategeories();
         int curind = -1;
+        // initialize with others category
+        for (int i = 0; i < catArr.length; i++) {
+            if (catArr[i].compareToIgnoreCase(GlobalConstants.OTHERS_CAT) == 0) {
+                curind = i;
+                break;
+            }
+        }
+
         for (int i = 0; i < catArr.length; i++) {
             if (catArr[i].compareToIgnoreCase(mbrOld.getCategory()) == 0) {
                 curind = i;
@@ -104,6 +115,29 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cate.setAdapter(caa);
         cate.setSelection(curind);
+
+        paymentMethodView = (Spinner) findViewById(R.id.payment_method);
+        payMethArr = db.getPaymentMethods();
+        int pCurind = -1;
+
+        // initialize with others payment method
+        for (int i = 0; i < payMethArr.length; i++) {
+            if (payMethArr[i].compareToIgnoreCase(GlobalConstants.OTHERS_CAT) == 0) {
+                pCurind = i;
+                break;
+            }
+        }
+
+        for (int i = 0; i < payMethArr.length; i++) {
+            if (payMethArr[i].compareToIgnoreCase(mbrOld.getPaymentMethod()) == 0) {
+                pCurind = i;
+                break;
+            }
+        }
+        ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, payMethArr);
+        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        paymentMethodView.setAdapter(paa);
+        paymentMethodView.setSelection(pCurind);
 
         if (recType == 4) {
             des.setVisibility(View.GONE);
@@ -150,13 +184,13 @@ public class AnalyticsItemDetail extends AppCompatActivity {
                 MBRecord mbrNew = new MBRecord(catArr[tcate.getSelectedItemPosition()],
                         Integer.parseInt(amount.getText().toString()),
                         format.parse(date.getText().toString()), mbrOld.getType(),
-                        catArr[cate.getSelectedItemPosition()]);
+                        catArr[cate.getSelectedItemPosition()], payMethArr[paymentMethodView.getSelectedItemPosition()]);
                 result = db.updateMTRecord(mbrOld, mbrNew);
             } else {
                 MBRecord mbrNew = new MBRecord(des.getText().toString(),
                         Integer.parseInt(amount.getText().toString()),
                         format.parse(date.getText().toString()), type.getSelectedItemPosition(),
-                        catArr[cate.getSelectedItemPosition()]);
+                        catArr[cate.getSelectedItemPosition()], payMethArr[paymentMethodView.getSelectedItemPosition()]);
                 result = db.updateRecord(mbrOld, mbrNew);
             }
             if (result)

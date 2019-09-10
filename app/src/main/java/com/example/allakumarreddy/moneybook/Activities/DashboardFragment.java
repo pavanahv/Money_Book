@@ -1,6 +1,5 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,14 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
-import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -91,7 +88,7 @@ public class DashboardFragment extends Fragment implements DashBoardAdapterInter
         dateY.setText(new SimpleDateFormat("yyyy").format(new Date()));
 
         dbr = new ArrayList<>();
-        dashBoardAdapter = new DashBoardAdapter(dbr, getContext(), this);
+        dashBoardAdapter = new DashBoardAdapter(dbr, getContext(), this, 1);
         dashBoardList.setAdapter(dashBoardAdapter);
     }
 
@@ -116,8 +113,8 @@ public class DashboardFragment extends Fragment implements DashBoardAdapterInter
         super.onDetach();
     }
 
-    public void addCategory(String name) {
-        db.addCategory(name);
+    public void addCategory(String name, int type) {
+        db.addCategory(name, type);
         DashBoardRecord temp = db.getDashBoardRecord(name);
         dbr.add(temp);
         dashBoardAdapter.add(temp);
@@ -155,38 +152,7 @@ public class DashboardFragment extends Fragment implements DashBoardAdapterInter
 
     @Override
     public void moneyTrasferPopMenu(String categoryName) {
-        Intent intent = new Intent(getContext(), AddActivity.class);
-        intent.putExtra("type", 2);
-        intent.putExtra("tcategory", categoryName.toLowerCase());
-        startActivityForResult(intent, ADD_ACTIVITY);
+        // no need to implement
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case ADD_ACTIVITY:
-                if (resultCode == Activity.RESULT_OK) {
-
-                    String s[] = new String[]{data.getStringExtra("fdes"),
-                            data.getStringExtra("famount"),
-                            data.getStringExtra("fcategory"),
-                            data.getStringExtra("tcategory")};
-
-                    if ((s[1].compareToIgnoreCase("") != 0) && (s[2].compareToIgnoreCase("") != 0)) {
-                        MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[3]);
-                        mbr.setToCategory(s[2]);
-                        boolean res = db.addMTRecord(mbr);
-                        if (res) {
-                            Toast.makeText(getContext(), "Succrssfully Trasfered !", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Something Went Wrong\nPlease Try Again!", Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Please Enter Amount", Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-        }
-    }
 }

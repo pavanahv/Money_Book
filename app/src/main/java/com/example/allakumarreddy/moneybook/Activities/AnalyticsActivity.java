@@ -97,7 +97,7 @@ public class AnalyticsActivity extends AppCompatActivity {
                 break;
             case R.id.save_filter:
                 Intent lIntent = new Intent(AnalyticsActivity.this, AddActivity.class);
-                lIntent.putExtra("type", 3);
+                lIntent.putExtra("type", GlobalConstants.SAVE_FILTER_SCREEN);
                 startActivityForResult(lIntent, ADD_ACTIVITY);
                 break;
 

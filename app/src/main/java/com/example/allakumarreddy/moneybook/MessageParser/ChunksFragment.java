@@ -1,9 +1,13 @@
 package com.example.allakumarreddy.moneybook.MessageParser;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +20,7 @@ import com.example.allakumarreddy.moneybook.R;
 
 import java.util.ArrayList;
 
-/**
- * A fragment with a Google +1 button.
- * Activities that contain this fragment must implement the
- * {@link ChunksFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ChunksFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ChunksFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,9 +35,10 @@ public class ChunksFragment extends Fragment {
     private String mParam2;
 
     private ChunksFragmentInteractionListener mListener;
-    private EditText msg;
+    private TextView msg;
     private TextView chunks;
     private EditText name;
+    private String msgText;
 
     public ChunksFragment() {
         // Required empty public constructor
@@ -79,7 +77,7 @@ public class ChunksFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chunks, container, false);
 
-        msg = (EditText) view.findViewById(R.id.msg);
+        msg = (TextView) view.findViewById(R.id.msg);
         name = (EditText) view.findViewById(R.id.name);
         //chunks = (TextView) view.findViewById(R.id.parsed_chunks);
         ((Button) view.findViewById(R.id.parse)).setOnClickListener(new View.OnClickListener() {
@@ -90,8 +88,35 @@ public class ChunksFragment extends Fragment {
                 parse(msgStr, nameStr);
             }
         });
-
+        msg.setText(msgText);
+        ((Button) view.findViewById(R.id.select)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectText();
+            }
+        });
         return view;
+    }
+
+    private void selectText() {
+        int start = msg.getSelectionStart();
+        int end = msg.getSelectionEnd();
+        String text = msg.getText().toString();
+        String selectedText = text.substring(start, end);
+        String fstr = text.substring(0, start) + "{{" + selectedText + "}}" + text.substring(end);
+        Spannable span = new SpannableString(fstr);
+        int lastInd = 0;
+        while (true) {
+            int indStart = fstr.indexOf("{{", lastInd);
+            if (indStart == -1)
+                break;
+            int indEnd = fstr.indexOf("}}", indStart);
+            indEnd += 2;
+            span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary)), indStart, indEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            lastInd = indEnd;
+        }
+        span.setSpan(new ForegroundColorSpan(Color.RED), start, end + 4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        msg.setText(span);
     }
 
     @Override
@@ -158,4 +183,7 @@ public class ChunksFragment extends Fragment {
         //chunks.setText(sb.toString());
     }
 
+    public void setMessage(String s) {
+        this.msgText = s;
+    }
 }

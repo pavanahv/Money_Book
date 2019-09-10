@@ -110,6 +110,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:id="@+id/payment_method_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="Payment Method"
+            android:paddingLeft="5dp"
+            android:textColor="@color/white" />
+
+        <Spinner
+            android:id="@+id/payment_method"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <ImageButton
             android:background="@color/colorPrimary"
             android:id="@+id/imageButton"

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     private final DbHandler db;
+    private final int type;
     private DashBoardAdapterInterface mDashBoardAdapterInterface;
     private ArrayList<DashBoardRecord> dataSet;
     Context mContext;
@@ -35,6 +36,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     // View lookup cache
     private static class ViewHolder {
+        public ImageView mBalLeftImg;
         TextView mBalLeft;
         CircularProgressBar mCircularProgressbarDay;
         TextView mPercentDay;
@@ -54,12 +56,13 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     }
 
-    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context, DashBoardAdapterInterface dashBoardAdapterInterface) {
+    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context, DashBoardAdapterInterface dashBoardAdapterInterface,int type) {
         super(context, R.layout.dash_board_item, data);
         this.dataSet = data;
         this.mContext = context;
         this.db = new DbHandler(mContext);
         mDashBoardAdapterInterface = dashBoardAdapterInterface;
+        this.type = type;
     }
 
 
@@ -95,6 +98,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.ibtn);
             viewHolder.mTextHead = (TextView) convertView.findViewById(R.id.dashhead);
             viewHolder.mBalLeft = (TextView) convertView.findViewById(R.id.bal_left);
+            viewHolder.mBalLeftImg = (ImageView) convertView.findViewById(R.id.bal_left_img);
             result = convertView;
 
             convertView.setTag(viewHolder);
@@ -107,8 +111,13 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
         final PopupMenu popup = new PopupMenu(mContext, viewHolder.imageView);
         //Inflating the Popup using xml file
-        popup.getMenuInflater()
-                .inflate(R.menu.dashboard_popmenu, popup.getMenu());
+        if(type == 1){
+            popup.getMenuInflater()
+                    .inflate(R.menu.dashboard_popmenu, popup.getMenu());
+        }else {
+            popup.getMenuInflater()
+                    .inflate(R.menu.payment_popmenu, popup.getMenu());
+        }
 
         //registering popup with OnMenuItemClickListener
         popup.setOnMenuItemClickListener(item -> {
@@ -163,7 +172,12 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         viewHolder.mPriceYear.setText(Utils.getFormattedNumber(dataModel.getYear()));
 
         viewHolder.mTextHead.setText(dataModel.getText());
-        viewHolder.mBalLeft.setText(Utils.getFormattedNumber(dataModel.getBalanceLeft()));
+        if(type == 1){
+            viewHolder.mBalLeft.setVisibility(View.GONE);
+            viewHolder.mBalLeftImg.setVisibility(View.GONE);
+        }else {
+            viewHolder.mBalLeft.setText(Utils.getFormattedNumber(dataModel.getBalanceLeft()));
+        }
         // Return the completed view to render on screen
         return convertView;
     }

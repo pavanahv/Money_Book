@@ -9,6 +9,11 @@ import java.util.Date;
 
 public class MBRecord implements Serializable {
 
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    private String paymentMethod;
     private String Description;
     private int amount;
     private Date date;
@@ -44,24 +49,26 @@ public class MBRecord implements Serializable {
 
     private int balLeft = 0;
 
-    public MBRecord(String description, int amount, Date date, String category) {
+    public MBRecord(String description, int amount, Date date, String category, String paymentMethod) {
         this.Description = description;
         this.amount = amount;
         this.date = date;
         this.type = -1;
         this.category = category;
-        LoggerCus.d("MBRecord", description + ":" + amount + ":" + date + ":" + category + ";" + type);
+        this.paymentMethod = paymentMethod;
+        LoggerCus.d("MBRecord", description + ":" + amount + ":" + date + ":" + category + ";" + type + ";" + paymentMethod);
     }
 
     public MBRecord() {
     }
 
-    public MBRecord(String description, int amount, Date date, int type, String category) {
+    public MBRecord(String description, int amount, Date date, int type, String category, String paymentMethod) {
         this.Description = description;
         this.amount = amount;
         this.date = date;
         this.type = type;
         this.category = category;
+        this.paymentMethod = paymentMethod;
         //LoggerCus.d("MBRecord",description+":"+amount+":"+date+":"+category+";"+type);
     }
 

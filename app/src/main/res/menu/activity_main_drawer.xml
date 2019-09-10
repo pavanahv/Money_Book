@@ -2,15 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+
         <item
             android:checked="true"
-            android:id="@+id/dash"
-            android:icon="@android:drawable/ic_dialog_dialer"
-            android:title="DashBoard" />
-        <item
             android:id="@+id/home"
             android:icon="@drawable/ic_home"
             android:title="Home" />
+
+        <item
+            android:id="@+id/dash"
+            android:icon="@drawable/ic_icon_categories"
+            android:title="Category" />
+
+        <item
+            android:id="@+id/payment_method"
+            android:icon="@drawable/ic_payment_method"
+            android:title="Payment Method" />
 
     </group>
 </menu>

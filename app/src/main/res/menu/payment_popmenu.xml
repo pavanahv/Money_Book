@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/dashboardPopupDelete"
+        android:title="Delete"/>
+
+    <item
+        android:id="@+id/dashboardPopupMT"
+        android:title="Money Transfer"/>
+
+</menu>

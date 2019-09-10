@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import com.example.allakumarreddy.moneybook.Adapter.DescriptionAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
@@ -37,6 +38,8 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     private Button cancel;
     private ArrayList<MBRecord> records;
     private EditText amtv;
+    private Spinner paymentMethodView;
+    private String[] payMethArr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +56,22 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     private void init() {
         autoCompleteTextView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewDes);
         categoryView = (Spinner) findViewById(R.id.addcategory);
+        paymentMethodView = (Spinner) findViewById(R.id.payment_method);
         amtv = ((EditText) findViewById(R.id.amount));
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        if (type == 0 || type == 2) {
+        if (type == GlobalConstants.HOME_SCREEN || type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN) {
             catArr = db.getCategeories();
-            int curInd = -1;
+            payMethArr = db.getPaymentMethods();
+            int curInd = -1, pCurInd = -1;
             for (int i = 0; i < catArr.length; i++) {
                 if ("others".compareToIgnoreCase(catArr[i]) == 0) {
                     curInd = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < payMethArr.length; i++) {
+                if ("others".compareToIgnoreCase(payMethArr[i]) == 0) {
+                    pCurInd = i;
                     break;
                 }
             }
@@ -68,7 +79,13 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             categoryView.setAdapter(aa);
             categoryView.setSelection(curInd);
-            if (type == 0) {
+
+            ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, payMethArr);
+            paa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            paymentMethodView.setAdapter(paa);
+            paymentMethodView.setSelection(pCurInd);
+
+            if (type == GlobalConstants.HOME_SCREEN) {
                 autoCompleteTextView.setHint("Description");
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
 
@@ -120,16 +137,18 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                         add.setFocusable(true);
                     }
                 });
-            } else if (type == 2)
+            } else if (type == GlobalConstants.HOME_SCREEN)
                 autoCompleteTextView.setVisibility(View.GONE);
-        } else if (type == 3) {
+        } else if (type == GlobalConstants.SAVE_FILTER_SCREEN) {
             autoCompleteTextView.setHint("Name Of Filter");
             findViewById(R.id.amount).setVisibility(View.GONE);
             categoryView.setVisibility(View.GONE);
-        }else{
+            paymentMethodView.setVisibility(View.GONE);
+        } else if (type == GlobalConstants.CATERGORY_SCREEN || type == GlobalConstants.PAYMENT_METHOD_SCREEN) {
             autoCompleteTextView.setHint("Name Of Category");
             findViewById(R.id.amount).setVisibility(View.GONE);
             categoryView.setVisibility(View.GONE);
+            paymentMethodView.setVisibility(View.GONE);
         }
         add = (Button) findViewById(R.id.addCus);
         cancel = (Button) findViewById(R.id.cancel);
@@ -153,9 +172,10 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
             case R.id.addCus:
                 String des = autoCompleteTextView.getText().toString();
                 String amount = amtv.getText().toString();
-                String category = "";
-                if (type == 0 || type == 2) {
+                String category = "", paymentMethod = "";
+                if (type == GlobalConstants.HOME_SCREEN || type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN) {
                     category = catArr[categoryView.getSelectedItemPosition()];
+                    paymentMethod = payMethArr[paymentMethodView.getSelectedItemPosition()];
                     if (amount == null)
                         amount = "0";
                     if (des == null)
@@ -169,6 +189,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                 resultIntent.putExtra("fcategory", category);
                 resultIntent.putExtra("tcategory", tcategory);
                 resultIntent.putExtra("type", type);
+                resultIntent.putExtra("payment_method", paymentMethod);
                 setResult(Activity.RESULT_OK, resultIntent);
 
                 break;

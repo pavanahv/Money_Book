@@ -20,10 +20,13 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.SettingsLock.CreatePinActivity;
 import com.example.allakumarreddy.moneybook.SettingsLock.FingerPrintManager;
+import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.TimePreference;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -105,7 +108,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 if (prefInit) {
                     switch (preference.getKey()) {
                         case GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH:
-                            if ((boolean)value) {
+                            if ((boolean) value) {
                                 Utils.setAlarmForReportsRemainder(context);
                             } else {
                                 Utils.cancelAlarmForReportsRemainder(context);
@@ -113,7 +116,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             break;
 
                         case GlobalConstants.PREF_REPORTS_SWITCH:
-                            if ((boolean)value) {
+                            if ((boolean) value) {
                                 Utils.setAlarmForReportsNotification(context);
                             } else {
                                 Utils.cancelAlarmForReportsNotification(context);
@@ -121,7 +124,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             break;
 
                         case GlobalConstants.PREF_LOCK_FINGERPRINT:
-                            if ((boolean)value) {
+                            if ((boolean) value) {
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                                     FingerPrintManager fm = new FingerPrintManager(context, null);
                                     boolean res = fm.init();
@@ -139,7 +142,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             break;
                     }
                 }
-            }else {
+            } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
@@ -273,6 +276,31 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference(GlobalConstants.PREF_BACKUP_FREQUENCY));
             bindPreferenceSummaryToValue(findPreference(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE));
             bindPreferenceSummaryToValue(findPreference(GlobalConstants.PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE));
+            Preference localBackupPreference = findPreference(GlobalConstants.PREF_LOCAL_BACKUP_DATA);
+            bindPreferenceSummaryToValue(localBackupPreference);
+            localBackupPreference.setOnPreferenceClickListener(preference -> {
+                new Thread(() -> {
+                    Backup backup = new Backup(context);
+                    if (backup.send()) {
+                        getActivity().runOnUiThread(() -> {
+                            final String summary = "Tap To Make Local Backup\nLast Local Backup Date : "
+                                    + new SimpleDateFormat("yyyy - MM - dd  H : m : s : S").format(new Date())
+                                    + "\nLast Local Backup File Size : "
+                                    + backup.getBackupFile().length() + " Bytes";
+                            PreferenceManager.getDefaultSharedPreferences(context).edit()
+                                    .putString(GlobalConstants.PREF_LOCAL_BACKUP_DATA, summary)
+                                    .apply();
+                            localBackupPreference.setSummary(summary);
+                            Toast.makeText(getActivity(), "Local Backup Successfull!", Toast.LENGTH_LONG).show();
+                        });
+                    } else {
+                        getActivity().runOnUiThread(() -> {
+                            Toast.makeText(getActivity(), "Error: Something went wrong while making Local Backup", Toast.LENGTH_LONG).show();
+                        });
+                    }
+                }).start();
+                return false;
+            });
         }
 
         @Override
@@ -284,6 +312,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             return super.onOptionsItemSelected(item);
         }
+
     }
 
     /**

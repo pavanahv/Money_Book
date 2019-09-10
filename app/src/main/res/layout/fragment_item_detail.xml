@@ -1,121 +1,180 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.allakumarreddy.moneybook.MessageParser.ItemDetailFragment">
 
-    <ScrollView
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="5">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp">
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/chunks"
+            <LinearLayout
+                android:id="@+id/chunks_list_header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Use below parsed items to fill your data. For example, description you can write like '1 bought from 2'. Here 1 and 2 arguments as you see in below list. They are replaced with parsed text when you got message.\n" />
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/chunks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:text="Use below parsed items to fill your data. For example, description you can write like '{{1}} bought from {{2}}'. Here {{1}} and {{2}} arguments as you see in below list. They are replaced with parsed text when you got message." />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:paddingLeft="5dp"
+                    android:text="Select From Below List"
+                    android:textColor="@color/white" />
+
+                <ListView
+                    android:id="@+id/chunks_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp" />
+
+            </LinearLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:paddingLeft="5dp"
+                        android:text="Description"
+                        android:textColor="@color/white" />
+
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/descitem"
+                        style="@style/Widget.AppCompat.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:hint="{{1}} spent at {{2}}"
+                        android:textSize="30dp"
+                        android:textStyle="bold" />
+
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:paddingLeft="5dp"
+                        android:text="amount"
+                        android:textColor="@color/white" />
+
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/amountitem"
+                        style="@style/Widget.AppCompat.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:hint="{{3}}"
+                        android:textSize="25dp" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:paddingLeft="5dp"
+                        android:text="Type"
+                        android:textColor="@color/white" />
+
+                    <Spinner
+                        android:id="@+id/typeitem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:paddingLeft="5dp"
+                        android:text="Category"
+                        android:textColor="@color/white" />
+
+                    <Spinner
+                        android:id="@+id/catitem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:paddingLeft="5dp"
+                        android:text="Payment Method"
+                        android:textColor="@color/white" />
+
+                    <Spinner
+                        android:id="@+id/payitem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:paddingLeft="5dp"
+                        android:text="Left Out Balance"
+                        android:textColor="@color/white" />
+
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/leftOutBalance"
+                        style="@style/Widget.AppCompat.EditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:hint="{{4}}"
+                        android:textSize="25dp" />
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/savbtn"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_margin="5dp"
+                        android:text="Next ->" />
+                </LinearLayout>
+            </ScrollView>
+
         </LinearLayout>
-    </ScrollView>
+    </android.support.v7.widget.CardView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="5dp">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/white" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:paddingLeft="5dp"
-            android:text="Description"
-            android:textColor="@color/white" />
-
-        <EditText
-            android:id="@+id/descitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="{{1}} spent at {{2}}"
-            android:textSize="30dp"
-            android:textStyle="bold" />
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:paddingLeft="5dp"
-            android:text="amount"
-            android:textColor="@color/white" />
-
-        <EditText
-            android:id="@+id/amountitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="{{3}}"
-            android:textSize="25dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:paddingLeft="5dp"
-            android:text="Type"
-            android:textColor="@color/white" />
-
-        <Spinner
-            android:id="@+id/typeitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:paddingLeft="5dp"
-            android:text="Category"
-            android:textColor="@color/white" />
-
-        <Spinner
-            android:id="@+id/catitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:paddingLeft="5dp"
-            android:text="Left Out Balance"
-            android:textColor="@color/white" />
-
-        <EditText
-            android:id="@+id/leftOutBalance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="{{4}}"
-            android:textSize="25dp" />
-
-        <ImageButton
-            android:id="@+id/savbtn"
-            app:srcCompat="@drawable/ic_save_noti"
-            android:background="@color/colorPrimary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-    </LinearLayout>
 </LinearLayout>

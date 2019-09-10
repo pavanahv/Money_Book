@@ -54,7 +54,7 @@ public class FileStore {
     }
 
     private File getMediaFile(boolean isBackup) {
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "MBStore");
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MBStore");
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 LoggerCus.d(TAG, "failed to create or open directory");

@@ -14,10 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
+import com.example.allakumarreddy.moneybook.Activities.WelcomeActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.fingerPrint.FingerPrintInterface;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.example.allakumarreddy.moneybook.utils.LoggerCus;
+import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.Random;
 
@@ -41,10 +44,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         PreferencesCus sp = new PreferencesCus(this);
-        /*if (sp.getData(Utils.getEmail()) == null) {
+        LoggerCus.d(TAG,sp.getData(Utils.getEmail())+" login data");
+        if (sp.getData(Utils.getEmail()) == null) {
             startActivity(new Intent(this, WelcomeActivity.class));
             finish();
-        }*/
+            return;
+        }
 
         init();
     }

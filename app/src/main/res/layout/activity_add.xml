@@ -43,7 +43,17 @@
                 android:textSize="20dp" />
 
             <Spinner
+                android:spinnerMode="dialog"
+                android:prompt="@string/select_category"
                 android:id="@+id/addcategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp" />
+
+            <Spinner
+                android:spinnerMode="dialog"
+                android:prompt="@string/select_payment_method"
+                android:id="@+id/payment_method"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp" />
