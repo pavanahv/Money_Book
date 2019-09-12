@@ -106,7 +106,7 @@ public class MessageParserBase {
             MBRecord mbRecord = new MBRecord(des, amount, new Date(Long.parseLong(rawMsgMap.get("date"))), dbMsgMap.get(DbHandler.MSG_KEY_CAT),dbMsgMap.get(DbHandler.MSG_KEY_PAYMENT_METHOD));
             boolean res = db.addRecordWithCatAsID(mbRecord, Integer.parseInt(dbMsgMap.get(DbHandler.MSG_KEY_TYPE)));
             if (res) {
-                res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_CAT)), balLeft);
+                res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_PAYMENT_METHOD)), balLeft);
             }
 
         } else if ((desc.compareToIgnoreCase("") != 0) && (bal.compareToIgnoreCase("") == 0)) {
@@ -119,7 +119,7 @@ public class MessageParserBase {
         } else if ((desc.compareToIgnoreCase("") == 0) && (bal.compareToIgnoreCase("") != 0)) {
             int balLeft = Utils.castFloat2IntRemovingCommas(parseUpdateField(flist, bal));
             LoggerCus.d(TAG, "" + balLeft);
-            boolean res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_CAT)), balLeft);
+            boolean res = db.updateBalLeft(Long.parseLong(dbMsgMap.get(DbHandler.MSG_KEY_PAYMENT_METHOD)), balLeft);
         }
     }
 

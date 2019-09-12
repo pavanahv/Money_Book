@@ -105,10 +105,12 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             }
         }
 
-        for (int i = 0; i < catArr.length; i++) {
-            if (catArr[i].compareToIgnoreCase(mbrOld.getCategory()) == 0) {
-                curind = i;
-                break;
+        if (mbrOld.getCategory() != null) {
+            for (int i = 0; i < catArr.length; i++) {
+                if (catArr[i].compareToIgnoreCase(mbrOld.getCategory()) == 0) {
+                    curind = i;
+                    break;
+                }
             }
         }
         ArrayAdapter caa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
@@ -128,12 +130,15 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             }
         }
 
-        for (int i = 0; i < payMethArr.length; i++) {
-            if (payMethArr[i].compareToIgnoreCase(mbrOld.getPaymentMethod()) == 0) {
-                pCurind = i;
-                break;
+        if (mbrOld.getPaymentMethod() != null) {
+            for (int i = 0; i < payMethArr.length; i++) {
+                if (payMethArr[i].compareToIgnoreCase(mbrOld.getPaymentMethod()) == 0) {
+                    pCurind = i;
+                    break;
+                }
             }
         }
+
         ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, payMethArr);
         caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         paymentMethodView.setAdapter(paa);

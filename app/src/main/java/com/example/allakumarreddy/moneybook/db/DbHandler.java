@@ -279,6 +279,7 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
         values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
         values.put(KEY_CAT, Long.parseLong(mbr.getCategory()));
+        values.put(KEY_PAYMENT_METHOD, Long.parseLong(mbr.getPaymentMethod()));
 
         SQLiteDatabase db = this.getWritableDatabase();
         // Inserting Row
@@ -313,6 +314,7 @@ public class DbHandler extends SQLiteOpenHelper {
             JSONArray jsonArrayc = obj.getJSONArray(CAT_TABLE_NAME);
             JSONArray jsonArraym = obj.getJSONArray(MSG_TABLE_NAME);
             JSONArray jsonArrayf = obj.getJSONArray(F_TABLE_NAME);
+            JSONArray jsonArrayp = obj.getJSONArray(PAY_METH_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -329,22 +331,33 @@ public class DbHandler extends SQLiteOpenHelper {
                 values.put(KEY_DATE, dc.getdDate().getTime());
                 values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
                 values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
-                values.put(KEY_CAT, 1);
-                values.put(KEY_PAYMENT_METHOD, jsonObj.getLong(KEY_CAT));
+                values.put(KEY_CAT, jsonObj.getLong(KEY_CAT));
+                values.put(KEY_PAYMENT_METHOD, jsonObj.getLong(KEY_PAYMENT_METHOD));
 
                 // Inserting Row
                 db.insert(TABLE_NAME, null, values);
             }
 
-            final int len1 = jsonArrayc.length();
+            final int len1 = jsonArrayp.length();
             for (int i = 0; i < len1; i++) {
-                JSONObject jsonObj = jsonArrayc.getJSONObject(i);
+                JSONObject jsonObj = jsonArrayp.getJSONObject(i);
                 ContentValues values = new ContentValues();
-                values.put(KEY_PAY_METH_NAME, jsonObj.getString(KEY_NAME));
-                values.put(KEY_PAY_METH_ID, jsonObj.getLong(KEY_CAT_ID));
-                values.put(KEY_PAY_METH_BAL, jsonObj.getLong(KEY_CAT_BAL));
+                values.put(KEY_PAY_METH_NAME, jsonObj.getString(KEY_PAY_METH_NAME));
+                values.put(KEY_PAY_METH_ID, jsonObj.getLong(KEY_PAY_METH_ID));
+                values.put(KEY_PAY_METH_BAL, jsonObj.getLong(KEY_PAY_METH_BAL));
                 // Inserting Row
                 db.insert(PAY_METH_TABLE_NAME, null, values);
+            }
+
+            final int len2 = jsonArrayc.length();
+            for (int i = 0; i < len2; i++) {
+                JSONObject jsonObj = jsonArrayc.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(KEY_NAME, jsonObj.getString(KEY_NAME));
+                values.put(KEY_CAT_ID, jsonObj.getLong(KEY_CAT_ID));
+                values.put(KEY_CAT_TYPE, jsonObj.getLong(KEY_CAT_TYPE));
+                // Inserting Row
+                db.insert(CAT_TABLE_NAME, null, values);
             }
 
             final int lenm = jsonArraym.length();
@@ -358,6 +371,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 values.put(MSG_KEY_CAT, jsonObj.getLong(MSG_KEY_CAT));
                 values.put(MSG_KEY_LEFT_BAL, jsonObj.getString(MSG_KEY_LEFT_BAL));
                 values.put(MSG_KEY_MSG, jsonObj.getString(MSG_KEY_MSG));
+                values.put(MSG_KEY_PAYMENT_METHOD, jsonObj.getLong(MSG_KEY_PAYMENT_METHOD));
                 // Inserting Row
                 db.insert(MSG_TABLE_NAME, null, values);
             }
@@ -385,6 +399,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.delete(CAT_TABLE_NAME, null, null);
         db.delete(MSG_TABLE_NAME, null, null);
         db.delete(F_TABLE_NAME, null, null);
+        db.delete(PAY_METH_TABLE_NAME, null, null);
         db.close();
     }
 
@@ -402,11 +417,17 @@ public class DbHandler extends SQLiteOpenHelper {
         sDate = intializeSDateForDay(sDate);
         eDate = intializeEDateForDay(eDate);
 
-        LoggerCus.d(TAG, KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime());
-        String query = KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND " + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE + " = " + mbr.getType() + " AND " + KEY_CAT + " = " + getIdOfCategory(mbr.getCategory()) + " AND " + KEY_PAYMENT_METHOD + " = " + getIdOfPaymentMethod(mbr.getPaymentMethod()) + " AND " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime();
+        String query = KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND "
+                + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE
+                + " = " + mbr.getType() + " AND " + KEY_CAT + " = "
+                + getIdOfCategory(mbr.getCategory()) + " AND " + KEY_PAYMENT_METHOD
+                + " = " + getIdOfPaymentMethod(mbr.getPaymentMethod()) + " AND "
+                + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= "
+                + eDate.getTime();
         SQLiteDatabase db = this.getWritableDatabase();
         int n = db.delete(TABLE_NAME, query, null);
         db.close();
+        LoggerCus.d(TAG, query);
         return n;
     }
 
@@ -482,7 +503,12 @@ public class DbHandler extends SQLiteOpenHelper {
 
         JSONArray jsonArray = new JSONArray();
 
-        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE + "," + KEY_CAT + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + " FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT " + KEY_DESCRIPTION + ","
+                + KEY_AMOUNT + "," + KEY_DATE + "," + KEY_TYPE
+                + "," + KEY_CAT + "," + KEY_DATE_MONTH + ","
+                + KEY_DATE_YEAR + "," + KEY_PAYMENT_METHOD
+                + " FROM " + TABLE_NAME, null);
+
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -492,11 +518,12 @@ public class DbHandler extends SQLiteOpenHelper {
                     jsonObject.put(KEY_DESCRIPTION, cursor.getString(0));
                     jsonObject.put(KEY_AMOUNT, cursor.getString(1));
                     jsonObject.put(KEY_DATE, format.format(new Date(cursor.getLong(2))));
-                    jsonObject.put("test_day", cursor.getLong(2));
-                    jsonObject.put("test_month", cursor.getLong(5));
-                    jsonObject.put("test_year", cursor.getLong(6));
+                    //jsonObject.put("test_day", cursor.getLong(2));
+                    //jsonObject.put("test_month", cursor.getLong(5));
+                    //jsonObject.put("test_year", cursor.getLong(6));
                     jsonObject.put(KEY_TYPE, cursor.getString(3));
                     jsonObject.put(KEY_CAT, cursor.getLong(4));
+                    jsonObject.put(KEY_PAYMENT_METHOD, cursor.getLong(7));
                     jsonArray.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
@@ -506,7 +533,8 @@ public class DbHandler extends SQLiteOpenHelper {
         }
 
         JSONArray jsonArrayc = new JSONArray();
-        cursor = db.rawQuery("SELECT " + KEY_NAME + "," + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME, null);
+        cursor = db.rawQuery("SELECT " + KEY_NAME + "," + KEY_CAT_ID + ","
+                + KEY_CAT_TYPE + " FROM " + CAT_TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
@@ -515,6 +543,7 @@ public class DbHandler extends SQLiteOpenHelper {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put(KEY_NAME, cursor.getString(0));
                     jsonObject.put(KEY_CAT_ID, cursor.getLong(1));
+                    jsonObject.put(KEY_CAT_TYPE, cursor.getLong(2));
                     jsonArrayc.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
@@ -525,7 +554,8 @@ public class DbHandler extends SQLiteOpenHelper {
 
         JSONArray jsonArraym = new JSONArray();
         cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + "," + MSG_KEY_DESCRIPTION + "," + MSG_KEY_AMOUNT + ","
-                + MSG_KEY_TYPE + "," + MSG_KEY_CAT + "," + MSG_KEY_LEFT_BAL + "," + MSG_KEY_MSG
+                + MSG_KEY_TYPE + "," + MSG_KEY_CAT + "," + MSG_KEY_LEFT_BAL
+                + "," + MSG_KEY_MSG + "," + MSG_KEY_PAYMENT_METHOD
                 + " FROM " + MSG_TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
@@ -540,6 +570,7 @@ public class DbHandler extends SQLiteOpenHelper {
                     jsonObject.put(MSG_KEY_CAT, cursor.getLong(4));
                     jsonObject.put(MSG_KEY_LEFT_BAL, cursor.getString(5));
                     jsonObject.put(MSG_KEY_MSG, cursor.getString(6));
+                    jsonObject.put(MSG_KEY_PAYMENT_METHOD, cursor.getLong(7));
                     jsonArraym.put(jsonObject);
                 } catch (JSONException e) {
                     LoggerCus.d(TAG, e.getMessage());
@@ -568,12 +599,34 @@ public class DbHandler extends SQLiteOpenHelper {
             cursor.close();
         }
 
+        JSONArray jsonArrayp = new JSONArray();
+        cursor = db.rawQuery("SELECT " + KEY_PAY_METH_ID + ","
+                + KEY_PAY_METH_NAME + "," + KEY_PAY_METH_BAL
+                + " FROM " + PAY_METH_TABLE_NAME, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(KEY_PAY_METH_ID, cursor.getLong(0));
+                    jsonObject.put(KEY_PAY_METH_NAME, cursor.getString(1));
+                    jsonObject.put(KEY_PAY_METH_BAL, cursor.getInt(2));
+                    jsonArrayp.put(jsonObject);
+                } catch (JSONException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
+            }
+            cursor.close();
+        }
+
         JSONObject obj = new JSONObject();
         try {
             obj.put(TABLE_NAME, jsonArray);
             obj.put(CAT_TABLE_NAME, jsonArrayc);
             obj.put(MSG_TABLE_NAME, jsonArraym);
             obj.put(F_TABLE_NAME, jsonArrayf);
+            obj.put(PAY_METH_TABLE_NAME, jsonArrayp);
         } catch (JSONException e) {
             e.printStackTrace();
         }
