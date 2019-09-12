@@ -179,7 +179,7 @@ public class AnalyticsFilterData implements Serializable {
             jobj.put("moneyTypeBool", jarrmenuTypeBool);
 
             jobj.put("dateInterval", dateInterval);
-            jobj.put("groupByNone", subMenuGroupByDataBool[2]);
+            jobj.put("groupByNone", subMenuGroupByDataBool[4]);
             jobj.put("groupBy", groupBy);
             jobj.put("sortBy", sortBy);
             jobj.put("sortingOrder", sortingOrder);
