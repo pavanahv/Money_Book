@@ -192,6 +192,12 @@ public class AnalyticsActivity extends AppCompatActivity {
     }
 
     private void init() {
+        initCategories();
+        initPaymentMethods();
+        initFilters();
+    }
+
+    private void initCategories() {
         // categories initialization
         String[] cat = db.getCategeories();
         mAnalyticsFilterData.subMenuCatogeoryData = new String[cat.length + 1];
@@ -214,8 +220,31 @@ public class AnalyticsActivity extends AppCompatActivity {
         } else {
             Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, true);
         }
+    }
 
-        initFilters();
+    private void initPaymentMethods() {
+        // payment methods initialization
+        String[] pay = db.getPaymentMethods();
+        mAnalyticsFilterData.subMenuPaymentMethodData = new String[pay.length + 1];
+        mAnalyticsFilterData.subMenuPaymentMethodData[0] = "All";
+        for (int i = 1; i < mAnalyticsFilterData.subMenuPaymentMethodData.length; i++)
+            mAnalyticsFilterData.subMenuPaymentMethodData[i] = pay[i - 1];
+
+        mAnalyticsFilterData.subMenuPaymentMethodDataBool = new boolean[mAnalyticsFilterData.subMenuPaymentMethodData.length];
+
+        Intent intent = getIntent();
+        String tempCat = intent.getStringExtra("paymentMethod");
+        if (tempCat != null) {
+            Arrays.fill(mAnalyticsFilterData.subMenuPaymentMethodDataBool, false);
+            for (int i = 1; i < mAnalyticsFilterData.subMenuPaymentMethodData.length; i++) {
+                if (mAnalyticsFilterData.subMenuPaymentMethodData[i].compareToIgnoreCase(tempCat) == 0) {
+                    mAnalyticsFilterData.subMenuPaymentMethodDataBool[i] = true;
+                    break;
+                }
+            }
+        } else {
+            Arrays.fill(mAnalyticsFilterData.subMenuPaymentMethodDataBool, true);
+        }
     }
 
     private void initFilters() {
@@ -237,9 +266,14 @@ public class AnalyticsActivity extends AppCompatActivity {
     }
 
     private void updateData() {
+        if (mAnalyticsFilterData.subMenuGroupByDataBool[4])
+            mStartItemDetailActivity = true;
+        else
+            mStartItemDetailActivity = false;
         list.clear();
         dataList = db.getRecordsAsList(mAnalyticsFilterData);
         list.addAll(dataList);
+        analyticsAdapter.setGroupBy(!mStartItemDetailActivity);
         analyticsAdapter.notifyDataSetChanged();
         upDateTotal();
         if (mAnalyticsFilterData.subMenuViewByDataBool[0]) {
@@ -251,10 +285,6 @@ public class AnalyticsActivity extends AppCompatActivity {
             }
             showGraph();
         }
-        if (mAnalyticsFilterData.subMenuGroupByDataBool[4])
-            mStartItemDetailActivity = true;
-        else
-            mStartItemDetailActivity = false;
     }
 
     private void upDateTotal() {

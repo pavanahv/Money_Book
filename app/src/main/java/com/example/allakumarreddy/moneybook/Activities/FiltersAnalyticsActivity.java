@@ -115,6 +115,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         subMenuListData.add(mAnalyticsFilterData.subMenuSortByData);
         subMenuListData.add(mAnalyticsFilterData.subMenuSortingOrderData);
         subMenuListData.add(mAnalyticsFilterData.subMenuCatogeoryData);
+        subMenuListData.add(mAnalyticsFilterData.subMenuPaymentMethodData);
         subMenuListData.add(mAnalyticsFilterData.subMenuViewByData);
         subMenuListData.add(mAnalyticsFilterData.subMenuGraphTypeData);
         subMenuListData.add(mAnalyticsFilterData.subMenuFilterData);
@@ -126,6 +127,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         subMenuListDataSelection.add(mAnalyticsFilterData.subMenuSortByDataBool);
         subMenuListDataSelection.add(mAnalyticsFilterData.subMenuSortingOrderDataBool);
         subMenuListDataSelection.add(mAnalyticsFilterData.subMenuCatogeoryDataBool);
+        subMenuListDataSelection.add(mAnalyticsFilterData.subMenuPaymentMethodDataBool);
         subMenuListDataSelection.add(mAnalyticsFilterData.subMenuViewByDataBool);
         subMenuListDataSelection.add(mAnalyticsFilterData.subMenuGraphTypeDataBool);
         subMenuListDataSelection.add(mAnalyticsFilterData.subMenuFilterDataBool);
@@ -156,18 +158,19 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     private void setSubMenu(int position) {
         mMainMenuSelectedItemPosition = position;
         switch (position) {
-            case 0:
-            case 1:
-            case 3:
-            case 4:
-            case 5:
-            case 7:
-            case 8:
-            case 9:
+            case 0: // "Date"
+            case 1: // "Date Interval"
+            case 3: // "Group By"
+            case 4: // "Sort By"
+            case 5: // "Sorting Order"
+            case 8: // "View By"
+            case 9: // "Graph Type"
+            case 10: // "Saved Filters"
                 initSubMenu(subMenuListData.get(position), true, subMenuListDataSelection.get(position));
                 break;
-            case 2:
-            case 6:
+            case 2: // "Money Type"
+            case 6: // "Category"
+            case 7: // "Payment Method"
                 initSubMenu(subMenuListData.get(position), false, subMenuListDataSelection.get(position));
                 break;
         }

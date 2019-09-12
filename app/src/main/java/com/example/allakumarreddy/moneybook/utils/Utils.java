@@ -283,10 +283,25 @@ public class Utils {
             for (int i = 0; i < jarrcols.length(); i++) {
                 cols[i] = jarrcols.getJSONObject(i).getString("element" + i);
             }
+
+            JSONArray jarrPayMethBool = jobj.getJSONArray("PayMethBool");
+            boolean[] payMetheBool = new boolean[jarrPayMethBool.length()];
+            for (int i = 0; i < jarrPayMethBool.length(); i++) {
+                payMetheBool[i] = jarrPayMethBool.getJSONObject(i).getBoolean("element" + i);
+            }
+
+            JSONArray jarrpays = jobj.getJSONArray("pays");
+            String[] pays = new String[jarrpays.length()];
+            for (int i = 0; i < jarrpays.length(); i++) {
+                pays[i] = jarrpays.getJSONObject(i).getString("element" + i);
+            }
+
             DbHandler db = new DbHandler(context);
             return db.getRecordsAsList(queryText, dateDataBool, sDate, eDate,
-                    menuTypeBool, dateInterval, groupByNone, groupBy, sortBy, catTypeBool, cols,
-                    sortingOrder);
+                    menuTypeBool, dateInterval, groupByNone, groupBy,
+                    sortBy, catTypeBool, cols,
+                    sortingOrder,
+                    payMetheBool, pays);
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
         } catch (ParseException e) {

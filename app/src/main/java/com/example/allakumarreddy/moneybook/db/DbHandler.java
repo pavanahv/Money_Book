@@ -675,12 +675,13 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public ArrayList<MBRecord> getRecordsAsList(String query, boolean[] dateBool, Date sDate, Date eDate,
                                                 boolean[] moneyType, int dateInterval,
-                                                boolean groupByNone, int groupBy, int sortBy, boolean[] categoryBool,
-                                                String[] category, int sortingOrder) {
+                                                boolean groupByNone, int groupBy, int sortBy,
+                                                boolean[] categoryBool, String[] category,
+                                                int sortingOrder,
+                                                boolean[] payBool, String[] payMeth) {
         this.total = 0;
 
         ArrayList<MBRecord> mbr = new ArrayList<>();
-        int moneyTypeVal = 0;
         boolean res = false;
         for (int i = 0; i < moneyType.length; i++) {
             if (moneyType[i]) {
@@ -808,6 +809,8 @@ public class DbHandler extends SQLiteOpenHelper {
 
         eQuery += getCategoryQueryString(categoryBool, category);
 
+        eQuery += getPaymentMethodQueryString(payBool, payMeth);
+
         if (!groupByNone) {
             switch (groupBy) {
                 case 0:
@@ -912,6 +915,30 @@ public class DbHandler extends SQLiteOpenHelper {
         }
         // return contact
         return mbr;
+    }
+
+    private String getPaymentMethodQueryString(boolean[] payBool, String[] payMeth) {
+
+        String eQuery = "";
+        eQuery += " AND (";
+        boolean started = false;
+        boolean evenOneCatTrue = false;
+        for (int i = 1; i < payBool.length; i++) {
+            if (payBool[i]) {
+                evenOneCatTrue = true;
+                if (started)
+                    eQuery += " OR ";
+                eQuery += "(" + KEY_PAYMENT_METHOD + " = (SELECT " + KEY_PAY_METH_ID + " FROM " + PAY_METH_TABLE_NAME
+                        + " WHERE " + KEY_PAY_METH_NAME + " = '" + payMeth[i] + "')) ";
+                started = true;
+            }
+        }
+        eQuery += ")";
+        if (evenOneCatTrue)
+            return eQuery;
+        else
+            return "";
+
     }
 
     private String getQueryForMoneyType(boolean[] moneyType) {
@@ -1595,7 +1622,9 @@ public class DbHandler extends SQLiteOpenHelper {
                 sortBy,
                 mAnalyticsFilterData.subMenuCatogeoryDataBool,
                 mAnalyticsFilterData.subMenuCatogeoryData,
-                sortingOrder);
+                sortingOrder,
+                mAnalyticsFilterData.subMenuPaymentMethodDataBool,
+                mAnalyticsFilterData.subMenuPaymentMethodData);
     }
 
     public String[][] getFilterRecords() {

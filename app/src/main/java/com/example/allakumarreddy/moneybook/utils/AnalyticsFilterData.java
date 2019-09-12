@@ -12,7 +12,7 @@ import java.util.Date;
 public class AnalyticsFilterData implements Serializable {
 
     private static final String TAG = AnalyticsFilterData.class.getSimpleName();
-    public String[] mainMenuData = new String[]{"Date", "Date Interval", "Money Type", "Group By", "Sort By", "Sorting Order", "Category", "View By", "Graph Type", "Saved Filters"};
+    public String[] mainMenuData = new String[]{"Date", "Date Interval", "Money Type", "Group By", "Sort By", "Sorting Order", "Category", "Payment Method", "View By", "Graph Type", "Saved Filters"};
     public String[] subMenuDateData = new String[]{"Current Day", "Current Month", "Current Year", "Custom", "All"};
     public boolean[] subMenuDateDataBool = new boolean[]{false, false, false, false, true};
     public String[] subMenuMoneyTypeData = new String[]{"All", "Spent", "Earn", "Due", "Loan", "Money Transfer"};
@@ -31,6 +31,8 @@ public class AnalyticsFilterData implements Serializable {
     public boolean[] subMenuSortingOrderDataBool = new boolean[]{false, true};
     public String[] subMenuCatogeoryData = new String[]{"All"};
     public boolean[] subMenuCatogeoryDataBool = new boolean[]{true};
+    public String[] subMenuPaymentMethodData = new String[]{"All"};
+    public boolean[] subMenuPaymentMethodDataBool = new boolean[]{true};
     public String[] subMenuFilterData = new String[]{"No Filters"};
     public boolean[] subMenuFilterDataBool = new boolean[]{false};
     public String queryText = "";
@@ -48,6 +50,7 @@ public class AnalyticsFilterData implements Serializable {
         subMenuSortByDataBool = new boolean[]{true, false, false};
         subMenuSortingOrderDataBool = new boolean[]{false, true};
         subMenuCatogeoryDataBool = new boolean[]{true};
+        subMenuPaymentMethodDataBool = new boolean[]{true};
         subMenuFilterDataBool = new boolean[]{false};
         queryText = "";
     }
@@ -93,10 +96,13 @@ public class AnalyticsFilterData implements Serializable {
         sb.append("\n");
         sb.append(Arrays.toString(subMenuCatogeoryDataBool));
         sb.append("\n");
+        sb.append(Arrays.toString(subMenuPaymentMethodDataBool));
+        sb.append("\n");
         sb.append(Arrays.toString(subMenuFilterData));
         sb.append("\n");
         sb.append(Arrays.toString(subMenuFilterDataBool));
 
+        //LoggerCus.d(TAG, sb.toString());
         return sb.toString();
     }
 
@@ -186,6 +192,14 @@ public class AnalyticsFilterData implements Serializable {
             }
             jobj.put("CatTypeBool", jarrCatTypeBool);
 
+            JSONArray jarrPayMethBool = new JSONArray();
+            for (int i = 0; i < subMenuPaymentMethodDataBool.length; i++) {
+                JSONObject jobjSub = new JSONObject();
+                jobjSub.put("element" + i, subMenuPaymentMethodDataBool[i]);
+                jarrPayMethBool.put(jobjSub);
+            }
+            jobj.put("PayMethBool", jarrPayMethBool);
+
             JSONArray jarrcols = new JSONArray();
             for (int i = 0; i < subMenuCatogeoryData.length; i++) {
                 JSONObject jobjSub = new JSONObject();
@@ -193,6 +207,14 @@ public class AnalyticsFilterData implements Serializable {
                 jarrcols.put(jobjSub);
             }
             jobj.put("cols", jarrcols);
+
+            JSONArray jarrpays = new JSONArray();
+            for (int i = 0; i < subMenuPaymentMethodData.length; i++) {
+                JSONObject jobjSub = new JSONObject();
+                jobjSub.put("element" + i, subMenuPaymentMethodData[i]);
+                jarrpays.put(jobjSub);
+            }
+            jobj.put("pays", jarrpays);
 
             jobj.put("graphType", graphType);
         } catch (JSONException e) {
