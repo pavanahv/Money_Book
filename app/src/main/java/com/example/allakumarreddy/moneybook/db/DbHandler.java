@@ -777,6 +777,18 @@ public class DbHandler extends SQLiteOpenHelper {
                             break;
                     }
                     break;
+                case 2:
+                    eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE
+                            + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE
+                            + ",count(" + KEY_CAT + ") as cat_count," + getSQLQueryForCat()
+                            + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " WHERE ";
+                    break;
+                case 3:
+                    eQuery = "SELECT " + KEY_DESCRIPTION + ",sum(" + KEY_AMOUNT + ") AS " + KEY_AMOUNT + "," + KEY_DATE
+                            + "," + KEY_DATE_MONTH + "," + KEY_DATE_YEAR + "," + KEY_TYPE
+                            + ",count(" + KEY_PAYMENT_METHOD + ") as payment_method_count," + getSQLQueryForCat()
+                            + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " WHERE ";
+                    break;
             }
         }
         eQuery += KEY_DESCRIPTION + " LIKE '%" + query + "%'";
@@ -815,6 +827,12 @@ public class DbHandler extends SQLiteOpenHelper {
                             eQuery += " GROUP BY " + KEY_DATE_YEAR;
                             break;
                     }
+                    break;
+                case 2:
+                    eQuery += " GROUP BY " + KEY_CAT;
+                    break;
+                case 3:
+                    eQuery += " GROUP BY " + KEY_PAYMENT_METHOD;
                     break;
             }
         }
@@ -871,6 +889,18 @@ public class DbHandler extends SQLiteOpenHelper {
                                             cursor.getString(7), cursor.getString(8)));
                                     break;
                             }
+                            break;
+                        case 2:
+                            mbr.add(new MBRecord(cursor.getString(7)
+                                    + " (" + cursor.getLong(6) + ")", numSpent,
+                                    new Date(cursor.getLong(2)), cursor.getInt(5),
+                                    cursor.getString(7), cursor.getString(8)));
+                            break;
+                        case 3:
+                            mbr.add(new MBRecord(cursor.getString(8)
+                                    + " (" + cursor.getLong(6) + ")", numSpent,
+                                    new Date(cursor.getLong(2)), cursor.getInt(5),
+                                    cursor.getString(7), cursor.getString(8)));
                             break;
                     }
                 } else {
@@ -1528,7 +1558,7 @@ public class DbHandler extends SQLiteOpenHelper {
 
         // initializing group by var
         int groupBy = -1;
-        if (!mAnalyticsFilterData.subMenuGroupByDataBool[2]) {
+        if (!mAnalyticsFilterData.subMenuGroupByDataBool[4]) {
             for (int i = 0; i < mAnalyticsFilterData.subMenuGroupByDataBool.length - 1; i++) {
                 if (mAnalyticsFilterData.subMenuGroupByDataBool[i]) {
                     groupBy = i;
@@ -1560,7 +1590,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 mAnalyticsFilterData.eDate,
                 mAnalyticsFilterData.subMenuMoneyTypeDataBool,
                 dateInterval,
-                mAnalyticsFilterData.subMenuGroupByDataBool[2],
+                mAnalyticsFilterData.subMenuGroupByDataBool[4],
                 groupBy,
                 sortBy,
                 mAnalyticsFilterData.subMenuCatogeoryDataBool,

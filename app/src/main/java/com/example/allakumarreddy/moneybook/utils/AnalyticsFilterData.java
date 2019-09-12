@@ -23,8 +23,8 @@ public class AnalyticsFilterData implements Serializable {
     public boolean[] subMenuViewByDataBool = new boolean[]{false, true};
     public String[] subMenuGraphTypeData = new String[]{"Line", "Bar", "Pie", "Radar", "Scatter"};
     public boolean[] subMenuGraphTypeDataBool = new boolean[]{true, false, false, false, false};
-    public String[] subMenuGroupByData = new String[]{"Item", "Date", "None"};
-    public boolean[] subMenuGroupByDataBool = new boolean[]{false, false, true};
+    public String[] subMenuGroupByData = new String[]{"Item", "Date", "Categories", "Payment Method", "None"};
+    public boolean[] subMenuGroupByDataBool = new boolean[]{false, false, false, false, true};
     public String[] subMenuSortByData = new String[]{"Date", "Price", "Item"};
     public boolean[] subMenuSortByDataBool = new boolean[]{true, false, false};
     public String[] subMenuSortingOrderData = new String[]{"Increasing", "Decreasing"};
@@ -44,7 +44,7 @@ public class AnalyticsFilterData implements Serializable {
         subMenuDateIntervalDataBool = new boolean[]{true, false, false};
         subMenuViewByDataBool = new boolean[]{false, true};
         subMenuGraphTypeDataBool = new boolean[]{true, false, false, false, false};
-        subMenuGroupByDataBool = new boolean[]{false, false, true};
+        subMenuGroupByDataBool = new boolean[]{false, false, false, false, true};
         subMenuSortByDataBool = new boolean[]{true, false, false};
         subMenuSortingOrderDataBool = new boolean[]{false, true};
         subMenuCatogeoryDataBool = new boolean[]{true};
@@ -113,7 +113,7 @@ public class AnalyticsFilterData implements Serializable {
 
         // initializing group by var
         int groupBy = -1;
-        if (!subMenuGroupByDataBool[2]) {
+        if (!subMenuGroupByDataBool[4]) {
             for (int i = 0; i < subMenuGroupByDataBool.length - 1; i++) {
                 if (subMenuGroupByDataBool[i]) {
                     groupBy = i;

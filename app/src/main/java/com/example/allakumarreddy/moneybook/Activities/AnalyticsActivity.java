@@ -251,7 +251,7 @@ public class AnalyticsActivity extends AppCompatActivity {
             }
             showGraph();
         }
-        if (mAnalyticsFilterData.subMenuGroupByDataBool[2])
+        if (mAnalyticsFilterData.subMenuGroupByDataBool[4])
             mStartItemDetailActivity = true;
         else
             mStartItemDetailActivity = false;
