@@ -103,4 +103,18 @@ public class MBRecord implements Serializable {
     public void setToCategory(String toCategory) {
         this.toCategory = toCategory;
     }
+
+    @Override
+    public String toString() {
+        return "MBRecord{" +
+                "paymentMethod='" + paymentMethod + '\'' +
+                ", Description='" + Description + '\'' +
+                ", amount=" + amount +
+                ", date=" + date +
+                ", category='" + category + '\'' +
+                ", toCategory='" + toCategory + '\'' +
+                ", type=" + type +
+                ", balLeft=" + balLeft +
+                '}';
+    }
 }

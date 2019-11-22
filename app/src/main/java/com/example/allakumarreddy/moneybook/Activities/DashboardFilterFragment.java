@@ -54,6 +54,7 @@ public class DashboardFilterFragment extends Fragment implements DashBoardFilter
 
     private void init(View view) {
         dashBoardFilterList = (RecyclerView) view.findViewById(R.id.dash_filter_recycler);
+        getActivity().findViewById(R.id.fab).setVisibility(View.GONE);
     }
 
     @Override

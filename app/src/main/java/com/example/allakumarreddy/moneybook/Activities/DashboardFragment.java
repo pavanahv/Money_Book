@@ -1,9 +1,11 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -74,6 +77,15 @@ public class DashboardFragment extends Fragment implements DashBoardAdapterInter
         dataD = ((TextView) view.findViewById(R.id.dashday));
         dateM = ((TextView) view.findViewById(R.id.dashmonth));
         dateY = ((TextView) view.findViewById(R.id.dashyear));
+
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setVisibility(View.VISIBLE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startAddActivity();
+            }
+        });
     }
 
     @Override
@@ -155,4 +167,27 @@ public class DashboardFragment extends Fragment implements DashBoardAdapterInter
         // no need to implement
     }
 
+    private void startAddActivity() {
+        Intent intent = new Intent(getContext(), AddActivity.class);
+        intent.putExtra("type", GlobalConstants.CATERGORY_SCREEN);
+        startActivityForResult(intent, ADD_ACTIVITY);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (ADD_ACTIVITY): {
+                if (resultCode == Activity.RESULT_OK) {
+                    String s[] = new String[]{data.getStringExtra("fdes"),
+                            data.getStringExtra("famount"),
+                            data.getStringExtra("fcategory"),
+                            data.getStringExtra("tcategory"),
+                            data.getStringExtra("payment_method")};
+                    addCategory(s[0], 0);
+                }
+                break;
+            }
+        }
+    }
 }

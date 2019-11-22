@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:background="@color/colorPrimaryDark"
-                    android:paddingLeft="5dp"
+                    android:padding="5dp"
                     android:text="Select From Below List"
                     android:textColor="@color/white" />
 
@@ -67,7 +67,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/colorPrimaryDark"
-                        android:paddingLeft="5dp"
+                        android:padding="5dp"
                         android:text="Description"
                         android:textColor="@color/white" />
 
@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/colorPrimaryDark"
-                        android:paddingLeft="5dp"
+                        android:padding="5dp"
                         android:text="amount"
                         android:textColor="@color/white" />
 
@@ -105,7 +105,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/colorPrimaryDark"
-                        android:paddingLeft="5dp"
+                        android:padding="5dp"
                         android:text="Type"
                         android:textColor="@color/white" />
 
@@ -120,7 +120,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/colorPrimaryDark"
-                        android:paddingLeft="5dp"
+                        android:padding="5dp"
                         android:text="Category"
                         android:textColor="@color/white" />
 
@@ -135,7 +135,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/colorPrimaryDark"
-                        android:paddingLeft="5dp"
+                        android:padding="5dp"
                         android:text="Payment Method"
                         android:textColor="@color/white" />
 
@@ -150,7 +150,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@color/colorPrimaryDark"
-                        android:paddingLeft="5dp"
+                        android:padding="5dp"
                         android:text="Left Out Balance"
                         android:textColor="@color/white" />
 

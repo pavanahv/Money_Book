@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.MessageParser.ChunksFragment;
 import com.example.allakumarreddy.moneybook.MessageParser.ChunksFragmentInteractionListener;
 import com.example.allakumarreddy.moneybook.MessageParser.ItemDetailFragment;
+import com.example.allakumarreddy.moneybook.MessageParser.MessageListFragment;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 
@@ -31,10 +32,10 @@ public class MessageParseActivity extends AppCompatActivity implements ChunksFra
         setContentView(R.layout.activity_message_parse);
         getSupportActionBar().setTitle("Message Parser");
 
-        /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fragment_container, new MessageListFragment());
-        transaction.commit();*/
-        seelctedMsg("You have made a purchase for an amount of Rs. 24.00  on your Sodexo Card 637513-xxxxxx-6056 on 10:33,11 Mar at TULASI JUICE JUNCTION. The available balance on your Sodexo Card is INR 1000.10.Download the Zeta App to track your spends http://bit.ly/2RySHSA.");
+        transaction.commit();
+        //seelctedMsg("You have made a purchase for an amount of Rs. 24.00  on your Sodexo Card 637513-xxxxxx-6056 on 10:33,11 Mar at TULASI JUICE JUNCTION. The available balance on your Sodexo Card is INR 1000.10.Download the Zeta App to track your spends http://bit.ly/2RySHSA.");
     }
 
     @Override
@@ -61,11 +62,11 @@ public class MessageParseActivity extends AppCompatActivity implements ChunksFra
         this.balLeft = balLeftStr;
         this.payStr = paymStr;
 
-        /*FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, new MessageListFragment());
         transaction.addToBackStack(null);
-        transaction.commit();*/
-        seelctedMsg("You have made a purchase for an amount of Rs. 24.00  on your Sodexo Card 637513-xxxxxx-6056 on 10:33,11 Mar at TULASI JUICE JUNCTION. The available balance on your Sodexo Card is INR 1000.10.Download the Zeta App to track your spends http://bit.ly/2RySHSA.");
+        transaction.commit();
+        //seelctedMsg("You have made a purchase for an amount of Rs. 24.00  on your Sodexo Card 637513-xxxxxx-6056 on 10:33,11 Mar at TULASI JUICE JUNCTION. The available balance on your Sodexo Card is INR 1000.10.Download the Zeta App to track your spends http://bit.ly/2RySHSA.");
     }
 
     @Override

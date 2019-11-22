@@ -48,7 +48,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
 
         db = new DbHandler(this);
         type = getIntent().getIntExtra("type", -1);
-        if (type == 2)
+        if (type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN)
             tcategory = getIntent().getStringExtra("tcategory");
         init();
     }
@@ -137,8 +137,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                         add.setFocusable(true);
                     }
                 });
-            } else if (type == GlobalConstants.HOME_SCREEN)
-                autoCompleteTextView.setVisibility(View.GONE);
+            }
         } else if (type == GlobalConstants.SAVE_FILTER_SCREEN) {
             autoCompleteTextView.setHint("Name Of Filter");
             findViewById(R.id.amount).setVisibility(View.GONE);

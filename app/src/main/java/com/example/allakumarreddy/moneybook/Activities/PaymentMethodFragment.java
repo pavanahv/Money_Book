@@ -1,11 +1,12 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
 
 
     private static final int ADD_ACTIVITY = 1001;
+    private static final int ADD_ACTIVITY_MT = 1002;
     private static final String TAG = DashboardFragment.class.getSimpleName();
     private ListView dashBoardList;
     private TextView totalD;
@@ -78,6 +80,21 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         dataD = ((TextView) view.findViewById(R.id.dashday));
         dateM = ((TextView) view.findViewById(R.id.dashmonth));
         dateY = ((TextView) view.findViewById(R.id.dashyear));
+
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setVisibility(View.VISIBLE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startAddActivity();
+            }
+        });
+    }
+
+    private void startAddActivity() {
+        Intent intent = new Intent(getContext(), AddActivity.class);
+        intent.putExtra("type", GlobalConstants.PAYMENT_METHOD_SCREEN);
+        startActivityForResult(intent, ADD_ACTIVITY);
     }
 
     @Override
@@ -151,14 +168,14 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         Intent intent = new Intent(getActivity(), AddActivity.class);
         intent.putExtra("type", GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN);
         intent.putExtra("tcategory", categoryName.toLowerCase());
-        startActivityForResult(intent, ADD_ACTIVITY);
+        startActivityForResult(intent, ADD_ACTIVITY_MT);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case ADD_ACTIVITY:
+            case ADD_ACTIVITY_MT:
                 if (resultCode == Activity.RESULT_OK) {
 
                     String s[] = new String[]{data.getStringExtra("fdes"),
@@ -168,8 +185,8 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
                             data.getStringExtra("payment_method")};
 
                     if ((s[1].compareToIgnoreCase("") != 0) && (s[2].compareToIgnoreCase("") != 0)) {
-                        MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[3], s[4]);
-                        mbr.setToCategory(s[2]);
+                        MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2], s[4]);
+                        mbr.setToCategory(s[3]);
                         boolean res = db.addMTRecord(mbr);
                         if (res) {
                             Toast.makeText(getActivity(), "Succrssfully Trasfered !", Toast.LENGTH_SHORT).show();
@@ -181,6 +198,17 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
                     }
                 }
                 break;
+            case (ADD_ACTIVITY): {
+                if (resultCode == Activity.RESULT_OK) {
+                    String s[] = new String[]{data.getStringExtra("fdes"),
+                            data.getStringExtra("famount"),
+                            data.getStringExtra("fcategory"),
+                            data.getStringExtra("tcategory"),
+                            data.getStringExtra("payment_method")};
+                    addPaymentMethod(s[0]);
+                }
+                break;
+            }
         }
     }
 

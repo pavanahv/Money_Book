@@ -209,7 +209,7 @@ public class AnalyticsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String tempCat = intent.getStringExtra("name");
-        if (tempCat != null) {
+        if (tempCat != null && (!(tempCat.compareToIgnoreCase("0") == 0))) {
             Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, false);
             for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++) {
                 if (mAnalyticsFilterData.subMenuCatogeoryData[i].compareToIgnoreCase(tempCat) == 0) {

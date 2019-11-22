@@ -2,19 +2,16 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,11 +19,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.allakumarreddy.moneybook.Adapter.DashboardViewPagerAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
@@ -34,11 +29,10 @@ import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandl
 import com.example.allakumarreddy.moneybook.SettingsLock.CreateSmartPinActivity;
 import com.example.allakumarreddy.moneybook.backup.Backup;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.home.HomeViewPagerAdapter;
+import com.example.allakumarreddy.moneybook.home.HomeFragment;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
-import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.io.FileNotFoundException;
@@ -52,7 +46,7 @@ import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface {
+        implements NavigationView.OnNavigationItemSelectedListener,DashUIUpdateInterface {
 
     final static String TAG = "MainActivity";
     private static final int REQUESTCODE_PICK_JSON = 504;
@@ -61,19 +55,9 @@ public class MainActivity extends AppCompatActivity
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
     public static final int ADD_ACTIVITY = 1001;
     private int currentScreen = 0;
-    public DbHandler db;
-    private LinearLayout mDashBoard;
-    private PreferencesCus sp;
     private View mProgressBAr;
     private String bfrPermissionAction;
-    private ViewPager mViewPager;
-    private DashboardViewPagerAdapter mDashBoardViewPagerAdapter;
-    private View mHome;
-    private ViewPager mHomeViewPager;
-    private HomeViewPagerAdapter mHomeViewPagerAdapter;
-    private TabLayout tabLayout;
-    private LinearLayout mPaymentMethod;
-    private PaymentMethodFragment mPaymentMethodFragment;
+    private int mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,14 +73,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startAddActivity();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -106,16 +82,10 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        sp = new PreferencesCus(this);
+        PreferencesCus sp = new PreferencesCus(this);
         View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
         ((TextView) headerView.findViewById(R.id.mail)).setText(sp.getData(Utils.getEmail()));
         init();
-    }
-
-    private void startAddActivity() {
-        Intent intent = new Intent(MainActivity.this, AddActivity.class);
-        intent.putExtra("type", currentScreen);
-        startActivityForResult(intent, ADD_ACTIVITY);
     }
 
     @Override
@@ -269,12 +239,16 @@ public class MainActivity extends AppCompatActivity
                     switch (bfrPermissionAction) {
                         case ACTION_MSG_PARSE_BY_DATE:
                             Toast.makeText(this, "Message parser will not work. Try again", Toast.LENGTH_LONG).show();
-                            updateUI();
+                            showCurrentFragment();
                             break;
                     }
                 }
                 return;
         }
+    }
+
+    private void showCurrentFragment() {
+
     }
 
     @Override
@@ -293,9 +267,10 @@ public class MainActivity extends AppCompatActivity
                                     s.append((char) i);
                                 }
                             }
+                            DbHandler db = new DbHandler(this);
                             db.addRecords(s.toString());
                             MainActivity.this.runOnUiThread(() -> {
-                                updateUI();
+                                showCurrentFragment();
                             });
                         } catch (FileNotFoundException e) {
                             LoggerCus.d(TAG, e.getMessage());
@@ -314,18 +289,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
 
-            case (ADD_ACTIVITY): {
-                if (resultCode == Activity.RESULT_OK) {
-
-                    afterCallingAddDialog(new String[]{data.getStringExtra("fdes"),
-                                    data.getStringExtra("famount"),
-                                    data.getStringExtra("fcategory"),
-                                    data.getStringExtra("tcategory"),
-                                    data.getStringExtra("payment_method")},
-                            data.getIntExtra("type", -1));
-                }
-                break;
-            }
         }
     }
 
@@ -335,36 +298,51 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        showProgressBar();
+        //showProgressBar();
         if (id == R.id.dash) {
-            showDashBoard();
-        } else if (id == R.id.home) {
+            showCategory();
+        } else if (id == R.id.home) {;
             showHome();
         } else if (id == R.id.payment_method) {
             showPaymentMethod();
+        } else if (id == R.id.graphs) {
+            showGraphs();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    private void showGraphs() {
+        showGraphsActionBar();
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(mainLayout, new DashboardFilterFragment());
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.commit();
+    }
+
+    private void showGraphsActionBar() {
+        getSupportActionBar().setTitle("Graphs");
+    }
+
     private void showPaymentMethod() {
-        currentScreen = 2;
-        updatePaymentMethodUI();
+        showPaymentMethodActionBar();
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(mainLayout, new PaymentMethodFragment());
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.commit();
     }
 
     private void showPaymentMethodActionBar() {
         getSupportActionBar().setTitle("Payment Method");
     }
 
-    private void updatePaymentMethodUI() {
-        mPaymentMethodFragment.dashBoardUIData();
-        switchScreen();
-    }
-
-    private void showDashBoard() {
-        currentScreen = 1;
-        updateUI();
+    private void showCategory() {
+        showCategoryActionBar();
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(mainLayout, new DashboardFragment());
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.commit();
     }
 
     private void showCategoryActionBar() {
@@ -372,83 +350,34 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showHome() {
-        currentScreen = 0;
-        homeUIUpdate();
+        showHomeActionBar();
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(mainLayout, new HomeFragment());
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.commit();
     }
 
     private void showProgressBar() {
         mProgressBAr.setVisibility(View.VISIBLE);
     }
 
-    public void switchScreen() {
-        closeOtherScreens();
-        if (currentScreen == 1) {
-            showCategoryActionBar();
-            mDashBoard.setVisibility(View.VISIBLE);
-        } else if (currentScreen == 2) {
-            showPaymentMethodActionBar();
-            mPaymentMethod.setVisibility(View.VISIBLE);
-        } else if (currentScreen == 0) {
-            setHomeActionBar();
-            mHome.setVisibility(View.VISIBLE);
-        }
-    }
-
     public void goToAnalytics(String name) {
         startActivity(new Intent(MainActivity.this, AnalyticsActivity.class).putExtra("name", name));
     }
 
-    private void closeOtherScreens() {
-        if (mProgressBAr.getVisibility() == View.VISIBLE)
-            mProgressBAr.setVisibility(View.GONE);
-        mHome.setVisibility(View.INVISIBLE);
-        mDashBoard.setVisibility(View.INVISIBLE);
-        mPaymentMethod.setVisibility(View.INVISIBLE);
-    }
-
-    private void home() {
-        mHome = findViewById(R.id.home);
-        mHomeViewPager = (ViewPager) findViewById(R.id.home_pager);
-        mHomeViewPagerAdapter = new HomeViewPagerAdapter(getSupportFragmentManager());
-        mHomeViewPager.setAdapter(mHomeViewPagerAdapter);
-
-        tabLayout = (TabLayout) findViewById(R.id.home_tab_layout);
-        tabLayout.setupWithViewPager(mHomeViewPager);
-    }
-
-    private void homeUIUpdate() {
-        switchScreen();
-    }
-
-    private void setHomeActionBar() {
+    private void showHomeActionBar() {
         getSupportActionBar().setTitle("Home");
     }
 
-    private void dashBoard() {
-        mDashBoard = (LinearLayout) findViewById(R.id.dashboard);
-        mViewPager = (ViewPager) findViewById(R.id.view_pager);
-        mDashBoardViewPagerAdapter = new DashboardViewPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mDashBoardViewPagerAdapter);
-    }
-
-    private void paymentMethod() {
-        mPaymentMethod = (LinearLayout) findViewById(R.id.payment_method_home);
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        mPaymentMethodFragment = new PaymentMethodFragment();
-        transaction.add(R.id.payment_method_frag, mPaymentMethodFragment);
-        transaction.commit();
-    }
-
     private void performPendingTasks() {
-        home();
-        dashBoard();
-        paymentMethod();
 
+        boolean isShown = false;
         boolean isSmartRemainderNoti = getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false);
         if (isSmartRemainderNoti) {
+            isShown = true;
             LoggerCus.d(TAG, "" + isSmartRemainderNoti);
             showHome();
-            startAddActivity();
+            //startAddActivity();
         }
         int type = -1;
         for (int i = 0; i < GlobalConstants.REPORTS_NOTI.length; i++) {
@@ -458,10 +387,13 @@ public class MainActivity extends AppCompatActivity
             }
         }
         if (type != -1) {
+            isShown = true;
             LoggerCus.d(TAG, "" + type);
-            mHomeViewPager.setCurrentItem(type, false);
+            //mHomeViewPager.setCurrentItem(type, false);
             showHome();
         }
+        if (!isShown)
+            showHome();
         makeLocalBackup();
     }
 
@@ -483,8 +415,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void init() {
-        db = new DbHandler(this);
-        currentScreen = 0;
+        mainLayout = R.id.main;
         startMsgParserService();
     }
 
@@ -511,33 +442,8 @@ public class MainActivity extends AppCompatActivity
                 MY_PERMISSIONS_REQUEST_READ_SMS);
     }
 
-    private void updateUI() {
-        DashboardFragment dashboardFragment = (DashboardFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(0);
-        dashboardFragment.dashBoardUIData();
+    @Override
+    public void switchScreen() {
 
-        DashboardFilterFragment dashboardFilterFragment = (DashboardFilterFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(1);
-        dashboardFilterFragment.dashBoardUIData();
-
-        switchScreen();
     }
-
-    public void afterCallingAddDialog(String[] s, int type) {
-        switch (this.currentScreen) {
-            case GlobalConstants.HOME_SCREEN:
-                if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
-                    final int pos = mHomeViewPager.getCurrentItem();
-                    MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2], s[4]);
-                    db.addRecord(mbr, pos);
-                }
-                break;
-            case GlobalConstants.CATERGORY_SCREEN:
-                DashboardFragment dashboardFragment = (DashboardFragment) mDashBoardViewPagerAdapter.getRegisteredFragment(0);
-                dashboardFragment.addCategory(s[0], 0);
-                break;
-            case GlobalConstants.PAYMENT_METHOD_SCREEN:
-                mPaymentMethodFragment.addPaymentMethod(s[0]);
-                break;
-        }
-    }
-
 }

@@ -682,6 +682,8 @@ public class DbHandler extends SQLiteOpenHelper {
         this.total = 0;
 
         ArrayList<MBRecord> mbr = new ArrayList<>();
+
+        // checking with moneytype whether single money type is selected or not. If not selected just return empty list
         boolean res = false;
         for (int i = 0; i < moneyType.length; i++) {
             if (moneyType[i]) {
@@ -928,9 +930,10 @@ public class DbHandler extends SQLiteOpenHelper {
                 evenOneCatTrue = true;
                 if (started)
                     eQuery += " OR ";
+                else
+                    started = true;
                 eQuery += "(" + KEY_PAYMENT_METHOD + " = (SELECT " + KEY_PAY_METH_ID + " FROM " + PAY_METH_TABLE_NAME
                         + " WHERE " + KEY_PAY_METH_NAME + " = '" + payMeth[i] + "')) ";
-                started = true;
             }
         }
         eQuery += ")";
@@ -946,19 +949,21 @@ public class DbHandler extends SQLiteOpenHelper {
         eQuery += " AND (";
         boolean notFistItem = false;
         if (moneyType[0]) {
-            for (int i = 1; i < moneyType.length - 1; i++) {
+            for (int i = 1; i < moneyType.length; i++) {
                 if (notFistItem)
                     eQuery += " OR ";
+                else
+                    notFistItem = true;
                 eQuery += KEY_TYPE + " = " + (i - 1);
-                notFistItem = true;
             }
         } else {
             for (int i = 1; i < moneyType.length; i++) {
                 if (moneyType[i]) {
                     if (notFistItem)
                         eQuery += " OR ";
+                    else
+                        notFistItem = true;
                     eQuery += KEY_TYPE + " = " + (i - 1);
-                    notFistItem = true;
                 }
             }
         }
@@ -1028,8 +1033,9 @@ public class DbHandler extends SQLiteOpenHelper {
                 evenOneCatTrue = true;
                 if (started)
                     eQuery += " OR ";
+                else
+                    started = true;
                 eQuery += "(" + KEY_CAT + " = (SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + s[i] + "')) ";
-                started = true;
             }
         }
         eQuery += ")";
@@ -1504,6 +1510,7 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
         values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
         values.put(KEY_CAT, getIdOfCategory(mbr.getCategory()));
+        values.put(KEY_PAYMENT_METHOD, getIdOfPaymentMethod(mbr.getPaymentMethod()));
 
         SQLiteDatabase db = this.getWritableDatabase();
         // Inserting Row

@@ -11,8 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.example.allakumarreddy.moneybook.Adapter.FilterMainMenuAdapter;
@@ -210,31 +208,32 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     public void subMenuItemSelected(int position) {
         if (mIsRadioOrCheck) {
             setAllSubMenuItemsNotChecked(mIsRadioOrCheck);
-            ((RadioButton) subMenu.getChildAt(position).findViewById(R.id.radioButton)).setChecked(true);
+            mSubMenuArrayListSelection.set(position, true);
             subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[position] = true;
             checkDateCustomItem(position);
         } else {
-            CheckBox checkBox = (CheckBox) subMenu.getChildAt(position).findViewById(R.id.checkBox);
-            if (!checkBox.isChecked()) {
-                checkBox.setChecked(false);
+            boolean isChecked = mSubMenuArrayListSelection.get(position);
+            if (isChecked) {
+                mSubMenuArrayListSelection.set(position, false);
                 subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[position] = false;
                 if (position == 0) {
                     setAllSubMenuCheckBox(false);
                 } else {
-                    ((CheckBox) subMenu.getChildAt(0).findViewById(R.id.checkBox)).setChecked(false);
+                    mSubMenuArrayListSelection.set(0, false);
                     subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[0] = false;
                 }
             } else {
-                checkBox.setChecked(true);
+                mSubMenuArrayListSelection.set(position, true);
                 subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[position] = true;
                 if (position == 0) {
                     setAllSubMenuCheckBox(true);
                 } else {
-                    ((CheckBox) subMenu.getChildAt(0).findViewById(R.id.checkBox)).setChecked(false);
+                    mSubMenuArrayListSelection.set(0, false);
                     subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[0] = false;
                 }
             }
         }
+        mSubMenuAdapter.notifyDataSetChanged();
     }
 
     private void checkDateCustomItem(int position) {
@@ -247,7 +246,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         boolean[] values = subMenuListDataSelection.get(mMainMenuSelectedItemPosition);
         final int len = values.length;
         for (int i = 0; i < len; i++) {
-            ((CheckBox) subMenu.getChildAt(i).findViewById(R.id.checkBox)).setChecked(b);
+            mSubMenuArrayListSelection.set(i, b);
             values[i] = b;
         }
     }
@@ -256,7 +255,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         boolean[] values = subMenuListDataSelection.get(mMainMenuSelectedItemPosition);
         final int len = values.length;
         for (int i = 0; i < len; i++) {
-            ((RadioButton) subMenu.getChildAt(i).findViewById(R.id.radioButton)).setChecked(false);
+            mSubMenuArrayListSelection.set(i, false);
             values[i] = false;
         }
     }

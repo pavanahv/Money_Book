@@ -8,129 +8,160 @@
     tools:context="com.example.allakumarreddy.moneybook.Activities.AnalyticsItemDetail"
     tools:showIn="@layout/activity_analytics_item_detail">
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="5dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp">
 
-        <View
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/white" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/descitemtext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Description"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="5dp">
 
-        <EditText
-            android:id="@+id/descitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textSize="30dp"
-            android:textStyle="bold" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/white" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/descitemtext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="Description"
+                    android:textColor="@color/white" />
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/descitem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextView"
+                    android:textSize="30dp"
+                    android:layout_margin="5dp"
+                    android:textStyle="bold" />
 
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="amount"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="amount"
+                    android:textColor="@color/white" />
 
-        <EditText
-            android:id="@+id/amountitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textSize="25dp" />
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/amountitem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextView"
+                    android:layout_margin="5dp"
+                    android:textSize="25dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Date"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="Date"
+                    android:layout_margin="5dp"
+                    android:textColor="@color/white" />
 
-        <EditText
-            android:id="@+id/dateitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="date"
-            android:textSize="25dp" />
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/dateitem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:layout_margin="5dp"
+                    android:inputType="date"
+                    android:textSize="25dp" />
 
-        <TextView
-            android:id="@+id/typeitemtext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Type"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/typeitemtext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:text="Type"
+                    android:layout_margin="5dp"
+                    android:textColor="@color/white" />
 
-        <Spinner
-            android:id="@+id/typeitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <Spinner
+                    android:id="@+id/typeitem"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/catfromitemtext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Category"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/catfromitemtext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="Category"
+                    android:textColor="@color/white" />
 
-        <Spinner
-            android:id="@+id/catitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <Spinner
+                    android:id="@+id/catitem"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/cattoitemtext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="To Category"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/cattoitemtext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="To Category"
+                    android:textColor="@color/white" />
 
-        <Spinner
-            android:id="@+id/cattoitem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <Spinner
+                    android:id="@+id/cattoitem"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/payment_method_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Payment Method"
-            android:paddingLeft="5dp"
-            android:textColor="@color/white" />
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/payment_method_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="Payment Method"
+                    android:textColor="@color/white" />
 
-        <Spinner
-            android:id="@+id/payment_method"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                <Spinner
+                    android:id="@+id/payment_method"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_height="wrap_content" />
 
-        <ImageButton
-            android:background="@color/colorPrimary"
-            android:id="@+id/imageButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:onClick="save"
-            app:srcCompat="@drawable/ic_save_noti" />
-    </LinearLayout>
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/imageButton"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="Save"
+                    android:onClick="save" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </android.support.v7.widget.CardView>
 </FrameLayout>
