@@ -53,6 +53,9 @@ public class GlobalConstants {
     public static final int PAYMENT_METHOD_SCREEN = 2;
     public static final String PREF_LOCAL_BACKUP_DATA = "PREF_LOCAL_BACKUP_DATA";
     public static final String OTHERS_CAT = "others";
+    public static final String ANALYTICS_FILTER_ACTIVITY_CATEGORY = "category";
+    public static final String ANALYTICS_FILTER_ACTIVITY_PAYMENT_METHOD = "payment_method";
+    public static final String ANALYTICS_FILTER_ACTIVITY_FILTER = "filter";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

@@ -28,7 +28,6 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class AnalyticsActivity extends AppCompatActivity {
 
@@ -47,6 +46,9 @@ public class AnalyticsActivity extends AppCompatActivity {
     private int graphType = 0;
     private AnalyticsFilterData mAnalyticsFilterData;
     private boolean mStartItemDetailActivity = true;
+    private String mCategory;
+    private String mPaymentMethod;
+    private boolean mFilterUpdate = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,6 @@ public class AnalyticsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_analytics);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mAnalyticsFilterData = new AnalyticsFilterData();
         main = (LinearLayout) findViewById(R.id.analyticsview);
         db = new DbHandler(this);
         format = new SimpleDateFormat("yyyy/MM/dd");
@@ -79,7 +80,7 @@ public class AnalyticsActivity extends AppCompatActivity {
                     String jsonStrFiltr = mAnalyticsFilterData.getParcelableJSONStringForFilter();
                     boolean res = db.insertFilterRecord(name, jsonStrFiltr, false);
                     if (res) {
-                        initFilters();
+                        mFilterUpdate = true;
                         Toast.makeText(this, "Filter Saved Successfully!", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -93,6 +94,12 @@ public class AnalyticsActivity extends AppCompatActivity {
             case R.id.analytics_filter:
                 Intent intent = new Intent(this, FiltersAnalyticsActivity.class);
                 intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY, mAnalyticsFilterData);
+                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY_CATEGORY, mCategory);
+                mCategory = null;
+                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY_PAYMENT_METHOD, mPaymentMethod);
+                mPaymentMethod = null;
+                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY_FILTER, mFilterUpdate);
+                mFilterUpdate = false;
                 startActivityForResult(intent, ANALYTICS_FILTER_ACTIVITY);
                 break;
             case R.id.save_filter:
@@ -192,71 +199,12 @@ public class AnalyticsActivity extends AppCompatActivity {
     }
 
     private void init() {
-        initCategories();
-        initPaymentMethods();
-        initFilters();
-    }
-
-    private void initCategories() {
-        // categories initialization
-        String[] cat = db.getCategeories();
-        mAnalyticsFilterData.subMenuCatogeoryData = new String[cat.length + 1];
-        mAnalyticsFilterData.subMenuCatogeoryData[0] = "All";
-        for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++)
-            mAnalyticsFilterData.subMenuCatogeoryData[i] = cat[i - 1];
-
-        mAnalyticsFilterData.subMenuCatogeoryDataBool = new boolean[mAnalyticsFilterData.subMenuCatogeoryData.length];
-
+        mAnalyticsFilterData = new AnalyticsFilterData();
         Intent intent = getIntent();
-        String tempCat = intent.getStringExtra("name");
-        if (tempCat != null && (!(tempCat.compareToIgnoreCase("0") == 0))) {
-            Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, false);
-            for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++) {
-                if (mAnalyticsFilterData.subMenuCatogeoryData[i].compareToIgnoreCase(tempCat) == 0) {
-                    mAnalyticsFilterData.subMenuCatogeoryDataBool[i] = true;
-                    break;
-                }
-            }
-        } else {
-            Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, true);
-        }
-    }
-
-    private void initPaymentMethods() {
-        // payment methods initialization
-        String[] pay = db.getPaymentMethods();
-        mAnalyticsFilterData.subMenuPaymentMethodData = new String[pay.length + 1];
-        mAnalyticsFilterData.subMenuPaymentMethodData[0] = "All";
-        for (int i = 1; i < mAnalyticsFilterData.subMenuPaymentMethodData.length; i++)
-            mAnalyticsFilterData.subMenuPaymentMethodData[i] = pay[i - 1];
-
-        mAnalyticsFilterData.subMenuPaymentMethodDataBool = new boolean[mAnalyticsFilterData.subMenuPaymentMethodData.length];
-
-        Intent intent = getIntent();
-        String tempCat = intent.getStringExtra("paymentMethod");
-        if (tempCat != null) {
-            Arrays.fill(mAnalyticsFilterData.subMenuPaymentMethodDataBool, false);
-            for (int i = 1; i < mAnalyticsFilterData.subMenuPaymentMethodData.length; i++) {
-                if (mAnalyticsFilterData.subMenuPaymentMethodData[i].compareToIgnoreCase(tempCat) == 0) {
-                    mAnalyticsFilterData.subMenuPaymentMethodDataBool[i] = true;
-                    break;
-                }
-            }
-        } else {
-            Arrays.fill(mAnalyticsFilterData.subMenuPaymentMethodDataBool, true);
-        }
-    }
-
-    private void initFilters() {
-        mAnalyticsFilterData.filters = db.getFilterRecords();
-        mAnalyticsFilterData.subMenuFilterData = new String[mAnalyticsFilterData.filters.length + 1];
-        mAnalyticsFilterData.subMenuFilterData[0] = "None";
-        for (int i = 0; i < mAnalyticsFilterData.subMenuFilterData.length - 1; i++) {
-            mAnalyticsFilterData.subMenuFilterData[i + 1] = mAnalyticsFilterData.filters[i][0];
-        }
-        mAnalyticsFilterData.subMenuFilterDataBool = new boolean[mAnalyticsFilterData.subMenuFilterData.length];
-        Arrays.fill(mAnalyticsFilterData.subMenuFilterDataBool, false);
-        mAnalyticsFilterData.subMenuFilterDataBool[0] = true;
+        mCategory = intent.getStringExtra("name");
+        mPaymentMethod = intent.getStringExtra("paymentMethod");
+        if (mPaymentMethod == null)
+            mPaymentMethod = "0";
     }
 
     @Override
