@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
+import com.example.allakumarreddy.moneybook.Activities.WelcomeActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.fingerPrint.FingerPrintInterface;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
@@ -45,9 +46,9 @@ public class LoginActivity extends AppCompatActivity {
         PreferencesCus sp = new PreferencesCus(this);
         LoggerCus.d(TAG,sp.getData(Utils.getEmail())+" login data");
         if (sp.getData(Utils.getEmail()) == null) {
-            //startActivity(new Intent(this, WelcomeActivity.class));
-            //finish();
-            //return;
+            startActivity(new Intent(this, WelcomeActivity.class));
+            finish();
+            return;
         }
 
         init();
