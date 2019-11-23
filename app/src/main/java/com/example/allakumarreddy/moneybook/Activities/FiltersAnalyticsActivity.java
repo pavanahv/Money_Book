@@ -25,11 +25,10 @@ import com.example.allakumarreddy.moneybook.utils.IDate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ANALYTICS_FILTER_ACTIVITY_CATEGORY;
-import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ANALYTICS_FILTER_ACTIVITY_FILTER;
-import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ANALYTICS_FILTER_ACTIVITY_PAYMENT_METHOD;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initCategories;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initFilters;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initPaymentMethods;
 
 public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate {
 
@@ -71,6 +70,9 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
             case R.id.analytics_clear_all:
                 clearAll();
                 break;
+            case android.R.id.home:
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -89,70 +91,12 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         mSubMenuArrayList.clear();
 
         mAnalyticsFilterData.initDataAgainAfterClear();
-        initCategories(null);
-        initPaymentMethods(null);
-        initFilters();
+        initCategories(null, db, mAnalyticsFilterData);
+        initPaymentMethods(null, db, mAnalyticsFilterData);
+        initFilters(db, mAnalyticsFilterData);
         initMainMenuData();
         initSubMenuData();
         initSubMenu();
-    }
-
-    public void initCategories(String tempCat) {
-        // categories initialization
-        String[] cat = db.getCategeories();
-        mAnalyticsFilterData.subMenuCatogeoryData = new String[cat.length + 1];
-        mAnalyticsFilterData.subMenuCatogeoryData[0] = "All";
-        for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++)
-            mAnalyticsFilterData.subMenuCatogeoryData[i] = cat[i - 1];
-
-        mAnalyticsFilterData.subMenuCatogeoryDataBool = new boolean[mAnalyticsFilterData.subMenuCatogeoryData.length];
-
-        if (tempCat != null && (!(tempCat.compareToIgnoreCase("0") == 0))) {
-            Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, false);
-            for (int i = 1; i < mAnalyticsFilterData.subMenuCatogeoryData.length; i++) {
-                if (mAnalyticsFilterData.subMenuCatogeoryData[i].compareToIgnoreCase(tempCat) == 0) {
-                    mAnalyticsFilterData.subMenuCatogeoryDataBool[i] = true;
-                    break;
-                }
-            }
-        } else {
-            Arrays.fill(mAnalyticsFilterData.subMenuCatogeoryDataBool, true);
-        }
-    }
-
-    public void initPaymentMethods(String tempCat) {
-        // payment methods initialization
-        String[] pay = db.getPaymentMethods();
-        mAnalyticsFilterData.subMenuPaymentMethodData = new String[pay.length + 1];
-        mAnalyticsFilterData.subMenuPaymentMethodData[0] = "All";
-        for (int i = 1; i < mAnalyticsFilterData.subMenuPaymentMethodData.length; i++)
-            mAnalyticsFilterData.subMenuPaymentMethodData[i] = pay[i - 1];
-
-        mAnalyticsFilterData.subMenuPaymentMethodDataBool = new boolean[mAnalyticsFilterData.subMenuPaymentMethodData.length];
-
-        if (tempCat != null && (!(tempCat.compareToIgnoreCase("0") == 0))) {
-            Arrays.fill(mAnalyticsFilterData.subMenuPaymentMethodDataBool, false);
-            for (int i = 1; i < mAnalyticsFilterData.subMenuPaymentMethodData.length; i++) {
-                if (mAnalyticsFilterData.subMenuPaymentMethodData[i].compareToIgnoreCase(tempCat) == 0) {
-                    mAnalyticsFilterData.subMenuPaymentMethodDataBool[i] = true;
-                    break;
-                }
-            }
-        } else {
-            Arrays.fill(mAnalyticsFilterData.subMenuPaymentMethodDataBool, true);
-        }
-    }
-
-    public void initFilters() {
-        mAnalyticsFilterData.filters = db.getFilterRecords();
-        mAnalyticsFilterData.subMenuFilterData = new String[mAnalyticsFilterData.filters.length + 1];
-        mAnalyticsFilterData.subMenuFilterData[0] = "None";
-        for (int i = 0; i < mAnalyticsFilterData.subMenuFilterData.length - 1; i++) {
-            mAnalyticsFilterData.subMenuFilterData[i + 1] = mAnalyticsFilterData.filters[i][0];
-        }
-        mAnalyticsFilterData.subMenuFilterDataBool = new boolean[mAnalyticsFilterData.subMenuFilterData.length];
-        Arrays.fill(mAnalyticsFilterData.subMenuFilterDataBool, false);
-        mAnalyticsFilterData.subMenuFilterDataBool[0] = true;
     }
 
     private void initMainMenuData() {
@@ -211,15 +155,6 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
 
         Intent intent = getIntent();
         mAnalyticsFilterData = (AnalyticsFilterData) intent.getSerializableExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY);
-        String cat = intent.getStringExtra(ANALYTICS_FILTER_ACTIVITY_CATEGORY);
-        String paymentMethod = intent.getStringExtra(ANALYTICS_FILTER_ACTIVITY_PAYMENT_METHOD);
-        boolean filter = intent.getBooleanExtra(ANALYTICS_FILTER_ACTIVITY_FILTER, false);
-        if (cat != null)
-            initCategories(cat);
-        if (paymentMethod != null)
-            initPaymentMethods(paymentMethod);
-        if (filter)
-            initFilters();
     }
 
     public void mainMenuItemSelected(int position) {

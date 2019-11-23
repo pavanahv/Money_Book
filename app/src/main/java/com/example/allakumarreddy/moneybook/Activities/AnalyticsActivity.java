@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initCategories;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initFilters;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initPaymentMethods;
+
 public class AnalyticsActivity extends AppCompatActivity {
 
     private static final String TAG = "AnalyticsActivity";
@@ -46,9 +50,6 @@ public class AnalyticsActivity extends AppCompatActivity {
     private int graphType = 0;
     private AnalyticsFilterData mAnalyticsFilterData;
     private boolean mStartItemDetailActivity = true;
-    private String mCategory;
-    private String mPaymentMethod;
-    private boolean mFilterUpdate = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class AnalyticsActivity extends AppCompatActivity {
                     String jsonStrFiltr = mAnalyticsFilterData.getParcelableJSONStringForFilter();
                     boolean res = db.insertFilterRecord(name, jsonStrFiltr, false);
                     if (res) {
-                        mFilterUpdate = true;
+                        initFilters(db, mAnalyticsFilterData);
                         Toast.makeText(this, "Filter Saved Successfully!", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -94,12 +95,6 @@ public class AnalyticsActivity extends AppCompatActivity {
             case R.id.analytics_filter:
                 Intent intent = new Intent(this, FiltersAnalyticsActivity.class);
                 intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY, mAnalyticsFilterData);
-                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY_CATEGORY, mCategory);
-                mCategory = null;
-                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY_PAYMENT_METHOD, mPaymentMethod);
-                mPaymentMethod = null;
-                intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY_FILTER, mFilterUpdate);
-                mFilterUpdate = false;
                 startActivityForResult(intent, ANALYTICS_FILTER_ACTIVITY);
                 break;
             case R.id.save_filter:
@@ -201,10 +196,11 @@ public class AnalyticsActivity extends AppCompatActivity {
     private void init() {
         mAnalyticsFilterData = new AnalyticsFilterData();
         Intent intent = getIntent();
-        mCategory = intent.getStringExtra("name");
-        mPaymentMethod = intent.getStringExtra("paymentMethod");
-        if (mPaymentMethod == null)
-            mPaymentMethod = "0";
+        String temp = intent.getStringExtra("name");
+        initCategories(temp, db, mAnalyticsFilterData);
+        temp = intent.getStringExtra("paymentMethod");
+        initPaymentMethods(temp, db, mAnalyticsFilterData);
+        initFilters(db, mAnalyticsFilterData);
     }
 
     @Override

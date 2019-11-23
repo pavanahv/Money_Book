@@ -377,7 +377,6 @@ public class MainActivity extends AppCompatActivity
             isShown = true;
             LoggerCus.d(TAG, "" + isSmartRemainderNoti);
             showHome();
-            //startAddActivity();
         }
         int type = -1;
         for (int i = 0; i < GlobalConstants.REPORTS_NOTI.length; i++) {
