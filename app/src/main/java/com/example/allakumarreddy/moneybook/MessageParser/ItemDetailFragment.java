@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 
 import java.util.ArrayList;
 
@@ -36,6 +38,7 @@ public class ItemDetailFragment extends Fragment {
     private ListView chunksListView;
     private View chunksListHeader;
     private EditText[] viewArr;
+    private boolean firstTimeTypeSelection;
 
     public String getChunkText() {
         return chunkText;
@@ -138,7 +141,6 @@ public class ItemDetailFragment extends Fragment {
     }
 
 
-    // TODO: Rename and change types and number of parameters
     public static ItemDetailFragment newInstance() {
         ItemDetailFragment fragment = new ItemDetailFragment();
         return fragment;
@@ -170,11 +172,9 @@ public class ItemDetailFragment extends Fragment {
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         type.setAdapter(aa);
 
+
         cate = (Spinner) view.findViewById(R.id.catitem);
-        catArr = db.getCategeories();
-        ArrayAdapter caa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, catArr);
-        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cate.setAdapter(caa);
+        initCategories(GlobalConstants.TYPE_SPENT);
 
         payMeth = (Spinner) view.findViewById(R.id.payitem);
         payArr = db.getPaymentMethods();
@@ -202,7 +202,23 @@ public class ItemDetailFragment extends Fragment {
 
             ((Button) view.findViewById(R.id.savbtn)).setText("Save");
         } else if (typeActivate == 0) {
-            ArrayAdapter laa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, chunkText.split("\n"));
+            firstTimeTypeSelection = false;
+            type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (!firstTimeTypeSelection) {
+                        firstTimeTypeSelection = true;
+                    } else {
+                        initCategories(position);
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            ArrayAdapter laa = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, chunkText.split("\n"));
             chunksListView.setAdapter(laa);
             chunksListView.setOnItemClickListener((parent, view1, position, id) -> {
                 clickedItem(position);
@@ -212,6 +228,13 @@ public class ItemDetailFragment extends Fragment {
 
         viewArr = new EditText[]{des, amount, balLeft};
         return view;
+    }
+
+    private void initCategories(int type) {
+        catArr = db.getCategeories(type);
+        ArrayAdapter caa = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, catArr);
+        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cate.setAdapter(caa);
     }
 
     private void clickedItem(int pos) {
@@ -274,6 +297,8 @@ public class ItemDetailFragment extends Fragment {
         des.setText(parseUpdateField(flist, desStr));
         amount.setText(parseUpdateField(flist, amountStr));
         type.setSelection(typeStr);
+
+        initCategories(typeStr);
 
         // for selecting correct item in category array
         for (int i = 0; i < catArr.length; i++) {

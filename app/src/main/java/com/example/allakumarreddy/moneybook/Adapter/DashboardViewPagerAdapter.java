@@ -7,7 +7,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.example.allakumarreddy.moneybook.Activities.DashboardFilterFragment;
-import com.example.allakumarreddy.moneybook.Activities.DashboardFragment;
+import com.example.allakumarreddy.moneybook.dashboard.DashboardFragment;
 
 public class DashboardViewPagerAdapter extends FragmentPagerAdapter {
 

@@ -15,8 +15,8 @@ public class AnalyticsFilterData implements Serializable {
     public String[] mainMenuData = new String[]{"Date", "Date Interval", "Money Type", "Group By", "Sort By", "Sorting Order", "Category", "Payment Method", "View By", "Graph Type", "Saved Filters"};
     public String[] subMenuDateData = new String[]{"Current Day", "Current Month", "Current Year", "Custom", "All"};
     public boolean[] subMenuDateDataBool = new boolean[]{false, false, false, false, true};
-    public String[] subMenuMoneyTypeData = new String[]{"All", "Spent", "Earn", "Due", "Loan", "Money Transfer"};
-    public boolean[] subMenuMoneyTypeDataBool = new boolean[]{true, true, true, true, true, true};
+    public String[] subMenuMoneyTypeData = new String[]{"Spent", "Earn", "Due", "Loan", "Money Transfer"};
+    public boolean[] subMenuMoneyTypeDataBool = new boolean[]{true, false, false, false, false};
     public String[] subMenuDateIntervalData = new String[]{"Day", "Month", "Year"};
     public boolean[] subMenuDateIntervalDataBool = new boolean[]{true, false, false};
     public String[] subMenuViewByData = new String[]{"Graph", "List"};
@@ -42,7 +42,7 @@ public class AnalyticsFilterData implements Serializable {
 
     public void initDataAgainAfterClear() {
         subMenuDateDataBool = new boolean[]{false, false, false, false, true};
-        subMenuMoneyTypeDataBool = new boolean[]{true, true, true, true, true, true};
+        subMenuMoneyTypeDataBool = new boolean[]{true, false, false, false, false};
         subMenuDateIntervalDataBool = new boolean[]{true, false, false};
         subMenuViewByDataBool = new boolean[]{false, true};
         subMenuGraphTypeDataBool = new boolean[]{true, false, false, false, false};
@@ -145,6 +145,15 @@ public class AnalyticsFilterData implements Serializable {
             }
         }
 
+        // intializing money type var
+        int moneyType = -1;
+        for (int i = 0; i < subMenuMoneyTypeDataBool.length; i++) {
+            if (subMenuMoneyTypeDataBool[i]) {
+                moneyType = i;
+                break;
+            }
+        }
+
 
         int graphType = -1;
         for (int i = 0; i < subMenuGraphTypeDataBool.length; i++) {
@@ -170,14 +179,7 @@ public class AnalyticsFilterData implements Serializable {
             }
             jobj.put("dateDataBool", jarrDateBool);
 
-            JSONArray jarrmenuTypeBool = new JSONArray();
-            for (int i = 0; i < subMenuMoneyTypeDataBool.length; i++) {
-                JSONObject jobjSub = new JSONObject();
-                jobjSub.put("element" + i, subMenuMoneyTypeDataBool[i]);
-                jarrmenuTypeBool.put(jobjSub);
-            }
-            jobj.put("moneyTypeBool", jarrmenuTypeBool);
-
+            jobj.put("moneyType", moneyType);
             jobj.put("dateInterval", dateInterval);
             jobj.put("groupByNone", subMenuGroupByDataBool[4]);
             jobj.put("groupBy", groupBy);

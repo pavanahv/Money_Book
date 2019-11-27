@@ -6,9 +6,13 @@ import java.util.Arrays;
 
 public class FilterUtils {
 
-    public static void initCategories(String tempCat, DbHandler db, AnalyticsFilterData analyticsFilterData) {
+    public static void initCategories(String tempCat, DbHandler db, AnalyticsFilterData analyticsFilterData, int type) {
         // categories initialization
-        String[] cat = db.getCategeories();
+        String[] cat = null;
+        if (type != -1)
+            cat = db.getCategeories(type);
+        else
+            cat = db.getCategeories(GlobalConstants.TYPE_SPENT);
         analyticsFilterData.subMenuCatogeoryData = new String[cat.length + 1];
         analyticsFilterData.subMenuCatogeoryData[0] = "All";
         for (int i = 1; i < analyticsFilterData.subMenuCatogeoryData.length; i++)
@@ -26,6 +30,16 @@ public class FilterUtils {
             }
         } else {
             Arrays.fill(analyticsFilterData.subMenuCatogeoryDataBool, true);
+        }
+    }
+
+    public static void initType(AnalyticsFilterData analyticsFilterData, int type) {
+        // money type initialization
+        Arrays.fill(analyticsFilterData.subMenuMoneyTypeDataBool, false);
+        if (type != -1) {
+            analyticsFilterData.subMenuMoneyTypeDataBool[type] = true;
+        } else {
+            analyticsFilterData.subMenuMoneyTypeDataBool[GlobalConstants.TYPE_SPENT] = true;
         }
     }
 

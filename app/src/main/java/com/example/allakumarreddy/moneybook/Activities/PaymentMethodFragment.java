@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.dashboard.DashboardFragment;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -26,6 +27,8 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static com.example.allakumarreddy.moneybook.utils.AnimationUtils.revealAnimation;
 
 
 public class PaymentMethodFragment extends Fragment implements DashBoardAdapterInterface {
@@ -45,6 +48,8 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     private TextView dateY;
     private DbHandler db;
     private DashUIUpdateInterface mDashUIUpdateInterface;
+    private View mainView;
+    private View progress;
 
     public PaymentMethodFragment() {
         // Required empty public constructor
@@ -71,6 +76,11 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     }
 
     private void init(View view) {
+        mainView = view.findViewById(R.id.mainView);
+        mainView.setVisibility(View.GONE);
+        progress = view.findViewById(R.id.progress);
+        progress.setVisibility(View.VISIBLE);
+
         dashBoardList = (ListView) view.findViewById(R.id.dashboardlist);
 
         totalD = (TextView) view.findViewById(R.id.dashboardtotald);
@@ -136,9 +146,9 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
 
     public void dashBoardUIData() {
         new Thread(() -> {
-            String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentDay());
-            String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentMonth());
-            String yearCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneySpentInCurrentYear());
+            String dayCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneyInCurrentDay(GlobalConstants.TYPE_SPENT));
+            String monthCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneyInCurrentMonth(GlobalConstants.TYPE_SPENT));
+            String yearCountTotalHeadText = Utils.getFormattedNumber(db.getTotalMoneyInCurrentYear(GlobalConstants.TYPE_SPENT));
             dbr = db.getPaymentMethodRecords();
             getActivity().runOnUiThread(() -> {
                 totalD.setText(dayCountTotalHeadText);
@@ -148,8 +158,13 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
                 dashBoardAdapter.addAll(dbr);
                 dashBoardAdapter.notifyDataSetChanged();
                 mDashUIUpdateInterface.switchScreen();
+                showMainView();
             });
         }).start();
+    }
+
+    private void showMainView() {
+        revealAnimation(progress, mainView,getView());
     }
 
     @Override

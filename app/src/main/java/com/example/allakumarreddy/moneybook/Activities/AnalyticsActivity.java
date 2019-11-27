@@ -28,10 +28,12 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initCategories;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initFilters;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initPaymentMethods;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initType;
 
 public class AnalyticsActivity extends AppCompatActivity {
 
@@ -197,7 +199,11 @@ public class AnalyticsActivity extends AppCompatActivity {
         mAnalyticsFilterData = new AnalyticsFilterData();
         Intent intent = getIntent();
         String temp = intent.getStringExtra("name");
-        initCategories(temp, db, mAnalyticsFilterData);
+        int catType = intent.getIntExtra(GlobalConstants.CATEGORY_TYPE, -1);
+        initType(mAnalyticsFilterData, catType);
+        initCategories(temp, db, mAnalyticsFilterData, catType);
+        LoggerCus.d(TAG, "cat: " + temp + " cat type: " + catType);
+        LoggerCus.d(TAG, Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryData)+" -> "+Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryDataBool));
         temp = intent.getStringExtra("paymentMethod");
         initPaymentMethods(temp, db, mAnalyticsFilterData);
         initFilters(db, mAnalyticsFilterData);

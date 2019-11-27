@@ -28,6 +28,7 @@ import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.SettingsLock.CreateSmartPinActivity;
 import com.example.allakumarreddy.moneybook.backup.Backup;
+import com.example.allakumarreddy.moneybook.dashboard.DashboardFragment;
 import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.home.HomeFragment;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;

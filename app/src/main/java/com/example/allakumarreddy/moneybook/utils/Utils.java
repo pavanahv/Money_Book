@@ -260,12 +260,7 @@ public class Utils {
                 dateDataBool[i] = jarrDataDataBool.getJSONObject(i).getBoolean("element" + i);
             }
 
-            JSONArray jarrmenuTypeBool = jobj.getJSONArray("moneyTypeBool");
-            boolean[] menuTypeBool = new boolean[jarrmenuTypeBool.length()];
-            for (int i = 0; i < jarrmenuTypeBool.length(); i++) {
-                menuTypeBool[i] = jarrmenuTypeBool.getJSONObject(i).getBoolean("element" + i);
-            }
-
+            int moneyType = jobj.getInt("moneyType");
             int dateInterval = jobj.getInt("dateInterval");
             boolean groupByNone = jobj.getBoolean("groupByNone");
             int groupBy = jobj.getInt("groupBy");
@@ -298,7 +293,7 @@ public class Utils {
 
             DbHandler db = new DbHandler(context);
             return db.getRecordsAsList(queryText, dateDataBool, sDate, eDate,
-                    menuTypeBool, dateInterval, groupByNone, groupBy,
+                    moneyType, dateInterval, groupByNone, groupBy,
                     sortBy, catTypeBool, cols,
                     sortingOrder,
                     payMetheBool, pays);

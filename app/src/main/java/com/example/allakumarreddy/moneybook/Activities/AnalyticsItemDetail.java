@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -24,6 +25,7 @@ import java.text.SimpleDateFormat;
 
 public class AnalyticsItemDetail extends AppCompatActivity {
 
+    private static final String TAG = AnalyticsItemDetail.class.getSimpleName();
     private MBRecord mbrOld;
     private SimpleDateFormat format;
     private EditText des;
@@ -37,6 +39,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private Spinner tcate;
     private Spinner paymentMethodView;
     private String[] payMethArr;
+    private boolean firstTypeSelection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,28 +98,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         type = (Spinner) findViewById(R.id.typeitem);
 
         cate = (Spinner) findViewById(R.id.catitem);
-        catArr = db.getCategeories();
-        int curind = -1;
-        // initialize with others category
-        for (int i = 0; i < catArr.length; i++) {
-            if (catArr[i].compareToIgnoreCase(GlobalConstants.OTHERS_CAT) == 0) {
-                curind = i;
-                break;
-            }
-        }
-
-        if (mbrOld.getCategory() != null) {
-            for (int i = 0; i < catArr.length; i++) {
-                if (catArr[i].compareToIgnoreCase(mbrOld.getCategory()) == 0) {
-                    curind = i;
-                    break;
-                }
-            }
-        }
-        ArrayAdapter caa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
-        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cate.setAdapter(caa);
-        cate.setSelection(curind);
+        initCategory(mbrOld.getType(), mbrOld.getCategory());
 
         paymentMethodView = (Spinner) findViewById(R.id.payment_method);
         payMethArr = db.getPaymentMethods();
@@ -140,7 +122,6 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         }
 
         ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, payMethArr);
-        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         paymentMethodView.setAdapter(paa);
         paymentMethodView.setSelection(pCurind);
 
@@ -152,7 +133,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             ((TextView) findViewById(R.id.catfromitemtext)).setText("From Category");
 
             tcate = (Spinner) findViewById(R.id.cattoitem);
-            curind = -1;
+            int curind = -1;
             for (int i = 0; i < catArr.length; i++) {
                 if (catArr[i].compareToIgnoreCase(mbrOld.getDescription()) == 0) {
                     curind = i;
@@ -171,9 +152,55 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             type.setAdapter(aa);
             type.setSelection(mbrOld.getType());
+            firstTypeSelection = true;
+            type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (!firstTypeSelection) {
+                        initCategory(position, GlobalConstants.OTHERS_CAT);
+                    } else {
+                        firstTypeSelection = false;
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
         }
         amount.setText(mbrOld.getAmount() + "");
         date.setText(format.format(mbrOld.getDate()));
+    }
+
+    private void initCategory(int type, String cat) {
+        LoggerCus.d(TAG, "type : " + type + " cat : " + cat);
+        catArr = db.getCategeories(type);
+        int curind = -1;
+        // initialize with others category
+        for (int i = 0; i < catArr.length; i++) {
+            if (catArr[i].compareToIgnoreCase(GlobalConstants.OTHERS_CAT) == 0) {
+                curind = i;
+                break;
+            }
+        }
+
+        if (!(cat.compareToIgnoreCase(GlobalConstants.OTHERS_CAT) == 0)) {
+            if (cat != null) {
+                for (int i = 0; i < catArr.length; i++) {
+                    if (catArr[i].compareToIgnoreCase(cat) == 0) {
+                        curind = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        ArrayAdapter caa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cate.setAdapter(caa);
+        cate.setSelection(curind);
+        caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     }
 
 

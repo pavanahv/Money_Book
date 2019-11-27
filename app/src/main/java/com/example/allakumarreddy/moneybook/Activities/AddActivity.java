@@ -60,7 +60,11 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
         amtv = ((EditText) findViewById(R.id.amount));
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         if (type == GlobalConstants.HOME_SCREEN || type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN) {
-            catArr = db.getCategeories();
+            int catType = getIntent().getIntExtra(GlobalConstants.CATEGORY_TYPE, -1);
+            if (catType != -1)
+                catArr = db.getCategeories(catType);
+            else
+                catArr = db.getCategeories(GlobalConstants.TYPE_SPENT);
             payMethArr = db.getPaymentMethods();
             int curInd = -1, pCurInd = -1;
             for (int i = 0; i < catArr.length; i++) {

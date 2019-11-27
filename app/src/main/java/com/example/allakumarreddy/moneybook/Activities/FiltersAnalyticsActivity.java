@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initCategories;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initFilters;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initPaymentMethods;
+import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initType;
 
 public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate {
 
@@ -48,6 +49,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     private boolean isSdateOrEdate = false;
     private SimpleDateFormat format;
     private FilterSubMenuAdapter mSubMenuAdapter;
+    private boolean moneyTypeSubItemChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +93,8 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         mSubMenuArrayList.clear();
 
         mAnalyticsFilterData.initDataAgainAfterClear();
-        initCategories(null, db, mAnalyticsFilterData);
+        initType(mAnalyticsFilterData, GlobalConstants.TYPE_SPENT);
+        initCategories(null, db, mAnalyticsFilterData, GlobalConstants.TYPE_SPENT);
         initPaymentMethods(null, db, mAnalyticsFilterData);
         initFilters(db, mAnalyticsFilterData);
         initMainMenuData();
@@ -168,6 +171,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
         switch (position) {
             case 0: // "Date"
             case 1: // "Date Interval"
+            case 2: // "Money Type"
             case 3: // "Group By"
             case 4: // "Sort By"
             case 5: // "Sorting Order"
@@ -176,8 +180,20 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
             case 10: // "Saved Filters"
                 initSubMenu(subMenuListData.get(position), true, subMenuListDataSelection.get(position));
                 break;
-            case 2: // "Money Type"
             case 6: // "Category"
+                if (moneyTypeSubItemChanged) {
+                    moneyTypeSubItemChanged = false;
+                    int type = -1;
+                    for (int i = 0; i < mAnalyticsFilterData.subMenuMoneyTypeDataBool.length; i++) {
+                        if (mAnalyticsFilterData.subMenuMoneyTypeDataBool[i]) {
+                            type = i;
+                            break;
+                        }
+                    }
+                    initCategories(null, db, mAnalyticsFilterData, type);
+                    subMenuListData.set(6, mAnalyticsFilterData.subMenuCatogeoryData);
+                    subMenuListDataSelection.set(6, mAnalyticsFilterData.subMenuCatogeoryDataBool);
+                }
             case 7: // "Payment Method"
                 initSubMenu(subMenuListData.get(position), false, subMenuListDataSelection.get(position));
                 break;
@@ -217,6 +233,9 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
 
     public void subMenuItemSelected(int position) {
         if (mIsRadioOrCheck) {
+            if (mMainMenuSelectedItemPosition == 2) {
+                moneyTypeSubItemChanged = true;
+            }
             setAllSubMenuItemsNotChecked(mIsRadioOrCheck);
             mSubMenuArrayListSelection.set(position, true);
             subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[position] = true;

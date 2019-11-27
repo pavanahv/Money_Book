@@ -22,7 +22,6 @@ import java.util.ArrayList;
 
 
 public class ChunksFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -30,7 +29,6 @@ public class ChunksFragment extends Fragment {
     private static final int PLUS_ONE_REQUEST_CODE = 0;
     // The URL to +1.  Must be a valid URL.
     private final String PLUS_ONE_URL = "http://developer.android.com";
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -52,7 +50,6 @@ public class ChunksFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ChunksFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ChunksFragment newInstance(String param1, String param2) {
         ChunksFragment fragment = new ChunksFragment();
         Bundle args = new Bundle();
@@ -126,7 +123,6 @@ public class ChunksFragment extends Fragment {
         // Refresh the state of the +1 button each time the activity receives focus.
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         /*if (mListener != null) {
             mListener.onFragmentInteraction(uri);
