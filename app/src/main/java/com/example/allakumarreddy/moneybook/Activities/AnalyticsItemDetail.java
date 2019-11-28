@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
@@ -48,6 +48,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Item Detail");
         format = new SimpleDateFormat("yyyy/MM/dd");
         init();
     }
@@ -121,7 +122,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             }
         }
 
-        ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, payMethArr);
+        ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, payMethArr);
         paymentMethodView.setAdapter(paa);
         paymentMethodView.setSelection(pCurind);
 
@@ -140,7 +141,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
                     break;
                 }
             }
-            ArrayAdapter tcaa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+            ArrayAdapter tcaa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, catArr);
             tcaa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             tcate.setAdapter(tcaa);
             tcate.setSelection(curind);
@@ -148,7 +149,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             findViewById(R.id.cattoitem).setVisibility(View.GONE);
             findViewById(R.id.cattoitemtext).setVisibility(View.GONE);
             des.setText(mbrOld.getDescription());
-            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new String[]{"Spent", "Earn", "Due", "Loan"});
+            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, new String[]{"Spent", "Earn", "Due", "Loan"});
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             type.setAdapter(aa);
             type.setSelection(mbrOld.getType());
@@ -196,7 +197,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             }
         }
 
-        ArrayAdapter caa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+        ArrayAdapter caa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, catArr);
         caa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cate.setAdapter(caa);
         cate.setSelection(curind);

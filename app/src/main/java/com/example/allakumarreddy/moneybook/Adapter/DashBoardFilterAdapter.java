@@ -11,7 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.Activities.DashBoardFilterAdapterInterface;
+import com.example.allakumarreddy.moneybook.interfaces.DashBoardFilterAdapterInterface;
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.Utils;

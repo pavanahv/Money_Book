@@ -1,6 +1,6 @@
 package com.example.allakumarreddy.moneybook.utils;
 
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 
 import java.util.Arrays;
 

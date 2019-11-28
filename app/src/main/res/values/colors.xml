@@ -5,7 +5,13 @@
     <color name="colorAccent">#228B22</color>
     <color name="green">#228B22</color>
     <color name="fullGreen">#008000</color>
+    <color name="success">#5cb85c</color>
     <color name="white">#FFFFFF</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="spent">#d9534f</color>
+    <color name="earn">#5bc0de</color>
+    <color name="due">#ff9d5a</color>
+    <color name="loan">#f0ad4e</color>
 </resources>

@@ -17,10 +17,10 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
-import com.example.allakumarreddy.moneybook.MessageParser.MessageParserBase;
+import com.example.allakumarreddy.moneybook.utils.MessageParserBase;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.SettingsLock.LoginActivity;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.Activities.LoginActivity;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 

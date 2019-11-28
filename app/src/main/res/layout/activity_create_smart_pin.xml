@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".SettingsLock.CreateSmartPinActivity">
+    tools:context=".Activities.CreateSmartPinActivity">
 
     <TextView
         android:id="@+id/status"

@@ -6,8 +6,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.example.allakumarreddy.moneybook.MessageParser.MessageParserBase;
-import com.example.allakumarreddy.moneybook.backup.Backup;
+import com.example.allakumarreddy.moneybook.utils.MessageParserBase;
+import com.example.allakumarreddy.moneybook.utils.Backup;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 

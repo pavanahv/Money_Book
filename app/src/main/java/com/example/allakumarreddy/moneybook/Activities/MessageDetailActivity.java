@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 
 import java.util.ArrayList;
 
@@ -27,6 +27,7 @@ public class MessageDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Message Detail");
         init();
     }
 
@@ -67,7 +68,7 @@ public class MessageDetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.payitem)).setText(list.get(6));
 
         Spinner type = (Spinner) findViewById(R.id.typeitem);
-        ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, new String[]{"Spent", "Earn", "Due", "Loan"});
+        ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, new String[]{"Spent", "Earn", "Due", "Loan"});
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         type.setAdapter(aa);
         type.setSelection(Integer.parseInt(list.get(2)));

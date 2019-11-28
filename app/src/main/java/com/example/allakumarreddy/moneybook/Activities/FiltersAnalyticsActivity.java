@@ -16,11 +16,11 @@ import android.widget.TextView;
 import com.example.allakumarreddy.moneybook.Adapter.FilterMainMenuAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.FilterSubMenuAdapter;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
-import com.example.allakumarreddy.moneybook.utils.IDate;
+import com.example.allakumarreddy.moneybook.interfaces.IDate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,7 +55,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filters_analytics);
-        getSupportActionBar().setTitle("Analytics Filter");
+        getSupportActionBar().setTitle("Analytics Filters");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         init();

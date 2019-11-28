@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebView;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.DateConverter;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
@@ -15,18 +15,18 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 
-import static com.example.allakumarreddy.moneybook.db.DbHandler.CAT_TABLE_NAME;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_AMOUNT;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_CAT;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_CAT_BAL;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_CAT_ID;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_DATE;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_DATE_MONTH;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_DATE_YEAR;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_DESCRIPTION;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_NAME;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.KEY_TYPE;
-import static com.example.allakumarreddy.moneybook.db.DbHandler.TABLE_NAME;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.CAT_TABLE_NAME;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_AMOUNT;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_CAT;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_CAT_BAL;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_CAT_ID;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_DATE;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_DATE_MONTH;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_DATE_YEAR;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_DESCRIPTION;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_NAME;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.KEY_TYPE;
+import static com.example.allakumarreddy.moneybook.storage.db.DbHandler.TABLE_NAME;
 
 public class DataBaseActivity extends AppCompatActivity {
 

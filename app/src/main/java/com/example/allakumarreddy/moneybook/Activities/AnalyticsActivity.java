@@ -17,8 +17,8 @@ import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.AnalyticsAdapter;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.XLStore;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -63,6 +63,7 @@ public class AnalyticsActivity extends AppCompatActivity {
         db = new DbHandler(this);
         format = new SimpleDateFormat("yyyy/MM/dd");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Analytics");
         processTabs();
         init();
     }
@@ -135,6 +136,7 @@ public class AnalyticsActivity extends AppCompatActivity {
     public void startDetailActivity(int pos) {
         if (mStartItemDetailActivity) {
             MBRecord mbr = dataList.get(pos);
+            LoggerCus.d(TAG, mbr.toString());
             Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
             intent.putExtra("MBRecord", mbr);
             startActivity(intent);
@@ -203,7 +205,7 @@ public class AnalyticsActivity extends AppCompatActivity {
         initType(mAnalyticsFilterData, catType);
         initCategories(temp, db, mAnalyticsFilterData, catType);
         LoggerCus.d(TAG, "cat: " + temp + " cat type: " + catType);
-        LoggerCus.d(TAG, Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryData)+" -> "+Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryDataBool));
+        LoggerCus.d(TAG, Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryData) + " -> " + Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryDataBool));
         temp = intent.getStringExtra("paymentMethod");
         initPaymentMethods(temp, db, mAnalyticsFilterData);
         initFilters(db, mAnalyticsFilterData);

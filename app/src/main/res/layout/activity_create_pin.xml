@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".SettingsLock.CreatePinActivity">
+    tools:context=".Activities.CreatePinActivity">
 
     <TextView
         android:layout_marginBottom="10dp"

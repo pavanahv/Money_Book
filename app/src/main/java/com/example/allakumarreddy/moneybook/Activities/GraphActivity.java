@@ -16,7 +16,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.Utils;
@@ -130,7 +130,8 @@ public class GraphActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-
+        getSupportActionBar().setTitle("Graph");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         label = intent.getExtras().getStringArray("label");
@@ -161,6 +162,9 @@ public class GraphActivity extends AppCompatActivity {
                 Intent intent = new Intent(GraphActivity.this, AddActivity.class);
                 intent.putExtra("type", GlobalConstants.SAVE_FILTER_SCREEN);
                 startActivityForResult(intent, ADD_ACTIVITY);
+                break;
+            case android.R.id.home:
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);

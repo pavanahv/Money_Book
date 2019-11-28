@@ -18,9 +18,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.SettingsLock.CreatePinActivity;
-import com.example.allakumarreddy.moneybook.SettingsLock.FingerPrintManager;
-import com.example.allakumarreddy.moneybook.backup.Backup;
+import com.example.allakumarreddy.moneybook.utils.FingerPrintManager;
+import com.example.allakumarreddy.moneybook.utils.Backup;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.TimePreference;
 import com.example.allakumarreddy.moneybook.utils.Utils;

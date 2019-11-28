@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.Activities.HomeAdapterInterface;
+import com.example.allakumarreddy.moneybook.interfaces.HomeAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 

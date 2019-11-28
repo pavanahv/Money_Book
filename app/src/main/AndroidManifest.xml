@@ -26,8 +26,8 @@
             android:name=".Services.SmartRemainderIntentService"
             android:exported="false"></service>
 
-        <activity android:name=".SettingsLock.CreateSmartPinActivity" />
-        <activity android:name=".SettingsLock.CreatePinActivity" />
+        <activity android:name=".Activities.CreateSmartPinActivity" />
+        <activity android:name=".Activities.CreatePinActivity" />
         <activity android:name=".Activities.FiltersAnalyticsActivity" />
 
         <receiver
@@ -86,7 +86,7 @@
         <activity
             android:name=".Activities.MessageParseActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".SettingsLock.LoginActivity">
+        <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -119,7 +119,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".backup.GoogleDriveActivity" />
+        <activity android:name=".Activities.GoogleDriveActivity" />
         <activity android:name=".Activities.RestoreActivity" />
         <activity android:name=".Activities.WelcomeActivity" />
     </application>

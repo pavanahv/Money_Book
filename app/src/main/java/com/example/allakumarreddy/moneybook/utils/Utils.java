@@ -16,11 +16,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
 import com.example.allakumarreddy.moneybook.broadcastreceivers.ReportsAlarmReceiver;
 import com.example.allakumarreddy.moneybook.broadcastreceivers.SmartRemainderAlarmReceiver;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -478,5 +479,19 @@ public class Utils {
         AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarm.setRepeating(AlarmManager.RTC_WAKEUP, calOrg.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
         Toast.makeText(context, "Reports Set Successfully!", Toast.LENGTH_LONG).show();
+    }
+
+    public static int getColor(int type, Context context) {
+        switch (type) {
+            case 0:
+                return context.getResources().getColor(R.color.spent);
+            case 1:
+                return context.getResources().getColor(R.color.earn);
+            case 2:
+                return context.getResources().getColor(R.color.due);
+            case 3:
+                return context.getResources().getColor(R.color.loan);
+        }
+        return R.color.colorPrimary;
     }
 }

@@ -3,14 +3,15 @@ package com.example.allakumarreddy.moneybook.Activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.allakumarreddy.moneybook.MessageParser.ChunksFragment;
-import com.example.allakumarreddy.moneybook.MessageParser.ChunksFragmentInteractionListener;
-import com.example.allakumarreddy.moneybook.MessageParser.ItemDetailFragment;
-import com.example.allakumarreddy.moneybook.MessageParser.MessageListFragment;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.fragments.ChunksFragment;
+import com.example.allakumarreddy.moneybook.fragments.ItemDetailFragment;
+import com.example.allakumarreddy.moneybook.fragments.MessageListFragment;
+import com.example.allakumarreddy.moneybook.interfaces.ChunksFragmentInteractionListener;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 
 public class MessageParseActivity extends AppCompatActivity implements ChunksFragmentInteractionListener {
 
@@ -31,11 +32,22 @@ public class MessageParseActivity extends AppCompatActivity implements ChunksFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_parse);
         getSupportActionBar().setTitle("Message Parser");
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fragment_container, new MessageListFragment());
         transaction.commit();
         //seelctedMsg("You have made a purchase for an amount of Rs. 24.00  on your Sodexo Card 637513-xxxxxx-6056 on 10:33,11 Mar at TULASI JUICE JUNCTION. The available balance on your Sodexo Card is INR 1000.10.Download the Zeta App to track your spends http://bit.ly/2RySHSA.");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -103,7 +115,7 @@ public class MessageParseActivity extends AppCompatActivity implements ChunksFra
     @Override
     public void saveEverything() {
         DbHandler db = new DbHandler(this);
-        boolean res = db.insertMsgRecord(des, amount, type, cate, balLeft, msgStr, nameStr , payStr);
+        boolean res = db.insertMsgRecord(des, amount, type, cate, balLeft, msgStr, nameStr, payStr);
         if (res) {
             Toast.makeText(this, "Saved!", Toast.LENGTH_LONG).show();
             finish();

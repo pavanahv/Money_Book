@@ -25,13 +25,15 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentService;
-import com.example.allakumarreddy.moneybook.Services.MoneyBookIntentServiceHandler;
-import com.example.allakumarreddy.moneybook.SettingsLock.CreateSmartPinActivity;
-import com.example.allakumarreddy.moneybook.backup.Backup;
-import com.example.allakumarreddy.moneybook.dashboard.DashboardFragment;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
-import com.example.allakumarreddy.moneybook.home.HomeFragment;
+import com.example.allakumarreddy.moneybook.fragments.DashboardFilterFragment;
+import com.example.allakumarreddy.moneybook.fragments.DashboardFragment;
+import com.example.allakumarreddy.moneybook.fragments.HomeFragment;
+import com.example.allakumarreddy.moneybook.fragments.PaymentMethodFragment;
+import com.example.allakumarreddy.moneybook.handler.MoneyBookIntentServiceHandler;
+import com.example.allakumarreddy.moneybook.interfaces.DashUIUpdateInterface;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.Backup;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.Utils;
@@ -47,7 +49,7 @@ import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,DashUIUpdateInterface {
+        implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface {
 
     final static String TAG = "MainActivity";
     private static final int REQUESTCODE_PICK_JSON = 504;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     private View mProgressBAr;
     private String bfrPermissionAction;
     private int mainLayout;
+    private boolean closeActivity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +98,19 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            if (!closeActivity) {
+                closeActivity = true;
+                Toast.makeText(this, "Press Again To Exit", Toast.LENGTH_LONG).show();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(3000);
+                        closeActivity = false;
+                    } catch (InterruptedException e) {
+                        LoggerCus.d(TAG, "Error while making back press thread to sleep -> " + e.getMessage());
+                    }
+                }).start();
+                return;
+            }
             super.onBackPressed();
         }
     }
@@ -302,7 +318,8 @@ public class MainActivity extends AppCompatActivity
         //showProgressBar();
         if (id == R.id.dash) {
             showCategory();
-        } else if (id == R.id.home) {;
+        } else if (id == R.id.home) {
+            ;
             showHome();
         } else if (id == R.id.payment_method) {
             showPaymentMethod();

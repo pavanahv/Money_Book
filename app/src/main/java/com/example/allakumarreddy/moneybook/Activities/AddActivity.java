@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -17,7 +18,7 @@ import android.widget.Spinner;
 
 import com.example.allakumarreddy.moneybook.Adapter.DescriptionAdapter;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.db.DbHandler;
+import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
@@ -45,12 +46,24 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Add Item");
         db = new DbHandler(this);
         type = getIntent().getIntExtra("type", -1);
         if (type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN)
             tcategory = getIntent().getStringExtra("tcategory");
         init();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void init() {
@@ -79,12 +92,12 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                     break;
                 }
             }
-            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, catArr);
+            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, catArr);
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             categoryView.setAdapter(aa);
             categoryView.setSelection(curInd);
 
-            ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, payMethArr);
+            ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, payMethArr);
             paa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             paymentMethodView.setAdapter(paa);
             paymentMethodView.setSelection(pCurInd);
@@ -106,12 +119,12 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                     public void onTextChanged(CharSequence s, int start,
                                               int before, int count) {
                         if (s.length() != 0)
-                            updateAdapter(s.toString());
+                            updateAdapter(s.toString(), catType);
                     }
                 });
 
                 adapter = new DescriptionAdapter(new ArrayList<>(), this);
-                updateAdapter("");
+                updateAdapter("", catType);
                 autoCompleteTextView.setAdapter(adapter);
                 autoCompleteTextView.setThreshold(1);
                 autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -127,6 +140,8 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                             }
                         }
                         amtv.setText(mbr.getAmount() + "");
+
+                        // category selection
                         String catStr = mbr.getCategory();
                         int catSel = -1;
                         for (int i = 0; i < catArr.length; i++) {
@@ -138,6 +153,20 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                         }
                         if (catSel != -1)
                             categoryView.setSelection(catSel, true);
+
+                        // payment selection
+                        catStr = mbr.getPaymentMethod();
+                        catSel = -1;
+                        for (int i = 0; i < payMethArr.length; i++) {
+                            String ss = payMethArr[i];
+                            if (ss.compareToIgnoreCase(catStr) == 0) {
+                                catSel = i;
+                                break;
+                            }
+                        }
+                        if (catSel != -1)
+                            paymentMethodView.setSelection(catSel, true);
+
                         add.setFocusable(true);
                     }
                 });
@@ -159,9 +188,9 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
         cancel.setOnClickListener(this);
     }
 
-    private void updateAdapter(String s) {
+    private void updateAdapter(String s, int type) {
         adapter.clear();
-        records = db.getDesForAutoComplete(s);
+        records = db.getDesForAutoComplete(s, type);
         ArrayList<String> alist = new ArrayList<>();
         for (MBRecord rec : records)
             alist.add(rec.getDescription());

@@ -15,8 +15,8 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.backup.Backup;
-import com.example.allakumarreddy.moneybook.backup.GoogleDriveBackup;
+import com.example.allakumarreddy.moneybook.utils.Backup;
+import com.example.allakumarreddy.moneybook.utils.GoogleDriveBackup;
 import com.example.allakumarreddy.moneybook.broadcastreceivers.NetworkConnectionReceiver;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
