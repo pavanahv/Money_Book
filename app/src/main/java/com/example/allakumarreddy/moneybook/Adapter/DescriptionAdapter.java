@@ -40,7 +40,7 @@ public class DescriptionAdapter extends ArrayAdapter<String>{
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.row_des_item, parent, false);
-            viewHolder.txtName = (TextView) convertView.findViewById(R.id.des);
+            viewHolder.txtName = (TextView) convertView.findViewById(R.id.desc);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

@@ -37,10 +37,11 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     private DescriptionAdapter adapter;
     private Button add;
     private Button cancel;
-    private ArrayList<MBRecord> records;
+    private ArrayList<MBRecord> records = new ArrayList<>();
     private EditText amtv;
     private Spinner paymentMethodView;
     private String[] payMethArr;
+    ArrayList<MBRecord> prevRecords = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,10 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
         paymentMethodView = (Spinner) findViewById(R.id.payment_method);
         amtv = ((EditText) findViewById(R.id.amount));
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        if (type == GlobalConstants.HOME_SCREEN || type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN) {
+        if (type == GlobalConstants.HOME_SCREEN ||
+                type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN ||
+                type == GlobalConstants.TYPE_LOAN_REPAYMENT ||
+                type == GlobalConstants.TYPE_DUE_REPAYMENT) {
             int catType = getIntent().getIntExtra(GlobalConstants.CATEGORY_TYPE, -1);
             if (catType != -1)
                 catArr = db.getCategeories(catType);
@@ -130,15 +134,8 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                 autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String s = (String) parent.getItemAtPosition(position);
-                        MBRecord mbr = null;
-                        for (MBRecord rec : records) {
-                            String a = rec.getDescription();
-                            if (a.compareToIgnoreCase(s) == 0) {
-                                mbr = rec;
-                                break;
-                            }
-                        }
+                        MBRecord mbr = prevRecords.get(position);
+                        autoCompleteTextView.setText(mbr.getDescription());
                         amtv.setText(mbr.getAmount() + "");
 
                         // category selection
@@ -170,6 +167,9 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                         add.setFocusable(true);
                     }
                 });
+            } else if (type == GlobalConstants.TYPE_LOAN_REPAYMENT ||
+                    type == GlobalConstants.TYPE_DUE_REPAYMENT) {
+                autoCompleteTextView.setVisibility(View.GONE);
             }
         } else if (type == GlobalConstants.SAVE_FILTER_SCREEN) {
             autoCompleteTextView.setHint("Name Of Filter");
@@ -189,11 +189,15 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
     }
 
     private void updateAdapter(String s, int type) {
+        prevRecords.clear();
+        prevRecords.addAll(records);
         adapter.clear();
         records = db.getDesForAutoComplete(s, type);
         ArrayList<String> alist = new ArrayList<>();
         for (MBRecord rec : records)
-            alist.add(rec.getDescription());
+            alist.add(rec.getDescription() + "\nAmount : "
+                    + rec.getAmount() + "\nCategory : " + rec.getCategory()
+                    + "\nPaymentMethod : " + rec.getPaymentMethod());
         adapter.addAll(alist);
         adapter.notifyDataSetChanged();
     }
@@ -205,7 +209,10 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
                 String des = autoCompleteTextView.getText().toString();
                 String amount = amtv.getText().toString();
                 String category = "", paymentMethod = "";
-                if (type == GlobalConstants.HOME_SCREEN || type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN) {
+                if (type == GlobalConstants.HOME_SCREEN ||
+                        type == GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN ||
+                        type == GlobalConstants.TYPE_LOAN_REPAYMENT ||
+                        type == GlobalConstants.TYPE_DUE_REPAYMENT) {
                     category = catArr[categoryView.getSelectedItemPosition()];
                     paymentMethod = payMethArr[paymentMethodView.getSelectedItemPosition()];
                     if (amount == null)

@@ -58,6 +58,11 @@ public class GlobalConstants {
     public static final String ANALYTICS_FILTER_ACTIVITY_FILTER = "filter";
     public static final String CATEGORY_TYPE = "ADD_ACTIVITY_CATERGORY_TYPE";
     public static final String FRAGMENT_ACTIVATE_TYPE = "FRAGMENT_ACTIVATE_TYPE";
+    public static final int TYPE_LOAN_REPAYMENT = 8;
+    public static final int TYPE_DUE_REPAYMENT = 7;
+    public static final int TYPE_DUE_PAYMENT = 5;
+    public static final int TYPE_LOAN_PAYMENT = 6;
+    public static final int TYPE_MONEY_TRANSFER = 4;
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

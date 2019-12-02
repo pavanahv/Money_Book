@@ -1,46 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".home.HomeSpentFragment">
 
-    <LinearLayout
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/mainView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp">
 
-        <TextView
-            android:textStyle="bold"
-            android:id="@+id/date_text"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="10dp"
-            android:text=""
-            android:textColor="@color/colorPrimary" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/total_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="10dp"
-            android:text="TextView"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="25dp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/date_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:text=""
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/colorPrimaryDark" />
+            <TextView
+                android:id="@+id/total_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="10dp"
+                android:text="TextView"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="25dp"
+                android:textStyle="bold" />
 
-        <ListView
-            android:id="@+id/lv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/colorPrimaryDark" />
 
-    </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
+                <TextView
+                    android:layout_gravity="center"
+                    android:id="@+id/no_data"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Click + To Add Data"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/lv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
 </FrameLayout>

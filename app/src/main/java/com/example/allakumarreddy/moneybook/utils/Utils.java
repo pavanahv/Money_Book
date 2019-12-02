@@ -494,4 +494,26 @@ public class Utils {
         }
         return R.color.colorPrimary;
     }
+
+    public static void addRefIdForLoanDueFromDes(MBRecord mbr) {
+        String des = mbr.getDescription();
+        int count = 0;
+        for (int i = 0; true; i++) {
+            i = des.indexOf("{{", i);
+            if (i == -1) {
+                break;
+            } else {
+                count++;
+            }
+        }
+        if (count == 1) {
+            int inda = des.indexOf("{{");
+            int indb = des.indexOf("}}", inda);
+            String temp = des.substring(inda + 2, indb);
+            LoggerCus.d(TAG, temp);
+            String desc = des.substring(0, inda) + des.substring(indb + 2, des.length());
+            mbr.setDescription(desc);
+            mbr.setRefIdForLoanDue(temp);
+        }
+    }
 }

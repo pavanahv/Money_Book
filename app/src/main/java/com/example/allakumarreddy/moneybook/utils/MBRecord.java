@@ -9,6 +9,8 @@ import java.util.Date;
 
 public class MBRecord implements Serializable {
 
+    private String mRefIdForLoanDue = null;
+
     public String getPaymentMethod() {
         return paymentMethod;
     }
@@ -116,5 +118,13 @@ public class MBRecord implements Serializable {
                 ", type=" + type +
                 ", balLeft=" + balLeft +
                 '}';
+    }
+
+    public void setRefIdForLoanDue(String refIdForLoanDue) {
+        mRefIdForLoanDue = refIdForLoanDue;
+    }
+
+    public String getmRefIdForLoanDue() {
+        return mRefIdForLoanDue;
     }
 }

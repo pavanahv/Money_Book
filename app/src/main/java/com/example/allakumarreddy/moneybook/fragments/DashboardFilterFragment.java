@@ -24,11 +24,16 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.ArrayList;
 
+import static com.example.allakumarreddy.moneybook.utils.AnimationUtils.revealAnimation;
+
 public class DashboardFilterFragment extends Fragment implements DashBoardFilterAdapterInterface {
 
     private RecyclerView dashBoardFilterList;
     private DbHandler db;
     private DashUIUpdateInterface mDashUIUpdateInterface;
+    private View mainView;
+    private View progress;
+    private View noData;
 
     public DashboardFilterFragment() {
         // Required empty public constructor
@@ -56,7 +61,13 @@ public class DashboardFilterFragment extends Fragment implements DashBoardFilter
     }
 
     private void init(View view) {
+        mainView = view.findViewById(R.id.mainView);
+        mainView.setVisibility(View.GONE);
+        progress = view.findViewById(R.id.progress);
+        progress.setVisibility(View.VISIBLE);
+
         dashBoardFilterList = (RecyclerView) view.findViewById(R.id.dash_filter_recycler);
+        noData = view.findViewById(R.id.no_data);
         getActivity().findViewById(R.id.fab).setVisibility(View.GONE);
     }
 
@@ -82,11 +93,22 @@ public class DashboardFilterFragment extends Fragment implements DashBoardFilter
         new Thread(() -> {
             String[][] jsonDataTitle = db.getDashBoardFilterRecords();
             getActivity().runOnUiThread(() -> {
-
                 DashBoardFilterAdapter mDashBoardFilterAdapter = new DashBoardFilterAdapter(jsonDataTitle, getContext(), this);
                 dashBoardFilterList.setAdapter(mDashBoardFilterAdapter);
+                if (mDashBoardFilterAdapter.getItemCount() <= 0) {
+                    dashBoardFilterList.setVisibility(View.GONE);
+                    noData.setVisibility(View.VISIBLE);
+                } else {
+                    dashBoardFilterList.setVisibility(View.VISIBLE);
+                    noData.setVisibility(View.GONE);
+                }
+                showMainView();
             });
         }).start();
+    }
+
+    private void showMainView() {
+        revealAnimation(progress, mainView, getView());
     }
 
     @Override

@@ -137,9 +137,18 @@ public class AnalyticsActivity extends AppCompatActivity {
         if (mStartItemDetailActivity) {
             MBRecord mbr = dataList.get(pos);
             LoggerCus.d(TAG, mbr.toString());
-            Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
-            intent.putExtra("MBRecord", mbr);
-            startActivity(intent);
+            if (mbr.getType() == GlobalConstants.TYPE_DUE ||
+                    mbr.getType() == GlobalConstants.TYPE_LOAN ||
+                    mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT ||
+                    mbr.getType() == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                Intent intent = new Intent(AnalyticsActivity.this, RePaymentActivity.class);
+                intent.putExtra("MBRecord", mbr);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
+                intent.putExtra("MBRecord", mbr);
+                startActivity(intent);
+            }
         } else {
             Toast.makeText(this, "Record can't be edited when GROUPBY filter is selected", Toast.LENGTH_LONG).show();
         }

@@ -14,4 +14,5 @@
     <color name="earn">#5bc0de</color>
     <color name="due">#ff9d5a</color>
     <color name="loan">#f0ad4e</color>
+    <color name="error_color">#FF0000</color>
 </resources>

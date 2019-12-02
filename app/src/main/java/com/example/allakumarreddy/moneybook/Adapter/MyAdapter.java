@@ -10,8 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.interfaces.HomeAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.interfaces.HomeAdapterInterface;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         TextView txtName;
         TextView txtRs;
         ImageView imageView;
+        View statusView;
     }
 
     public MyAdapter(ArrayList<MBRecord> data, Context context, int type, HomeAdapterInterface homeAdapterInterface) {
@@ -65,6 +67,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.homeiv);
             viewHolder.catName = (TextView) convertView.findViewById(R.id.categoryhome);
             viewHolder.paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
+            viewHolder.statusView = convertView.findViewById(R.id.status_view);
 
             result = convertView;
 
@@ -82,21 +85,32 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         viewHolder.txtRs.setText("Rs. " + dataModel.getAmount());
         viewHolder.catName.setText(dataModel.getCategory());
         viewHolder.paymentMethod.setText(dataModel.getPaymentMethod());
-        switch (this.type) {
-            case 0:
+        viewHolder.statusView.setVisibility(View.GONE);
+        switch (dataModel.getType()) {
+            case GlobalConstants.TYPE_SPENT:
                 viewHolder.imageView.setImageResource(R.drawable.spent);
                 break;
 
-            case 1:
+            case GlobalConstants.TYPE_EARN:
                 viewHolder.imageView.setImageResource(R.drawable.earn);
                 break;
 
-            case 2:
+            case GlobalConstants.TYPE_DUE:
                 viewHolder.imageView.setImageResource(R.drawable.due);
                 break;
 
-            case 3:
+            case GlobalConstants.TYPE_LOAN:
                 viewHolder.imageView.setImageResource(R.drawable.ic_loan);
+                break;
+
+            case GlobalConstants.TYPE_DUE_PAYMENT:
+                viewHolder.imageView.setImageResource(R.drawable.due);
+                viewHolder.statusView.setVisibility(View.VISIBLE);
+                break;
+
+            case GlobalConstants.TYPE_LOAN_PAYMENT:
+                viewHolder.imageView.setImageResource(R.drawable.ic_loan);
+                viewHolder.statusView.setVisibility(View.VISIBLE);
                 break;
         }
         // Return the completed view to render on screen

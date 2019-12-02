@@ -34,7 +34,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/editor/ic_format_list_numbered_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_edit_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -46,6 +46,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+                                                <entry key="paddingPercent" value="5" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -57,7 +58,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="fontFamily" value="Arial Rounded MT Bold" />
-                                                <entry key="text" value="GB" />
+                                                <entry key="text" value="DP" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -67,7 +68,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_record_count" />
+                                      <entry key="assetType" value="TEXT" />
+                                      <entry key="outputName" value="due_payment" />
+                                      <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="5cb85c" />
                                     </map>
                                   </option>
@@ -153,7 +156,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/notification/ic_event_note_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_edit_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -174,7 +177,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_report" />
+                                      <entry key="outputName" value="ic_record_edit" />
                                     </map>
                                   </option>
                                 </PersistentState>

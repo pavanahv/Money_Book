@@ -12,6 +12,7 @@ import com.example.allakumarreddy.moneybook.utils.DateConverter;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
+import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -155,6 +156,13 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public long getIdOfCategory(String name, int type) {
+        if (type == GlobalConstants.TYPE_DUE_REPAYMENT
+                || type == GlobalConstants.TYPE_DUE_PAYMENT)
+            type = GlobalConstants.TYPE_DUE;
+        else if (type == GlobalConstants.TYPE_LOAN_REPAYMENT
+                || type == GlobalConstants.TYPE_LOAN_PAYMENT)
+            type = GlobalConstants.TYPE_LOAN;
+
         SQLiteDatabase db = this.getReadableDatabase();
         long result = -1L;
         Cursor cursor = db.rawQuery("SELECT " + KEY_CAT_ID + " FROM " + CAT_TABLE_NAME + " WHERE " + KEY_NAME + " = '" + name + "' AND " + KEY_CAT_TYPE + " = " + type, null);
@@ -231,10 +239,17 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public boolean addRecord(MBRecord mbr, int type) {
+        String des = mbr.getDescription();
+        if (type == GlobalConstants.TYPE_DUE ||
+                type == GlobalConstants.TYPE_LOAN ||
+                type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                type == GlobalConstants.TYPE_LOAN_PAYMENT) {
+            des += "{{" + System.currentTimeMillis() + "}}";
+        }
         DateConverter dc = new DateConverter(intializeSDateForDay(mbr.getDate()));
         ContentValues values = new ContentValues();
         values.put(KEY_TYPE, type);
-        values.put(KEY_DESCRIPTION, mbr.getDescription());
+        values.put(KEY_DESCRIPTION, des);
         values.put(KEY_AMOUNT, mbr.getAmount());
         values.put(KEY_DATE, dc.getdDate().getTime());
         values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
@@ -251,6 +266,55 @@ public class DbHandler extends SQLiteOpenHelper {
             return true;
         else
             return false;
+    }
+
+    public void addRePaymentRecord(MBRecord mbr, int type, MBRecord mainMbr) {
+        DateConverter dc = new DateConverter(intializeSDateForDay(mbr.getDate()));
+        ContentValues values = new ContentValues();
+        values.put(KEY_TYPE, mbr.getType());
+        values.put(KEY_DESCRIPTION, mbr.getDescription());
+        values.put(KEY_AMOUNT, mbr.getAmount());
+        values.put(KEY_DATE, dc.getdDate().getTime());
+        values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
+        values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
+        values.put(KEY_CAT, getIdOfCategory(mbr.getCategory(), type));
+        values.put(KEY_PAYMENT_METHOD, getIdOfPaymentMethod(mbr.getPaymentMethod()));
+        LoggerCus.d(TAG, values.toString());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Inserting Row
+        db.insert(TABLE_NAME, null, values);
+        db.close();
+
+        if (mainMbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT ||
+                mainMbr.getType() == GlobalConstants.TYPE_LOAN_PAYMENT) {
+            return;
+        }
+
+        int lBal = getRePaymentAmount(mbr.getType(), mainMbr.getmRefIdForLoanDue());
+        if (lBal != -1) {
+            int temp = mainMbr.getAmount() - lBal;
+            if (temp <= 0) {
+                updateRePaymentRecord(mainMbr);
+            }
+        }
+    }
+
+    private void updateRePaymentRecord(MBRecord mbr) {
+        ContentValues values = new ContentValues();
+        int type = -1;
+        if (mbr.getType() == GlobalConstants.TYPE_DUE)
+            type = GlobalConstants.TYPE_DUE_PAYMENT;
+        else if (mbr.getType() == GlobalConstants.TYPE_LOAN)
+            type = GlobalConstants.TYPE_LOAN_PAYMENT;
+        else
+            return;
+        values.put(KEY_TYPE, type);
+        SQLiteDatabase db = this.getWritableDatabase();
+        int res = db.update(TABLE_NAME, values,
+                KEY_DESCRIPTION + " = '" + mbr.getDescription() + "{{" + mbr.getmRefIdForLoanDue() + "}}'", null);
+        LoggerCus.d(TAG, mbr.toString() + " " + values.toString() + " updateRePaymentRecord() -> " + res);
+        db.close();
     }
 
     private long getIdOfPaymentMethod(String name) {
@@ -405,9 +469,101 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public boolean updateRecord(MBRecord mbrOld, MBRecord mbrNew) {
-        if (deleteRecord(mbrOld) > 0) {
-            return addRecord(mbrNew, mbrNew.getType());
-        } else
+        int type = mbrOld.getType();
+
+        if (type == GlobalConstants.TYPE_DUE ||
+                type == GlobalConstants.TYPE_LOAN ||
+                type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                type == GlobalConstants.TYPE_LOAN_PAYMENT) {
+            if (mbrOld.getmRefIdForLoanDue() == null) {
+                if (deleteRecord(mbrOld) > 0) {
+                    return addRecord(mbrNew, mbrNew.getType());
+                } else
+                    return false;
+            } else {
+                boolean isUpdated = false;
+                if (mbrOld.getAmount() != mbrNew.getAmount()) {
+                    if (mbrOld.getType() == GlobalConstants.TYPE_DUE_PAYMENT ||
+                            mbrOld.getType() == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                        if (mbrNew.getAmount() > mbrOld.getAmount()) {
+                            int tempType = -1;
+                            if (mbrOld.getType() == GlobalConstants.TYPE_DUE_PAYMENT)
+                                tempType = GlobalConstants.TYPE_DUE_REPAYMENT;
+                            else if (mbrOld.getType() == GlobalConstants.TYPE_LOAN_PAYMENT)
+                                tempType = GlobalConstants.TYPE_LOAN_REPAYMENT;
+
+                            int lBal = getRePaymentAmount(tempType, mbrOld.getmRefIdForLoanDue());
+                            if (lBal != -1) {
+                                int temp = mbrNew.getAmount() - lBal;
+                                if (temp <= 0) {
+                                    updateRePaymentRecord(mbrOld);
+                                } else {
+                                    isUpdated = updateRePaymentRecordToNormal(mbrOld);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (isUpdated) {
+                    if (mbrOld.getType() == GlobalConstants.TYPE_DUE_PAYMENT)
+                        type = GlobalConstants.TYPE_DUE;
+                    else if (mbrOld.getType() == GlobalConstants.TYPE_LOAN_PAYMENT)
+                        type = GlobalConstants.TYPE_LOAN;
+                }
+
+                DateConverter dc = new DateConverter(intializeSDateForDay(mbrNew.getDate()));
+                ContentValues values = new ContentValues();
+                values.put(KEY_TYPE, type);
+                values.put(KEY_DESCRIPTION, mbrNew.getDescription() + "{{" + mbrOld.getmRefIdForLoanDue() + "}}");
+                values.put(KEY_AMOUNT, mbrNew.getAmount());
+                values.put(KEY_DATE, dc.getdDate().getTime());
+                values.put(KEY_DATE_MONTH, dc.getmDate().getTime());
+                values.put(KEY_DATE_YEAR, dc.getyDate().getTime());
+                values.put(KEY_CAT, getIdOfCategory(mbrNew.getCategory(), type));
+                values.put(KEY_PAYMENT_METHOD, getIdOfPaymentMethod(mbrNew.getPaymentMethod()));
+                LoggerCus.d(TAG, values.toString());
+
+                SQLiteDatabase db = this.getWritableDatabase();
+                int res = db.update(TABLE_NAME, values,
+                        KEY_DESCRIPTION + " = '" + mbrOld.getDescription()
+                                + "{{" + mbrOld.getmRefIdForLoanDue() + "}}' AND "
+                                + KEY_TYPE + " = " + type, null);
+                LoggerCus.d(TAG, mbrNew.toString() + " " + values.toString() + " updateRecord() -> " + res);
+                db.close();
+
+                if (res > 0)
+                    return true;
+                else
+                    return false;
+            }
+        } else {
+            if (deleteRecord(mbrOld) > 0) {
+                return addRecord(mbrNew, mbrNew.getType());
+            } else
+                return false;
+        }
+    }
+
+    private boolean updateRePaymentRecordToNormal(MBRecord mbr) {
+        ContentValues values = new ContentValues();
+        int type = -1;
+        if (mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT)
+            type = GlobalConstants.TYPE_DUE;
+        else if (mbr.getType() == GlobalConstants.TYPE_LOAN_PAYMENT)
+            type = GlobalConstants.TYPE_LOAN;
+        else
+            return false;
+
+        values.put(KEY_TYPE, type);
+        SQLiteDatabase db = this.getWritableDatabase();
+        int res = db.update(TABLE_NAME, values,
+                KEY_DESCRIPTION + " = '" + mbr.getDescription() + "{{" + mbr.getmRefIdForLoanDue() + "}}'", null);
+        LoggerCus.d(TAG, mbr.toString() + " " + values.toString() + " updateRePaymentRecordToNormal() -> " + res);
+        db.close();
+        if (res > 0)
+            return true;
+        else
             return false;
     }
 
@@ -418,7 +574,15 @@ public class DbHandler extends SQLiteOpenHelper {
         sDate = intializeSDateForDay(sDate);
         eDate = intializeEDateForDay(eDate);
 
-        String query = KEY_DESCRIPTION + " = '" + mbr.getDescription() + "' AND "
+        String des = mbr.getDescription();
+        if (mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT ||
+                mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT) {
+            if (mbr.getmRefIdForLoanDue() != null) {
+                deleteRePaymentHistory(mbr);
+                des += "{{" + mbr.getmRefIdForLoanDue() + "}}";
+            }
+        }
+        String query = KEY_DESCRIPTION + " = '" + des + "' AND "
                 + KEY_AMOUNT + " = " + mbr.getAmount() + " AND " + KEY_TYPE
                 + " = " + mbr.getType() + " AND " + KEY_CAT + " = "
                 + getIdOfCategory(mbr.getCategory(), mbr.getType()) + " AND " + KEY_PAYMENT_METHOD
@@ -429,11 +593,79 @@ public class DbHandler extends SQLiteOpenHelper {
         int n = db.delete(TABLE_NAME, query, null);
         db.close();
         LoggerCus.d(TAG, query);
+
+        if (mbr.getType() == GlobalConstants.TYPE_DUE_REPAYMENT ||
+                mbr.getType() == GlobalConstants.TYPE_LOAN_REPAYMENT) {
+
+            int lBal = getRePaymentAmount(mbr.getType(), mbr.getDescription());
+            MBRecord parentMbr = getRepaymentParentRecord(mbr);
+            LoggerCus.d(TAG, parentMbr.toString());
+            if (lBal != -1) {
+                int temp = parentMbr.getAmount() - lBal;
+                if (temp > 0) {
+                    updateRePaymentRecordToNormal(parentMbr);
+                }
+            }
+        }
+
         return n;
+    }
+
+    private MBRecord getRepaymentParentRecord(MBRecord mbr) {
+        int type = -1;
+        if (mbr.getType() == GlobalConstants.TYPE_DUE_REPAYMENT)
+            type = GlobalConstants.TYPE_DUE_PAYMENT;
+        else if (mbr.getType() == GlobalConstants.TYPE_LOAN_REPAYMENT)
+            type = GlobalConstants.TYPE_LOAN_PAYMENT;
+
+        String query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                + "," + KEY_TYPE
+                + " FROM " + TABLE_NAME + " where " + KEY_DESCRIPTION + " LIKE '%" + mbr.getDescription()
+                + "%' "
+                + " AND " + KEY_TYPE + "=" + type;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        MBRecord temp = null;
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                temp = new MBRecord(cursor.getString(0),
+                        Integer.parseInt(cursor.getString(1)),
+                        new Date(cursor.getLong(2)), cursor.getInt(5),
+                        cursor.getString(3),
+                        cursor.getString(4));
+                if (type == GlobalConstants.TYPE_DUE ||
+                        type == GlobalConstants.TYPE_LOAN ||
+                        type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                        type == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                    Utils.addRefIdForLoanDueFromDes(temp);
+                }
+            }
+        }
+        db.close();
+        return temp;
+    }
+
+    private void deleteRePaymentHistory(MBRecord mbr) {
+        int type = -1;
+        if (mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT) {
+            type = GlobalConstants.TYPE_DUE_REPAYMENT;
+        } else if (mbr.getType() == GlobalConstants.TYPE_LOAN_PAYMENT) {
+            type = GlobalConstants.TYPE_LOAN_REPAYMENT;
+        } else
+            return;
+        String query = KEY_DESCRIPTION + " = '" + mbr.getmRefIdForLoanDue() + "' AND " + KEY_TYPE + " = " + type;
+        SQLiteDatabase db = this.getWritableDatabase();
+        int n = db.delete(TABLE_NAME, query, null);
+        db.close();
+        LoggerCus.d(TAG, "Repayment History deleted! -> " + n);
     }
 
 
     public ArrayList<MBRecord> getRecords(String date, int type) {
+
         LoggerCus.d(TAG, date);
         DateConverter dc = null;
         dc = new DateConverter(date);
@@ -450,21 +682,53 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        String query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + "," + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime() + " AND " + KEY_DATE + " <= " + temp2.getTime() + " AND " + KEY_TYPE + "=" + type;
+        String query = "";
+        if (type == GlobalConstants.TYPE_DUE) {
+            query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                    + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                    + "," + KEY_TYPE
+                    + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
+                    + " AND " + KEY_DATE + " <= " + temp2.getTime()
+                    + " AND (" + KEY_TYPE + "=" + type + " OR "
+                    + KEY_TYPE + " = " + GlobalConstants.TYPE_DUE_PAYMENT + ")";
+        } else if (type == GlobalConstants.TYPE_LOAN) {
+            query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                    + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                    + "," + KEY_TYPE
+                    + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
+                    + " AND " + KEY_DATE + " <= " + temp2.getTime()
+                    + " AND (" + KEY_TYPE + "=" + type + " OR "
+                    + KEY_TYPE + " = " + GlobalConstants.TYPE_LOAN_PAYMENT + ")";
+        } else {
+            query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                    + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                    + "," + KEY_TYPE
+                    + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
+                    + " AND " + KEY_DATE + " <= " + temp2.getTime()
+                    + " AND " + KEY_TYPE + "=" + type;
+        }
         LoggerCus.d(TAG, query);
         cursor = db.rawQuery(query, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                mbr.add(new MBRecord(cursor.getString(0),
+                MBRecord mbrTemp = new MBRecord(cursor.getString(0),
                         Integer.parseInt(cursor.getString(1)),
-                        new Date(cursor.getLong(2)), cursor.getString(3),
-                        cursor.getString(4)));
+                        new Date(cursor.getLong(2)), cursor.getInt(5),
+                        cursor.getString(3),
+                        cursor.getString(4));
+                if (type == GlobalConstants.TYPE_DUE ||
+                        type == GlobalConstants.TYPE_LOAN ||
+                        type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                        type == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                    Utils.addRefIdForLoanDueFromDes(mbrTemp);
+                }
+                LoggerCus.d(TAG, mbrTemp.toString());
+                mbr.add(mbrTemp);
             }
             cursor.close();
         }
-        // return contact
         return mbr;
     }
 
@@ -846,61 +1110,69 @@ public class DbHandler extends SQLiteOpenHelper {
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
+                MBRecord mbrTemp = null;
                 cursor.moveToPosition(i);
                 int numSpent = Integer.parseInt(cursor.getString(1));
                 this.total += numSpent;
                 if (!groupByNone) {
                     switch (groupBy) {
                         case 0:
-                            mbr.add(new MBRecord(cursor.getString(0)
+                            mbrTemp = new MBRecord(cursor.getString(0)
                                     + " (" + cursor.getLong(6) + ")", numSpent,
                                     new Date(cursor.getLong(2)), cursor.getInt(5),
-                                    cursor.getString(7), cursor.getString(8)));
+                                    cursor.getString(7), cursor.getString(8));
                             break;
                         case 1:
                             switch (dateInterval) {
                                 case 0:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("dd - MM - yyyy")
+                                    mbrTemp = new MBRecord(new SimpleDateFormat("dd - MM - yyyy")
                                             .format(new Date(cursor.getLong(2))) + " ("
                                             + cursor.getLong(6) + ")", numSpent,
                                             new Date(cursor.getLong(2)), cursor.getInt(5),
-                                            cursor.getString(7), cursor.getString(8)));
+                                            cursor.getString(7), cursor.getString(8));
                                     break;
 
                                 case 1:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("MM - yyyy")
+                                    mbrTemp = new MBRecord(new SimpleDateFormat("MM - yyyy")
                                             .format(new Date(cursor.getLong(2))) + " ("
                                             + cursor.getLong(6) + ")", numSpent,
                                             new Date(cursor.getLong(2)), cursor.getInt(5),
-                                            cursor.getString(7), cursor.getString(8)));
+                                            cursor.getString(7), cursor.getString(8));
                                     break;
 
                                 case 2:
-                                    mbr.add(new MBRecord(new SimpleDateFormat("yyyy")
+                                    mbrTemp = new MBRecord(new SimpleDateFormat("yyyy")
                                             .format(new Date(cursor.getLong(2))) + " ("
                                             + cursor.getLong(6) + ")", numSpent,
                                             new Date(cursor.getLong(2)), cursor.getInt(5),
-                                            cursor.getString(7), cursor.getString(8)));
+                                            cursor.getString(7), cursor.getString(8));
                                     break;
                             }
                             break;
                         case 2:
-                            mbr.add(new MBRecord(cursor.getString(7)
+                            mbrTemp = new MBRecord(cursor.getString(7)
                                     + " (" + cursor.getLong(6) + ")", numSpent,
                                     new Date(cursor.getLong(2)), cursor.getInt(5),
-                                    cursor.getString(7), cursor.getString(8)));
+                                    cursor.getString(7), cursor.getString(8));
                             break;
                         case 3:
-                            mbr.add(new MBRecord(cursor.getString(8)
+                            mbrTemp = new MBRecord(cursor.getString(8)
                                     + " (" + cursor.getLong(6) + ")", numSpent,
                                     new Date(cursor.getLong(2)), cursor.getInt(5),
-                                    cursor.getString(7), cursor.getString(8)));
+                                    cursor.getString(7), cursor.getString(8));
                             break;
                     }
                 } else {
-                    mbr.add(new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)),
-                            cursor.getInt(3), cursor.getString(6), cursor.getString(7)));
+                    mbrTemp = new MBRecord(cursor.getString(0), numSpent, new Date(cursor.getLong(2)),
+                            cursor.getInt(3), cursor.getString(6), cursor.getString(7));
                 }
+                if (moneyType == GlobalConstants.TYPE_DUE ||
+                        moneyType == GlobalConstants.TYPE_LOAN ||
+                        moneyType == GlobalConstants.TYPE_DUE_PAYMENT ||
+                        moneyType == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                    Utils.addRefIdForLoanDueFromDes(mbrTemp);
+                }
+                mbr.add(mbrTemp);
             }
             cursor.close();
         }
@@ -936,7 +1208,13 @@ public class DbHandler extends SQLiteOpenHelper {
     private String getQueryForMoneyType(int moneyType) {
         String eQuery = "";
         eQuery += " AND (";
-        eQuery += "  " + KEY_TYPE + " = " + moneyType;
+        if (moneyType == GlobalConstants.TYPE_DUE) {
+            eQuery += "  " + KEY_TYPE + " = " + moneyType + " OR " + KEY_TYPE + " = " + GlobalConstants.TYPE_DUE_PAYMENT;
+        } else if (moneyType == GlobalConstants.TYPE_LOAN) {
+            eQuery += "  " + KEY_TYPE + " = " + moneyType + " OR " + KEY_TYPE + " = " + GlobalConstants.TYPE_LOAN_PAYMENT;
+        } else {
+            eQuery += "  " + KEY_TYPE + " = " + moneyType;
+        }
         eQuery += " )";
         return eQuery;
     }
@@ -1490,20 +1768,42 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<MBRecord> getDesForAutoComplete(String s, int type) {
-        SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<MBRecord> list = new ArrayList<>();
 
+        if (type == GlobalConstants.TYPE_DUE_PAYMENT)
+            type = GlobalConstants.TYPE_DUE;
+        else if (type == GlobalConstants.TYPE_LOAN_PAYMENT)
+            type = GlobalConstants.TYPE_LOAN;
+
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT DISTINCT " + KEY_DESCRIPTION
                 + "," + KEY_AMOUNT + "," + getSQLQueryForCat() + ","
-                + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " WHERE "
-                + KEY_TYPE + " = " + type + " AND " + KEY_DESCRIPTION
-                + " LIKE '%" + s + "%' LIMIT 5", null);
+                + getSQLQueryForPayMeth() + ", " + KEY_TYPE
+                + " FROM " + TABLE_NAME + " WHERE "
+                + KEY_TYPE + " = " + type
+                + " AND (" + KEY_DESCRIPTION + " LIKE '%" + s + "%'"
+                + " OR " + KEY_DESCRIPTION + " LIKE '" + s + "%'"
+                + " OR " + KEY_DESCRIPTION + " LIKE '" + s + "'"
+                + " OR " + KEY_DESCRIPTION + " LIKE '%" + s + "')"
+                + " LIMIT 5", null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                list.add(new MBRecord(cursor.getString(0), cursor.getInt(1),
-                        null, cursor.getString(2), cursor.getString(3)));
+                type = cursor.getInt(4);
+                MBRecord mbrTemp = new MBRecord(cursor.getString(0),
+                        Integer.parseInt(cursor.getString(1)),
+                        null, type,
+                        cursor.getString(2),
+                        cursor.getString(3));
+                if (type == GlobalConstants.TYPE_DUE ||
+                        type == GlobalConstants.TYPE_LOAN ||
+                        type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                        type == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                    Utils.addRefIdForLoanDueFromDes(mbrTemp);
+                }
+                LoggerCus.d(TAG, mbrTemp.toString());
+                list.add(mbrTemp);
             }
             cursor.close();
         }
@@ -1658,5 +1958,69 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.insert(PAY_METH_TABLE_NAME, null, values);
         db.close();
+    }
+
+    public ArrayList<MBRecord> getRePaymentRecords(int type, String refId) {
+        ArrayList<MBRecord> mbr = new ArrayList<>();
+
+        if (refId == null)
+            return mbr;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        String query = "SELECT " + KEY_AMOUNT + "," + KEY_DATE + "," + getSQLQueryForCat()
+                + "," + getSQLQueryForPayMeth() + " FROM " + TABLE_NAME + " where "
+                + KEY_TYPE + "=" + type + " AND " + KEY_DESCRIPTION + " = '" + refId + "'";
+        LoggerCus.d(TAG, query);
+        cursor = db.rawQuery(query, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            int amount = cursor.getColumnIndex(KEY_AMOUNT);
+            int date = cursor.getColumnIndex(KEY_DATE);
+            int cat = cursor.getColumnIndex(KEY_CAT);
+            int paym = cursor.getColumnIndex(KEY_PAYMENT_METHOD);
+
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+
+                MBRecord mbrTemp = new MBRecord(refId,
+                        cursor.getInt(amount),
+                        new Date(cursor.getLong(date)),
+                        type,
+                        cursor.getString(cat),
+                        cursor.getString(paym));
+
+                mbr.add(mbrTemp);
+            }
+            cursor.close();
+        }
+
+        return mbr;
+    }
+
+    public int getRePaymentAmount(int type, String refId) {
+
+        if (refId == null) {
+            return 0;
+        }
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        String query = "SELECT SUM(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where "
+                + KEY_TYPE + "=" + type + " AND " + KEY_DESCRIPTION + " = '" + refId + "'";
+        LoggerCus.d(TAG, query);
+        cursor = db.rawQuery(query, null);
+        int res = -1;
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                res = cursor.getInt(0);
+            }
+            cursor.close();
+            return res;
+        }
+        return res;
     }
 }

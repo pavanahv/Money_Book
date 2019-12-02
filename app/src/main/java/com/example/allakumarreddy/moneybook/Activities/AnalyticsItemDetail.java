@@ -40,6 +40,9 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private Spinner paymentMethodView;
     private String[] payMethArr;
     private boolean firstTypeSelection;
+    private boolean isEditable = false;
+    private View saveBtn;
+    private int mType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,15 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.analytics_detail_menu, menu);
+        if (mType == GlobalConstants.TYPE_DUE_REPAYMENT ||
+                mType == GlobalConstants.TYPE_LOAN_REPAYMENT) {
+            menu.findItem(R.id.action_analytics_detail_save).setVisible(false);
+            menu.findItem(R.id.action_analytics_detail_edit).setVisible(false);
+        }
+
+        if (!isEditable) {
+            menu.findItem(R.id.action_analytics_detail_save).setVisible(false);
+        }
         return true;
     }
 
@@ -72,18 +84,34 @@ public class AnalyticsItemDetail extends AppCompatActivity {
                     Toast.makeText(AnalyticsItemDetail.this, "Deleted Successfully " + result + " !", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(AnalyticsItemDetail.this, "Deletion Error !", Toast.LENGTH_SHORT).show();
+                finish();
                 break;
 
             case android.R.id.home:
+                finish();
                 break;
 
             case R.id.action_analytics_detail_save:
-                save();
+                if (isEditable) {
+                    save();
+                    finish();
+                } else {
+                    Toast.makeText(this, "No Chnages To Save", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case R.id.action_analytics_detail_edit:
+                if (!isEditable) {
+                    isEditable = true;
+                    invalidateOptionsMenu();
+                    refreshLayout();
+                } else {
+                    Toast.makeText(this, "Already In Edit Mode", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;
         }
-        finish();
         return super.onOptionsItemSelected(item);
     }
 
@@ -91,15 +119,15 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         Intent intent = getIntent();
         db = new DbHandler(this);
         mbrOld = (MBRecord) intent.getSerializableExtra("MBRecord");
-        recType = mbrOld.getType();
-
+        initType();
+        saveBtn = findViewById(R.id.imageButton);
         des = (EditText) findViewById(R.id.descitem);
         amount = (EditText) findViewById(R.id.amountitem);
         date = (EditText) findViewById(R.id.dateitem);
         type = (Spinner) findViewById(R.id.typeitem);
 
         cate = (Spinner) findViewById(R.id.catitem);
-        initCategory(mbrOld.getType(), mbrOld.getCategory());
+        initCategory(mType, mbrOld.getCategory());
 
         paymentMethodView = (Spinner) findViewById(R.id.payment_method);
         payMethArr = db.getPaymentMethods();
@@ -125,15 +153,15 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         ArrayAdapter paa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, payMethArr);
         paymentMethodView.setAdapter(paa);
         paymentMethodView.setSelection(pCurind);
+        tcate = (Spinner) findViewById(R.id.cattoitem);
 
-        if (recType == 4) {
+        if (mType == GlobalConstants.TYPE_MONEY_TRANSFER) {
             des.setVisibility(View.GONE);
             findViewById(R.id.descitemtext).setVisibility(View.GONE);
             type.setVisibility(View.GONE);
             findViewById(R.id.typeitemtext).setVisibility(View.GONE);
             ((TextView) findViewById(R.id.catfromitemtext)).setText("From Category");
 
-            tcate = (Spinner) findViewById(R.id.cattoitem);
             int curind = -1;
             for (int i = 0; i < catArr.length; i++) {
                 if (catArr[i].compareToIgnoreCase(mbrOld.getDescription()) == 0) {
@@ -146,13 +174,16 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             tcate.setAdapter(tcaa);
             tcate.setSelection(curind);
         } else {
-            findViewById(R.id.cattoitem).setVisibility(View.GONE);
+            tcate.setVisibility(View.GONE);
             findViewById(R.id.cattoitemtext).setVisibility(View.GONE);
             des.setText(mbrOld.getDescription());
-            ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, new String[]{"Spent", "Earn", "Due", "Loan"});
+            ArrayAdapter aa = new ArrayAdapter(this,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    new String[]{"Spent", "Earn", "Due", "Loan", "MoneyTransfer", "Due Payment",
+                            "Loan Payment", "Due Repayment", "Loan Repayment"});
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             type.setAdapter(aa);
-            type.setSelection(mbrOld.getType());
+            type.setSelection(mType);
             firstTypeSelection = true;
             type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -172,10 +203,54 @@ public class AnalyticsItemDetail extends AppCompatActivity {
         }
         amount.setText(mbrOld.getAmount() + "");
         date.setText(format.format(mbrOld.getDate()));
+        refreshLayout();
+    }
+
+    private void initType() {
+        int temp = mbrOld.getType();
+        if (temp == GlobalConstants.TYPE_DUE_PAYMENT)
+            temp = GlobalConstants.TYPE_DUE;
+        else if (temp == GlobalConstants.TYPE_LOAN_PAYMENT) {
+            temp = GlobalConstants.TYPE_LOAN;
+        }
+        mType = temp;
+    }
+
+    private void refreshLayout() {
+        if (mType == GlobalConstants.TYPE_DUE_REPAYMENT ||
+                mType == GlobalConstants.TYPE_LOAN_REPAYMENT) {
+            des.setVisibility(View.GONE);
+            findViewById(R.id.descitemtext).setVisibility(View.GONE);
+        }
+        des.setEnabled(isEditable);
+        amount.setEnabled(isEditable);
+        date.setEnabled(isEditable);
+        if (mType == GlobalConstants.TYPE_DUE ||
+                mType == GlobalConstants.TYPE_LOAN ||
+                mType == GlobalConstants.TYPE_DUE_PAYMENT ||
+                mType == GlobalConstants.TYPE_LOAN_PAYMENT) {
+            type.setEnabled(false);
+        } else {
+            type.setEnabled(isEditable);
+        }
+        cate.setEnabled(isEditable);
+        paymentMethodView.setEnabled(isEditable);
+        tcate.setEnabled(isEditable);
+        if (isEditable) {
+            saveBtn.setVisibility(View.VISIBLE);
+        } else {
+            saveBtn.setVisibility(View.GONE);
+        }
     }
 
     private void initCategory(int type, String cat) {
         LoggerCus.d(TAG, "type : " + type + " cat : " + cat);
+        if (type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                type == GlobalConstants.TYPE_DUE_REPAYMENT)
+            type = GlobalConstants.TYPE_DUE;
+        else if (type == GlobalConstants.TYPE_LOAN_PAYMENT ||
+                type == GlobalConstants.TYPE_LOAN_REPAYMENT)
+            type = GlobalConstants.TYPE_LOAN;
         catArr = db.getCategeories(type);
         int curind = -1;
         // initialize with others category
@@ -213,10 +288,10 @@ public class AnalyticsItemDetail extends AppCompatActivity {
     private void save() {
         try {
             boolean result = false;
-            if (recType == 4) {
+            if (mType == GlobalConstants.TYPE_MONEY_TRANSFER) {
                 MBRecord mbrNew = new MBRecord(catArr[tcate.getSelectedItemPosition()],
                         Integer.parseInt(amount.getText().toString()),
-                        format.parse(date.getText().toString()), mbrOld.getType(),
+                        format.parse(date.getText().toString()), mType,
                         catArr[cate.getSelectedItemPosition()], payMethArr[paymentMethodView.getSelectedItemPosition()]);
                 result = db.updateMTRecord(mbrOld, mbrNew);
             } else {

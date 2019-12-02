@@ -65,9 +65,9 @@ public class FileStore {
         File mediaFile;
         String filename = "";
         if (isBackup)
-            filename += this.fileName + ".JSON";
+            filename += this.fileName + ".mb";
         else
-            filename += this.restoredFileName + ".JSON";
+            filename += this.restoredFileName + ".mb";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
         if (mediaFile.exists())
             mediaFile.delete();

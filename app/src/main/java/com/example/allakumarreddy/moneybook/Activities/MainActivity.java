@@ -33,6 +33,7 @@ import com.example.allakumarreddy.moneybook.handler.MoneyBookIntentServiceHandle
 import com.example.allakumarreddy.moneybook.interfaces.DashUIUpdateInterface;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
+import com.example.allakumarreddy.moneybook.utils.AnimationUtils;
 import com.example.allakumarreddy.moneybook.utils.Backup;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -57,11 +58,13 @@ public class MainActivity extends AppCompatActivity
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE = 1001;
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
     public static final int ADD_ACTIVITY = 1001;
+    private static final String LOCAL_BACKUP = "LOCAL_BACKUP";
     private int currentScreen = 0;
     private View mProgressBAr;
     private String bfrPermissionAction;
     private int mainLayout;
     private boolean closeActivity = false;
+    private View main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,6 +233,9 @@ public class MainActivity extends AppCompatActivity
                         case ACTION_IMPORT:
                             importAction();
                             break;
+                        case LOCAL_BACKUP:
+                            makeLocalBackup();
+                            break;
                     }
                 } else {
                     switch (bfrPermissionAction) {
@@ -319,7 +325,6 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.dash) {
             showCategory();
         } else if (id == R.id.home) {
-            ;
             showHome();
         } else if (id == R.id.payment_method) {
             showPaymentMethod();
@@ -377,6 +382,11 @@ public class MainActivity extends AppCompatActivity
 
     private void showProgressBar() {
         mProgressBAr.setVisibility(View.VISIBLE);
+        main.setVisibility(View.GONE);
+    }
+
+    private void hideProgressBar() {
+        AnimationUtils.revealAnimation(mProgressBAr, main, main);
     }
 
     public void goToAnalytics(String name) {
@@ -412,9 +422,15 @@ public class MainActivity extends AppCompatActivity
         if (!isShown)
             showHome();
         makeLocalBackup();
+        hideProgressBar();
     }
 
     private void makeLocalBackup() {
+        if (!Utils.checkReadWriteStoragePermissions(this)) {
+            bfrPermissionAction = LOCAL_BACKUP;
+            requestPermissionForReadWriteStorage();
+            return;
+        }
         new Thread(() -> {
             Backup backup = new Backup(MainActivity.this);
             if (backup.send()) {
@@ -433,6 +449,8 @@ public class MainActivity extends AppCompatActivity
 
     private void init() {
         mainLayout = R.id.main;
+        main = findViewById(mainLayout);
+        showProgressBar();
         startMsgParserService();
     }
 

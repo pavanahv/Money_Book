@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.allakumarreddy.moneybook.Activities.AnalyticsActivity;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
 import java.text.SimpleDateFormat;
@@ -43,6 +44,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
         TextView txtRs;
         TextView txtDate;
         ImageView im;
+        View statusView;
     }
 
     public AnalyticsAdapter(ArrayList<MBRecord> data, AnalyticsActivity context) {
@@ -82,6 +84,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.paymentMethod = (TextView) convertView.findViewById(R.id.apayment_method);
             viewHolder.totalPrice = (TextView) convertView.findViewById(R.id.tprice);
             viewHolder.recordCount = (TextView) convertView.findViewById(R.id.record_count);
+            viewHolder.statusView = convertView.findViewById(R.id.status_view);
 
             result = convertView;
 
@@ -106,12 +109,12 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.subInfoLayout.setVisibility(View.GONE);
             viewHolder.groupByLayout.setVisibility(View.VISIBLE);
 
-            viewHolder.totalPrice.setText(""+dataModel.getAmount());
+            viewHolder.totalPrice.setText("" + dataModel.getAmount());
             String[] arr = dataModel.getDescription().split(" ");
             String temp = arr[arr.length - 1].trim();
             viewHolder.recordCount.setText(temp.substring(1, temp.length() - 1));
             temp = "";
-            for(int i=0;i<arr.length-1;i++)
+            for (int i = 0; i < arr.length - 1; i++)
                 temp += arr[i];
             temp.trim();
             viewHolder.txtName.setText(temp);
@@ -125,26 +128,38 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.txtDate.setText(format.format(dataModel.getDate()));
             viewHolder.category.setText(dataModel.getCategory());
             viewHolder.paymentMethod.setText(dataModel.getPaymentMethod());
+            viewHolder.statusView.setVisibility(View.GONE);
             switch (dataModel.getType()) {
-                case 0:
+                case GlobalConstants.TYPE_SPENT:
                     viewHolder.im.setImageResource(R.drawable.spent);
                     break;
 
-                case 1:
+                case GlobalConstants.TYPE_EARN:
                     viewHolder.im.setImageResource(R.drawable.earn);
                     break;
 
-                case 2:
+                case GlobalConstants.TYPE_DUE:
                     viewHolder.im.setImageResource(R.drawable.due);
                     break;
 
-                case 3:
+                case GlobalConstants.TYPE_LOAN:
                     viewHolder.im.setImageResource(R.drawable.ic_loan);
                     break;
 
-                case 4:
+                case GlobalConstants.TYPE_MONEY_TRANSFER:
                     viewHolder.im.setImageResource(R.drawable.ic_money_transfer);
                     break;
+
+                case GlobalConstants.TYPE_DUE_PAYMENT:
+                    viewHolder.im.setImageResource(R.drawable.due);
+                    viewHolder.statusView.setVisibility(View.VISIBLE);
+                    break;
+
+                case GlobalConstants.TYPE_LOAN_PAYMENT:
+                    viewHolder.im.setImageResource(R.drawable.ic_loan);
+                    viewHolder.statusView.setVisibility(View.VISIBLE);
+                    break;
+
                 default:
                     break;
             }
