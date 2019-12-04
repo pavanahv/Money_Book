@@ -150,11 +150,17 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+
+            case R.id.action_auto_add:
+                startActivity(new Intent(this, AutoAddActivity.class));
+                break;
             /*case R.id.action_test:
-                db.exec();
+                //db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
                 //test();
+                AutoAddManager am = new AutoAddManager(this);
+                am.process();
                 break;*/
         }
         return super.onOptionsItemSelected(item);

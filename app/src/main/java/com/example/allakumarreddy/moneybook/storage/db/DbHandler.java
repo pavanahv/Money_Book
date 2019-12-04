@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
+import com.example.allakumarreddy.moneybook.utils.AutoAddRecord;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.example.allakumarreddy.moneybook.utils.DateConverter;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -88,13 +89,18 @@ public class DbHandler extends SQLiteOpenHelper {
     private static final String SORTING_ORDER[] = new String[]{"ASC", "DESC"};
     public static final String KEY_CAT_BAL = "balance_left";
     public static final String MSG_KEY_PAYMENT_METHOD = "payment_method";
+    private static final String AA_KEY_NAME = "name";
+    private static final String AA_KEY_TYPE = "type";
+    private static final String AA_KEY_DESCRIPTION = "description";
+    private static final String AA_KEY_AMOUNT = "amount";
+    private static final String AA_KEY_DATE = "date_execution";
+    private static final String AA_TABLE_NAME = "auto_add";
+    private static final String AA_KEY_FREQUENCY = "frequency";
+    private static final String AA_KEY_FREQUENCY_DATA = "frequency_data";
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
     private int total;
-    private int mTotalMoneySpentInCurrentMonth;
-    private int mTotalMoneySpentInCurrentDay;
-    private int mTotalMoneySpentInCurrentYear;
 
     public DbHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -104,42 +110,67 @@ public class DbHandler extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-                + KEY_TYPE + " INTEGER," + KEY_DESCRIPTION + " TEXT,"
-                + KEY_AMOUNT + " INTEGER," + KEY_DATE + " INTEGER," + KEY_DATE_MONTH + " INTEGER,"
-                + KEY_DATE_YEAR + " INTEGER," + KEY_CAT + " INTEGER, " + KEY_PAYMENT_METHOD + " INTEGER)";
-        db.execSQL(CREATE_CONTACTS_TABLE);
+        String CREATE_RECORDS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
+                + KEY_TYPE + " INTEGER,"
+                + KEY_DESCRIPTION + " TEXT,"
+                + KEY_AMOUNT + " INTEGER,"
+                + KEY_DATE + " INTEGER,"
+                + KEY_DATE_MONTH + " INTEGER,"
+                + KEY_DATE_YEAR + " INTEGER,"
+                + KEY_CAT + " INTEGER, "
+                + KEY_PAYMENT_METHOD + " INTEGER)";
+        db.execSQL(CREATE_RECORDS_TABLE);
 
         String CREATE_CAT_TABLE = "CREATE TABLE " + CAT_TABLE_NAME + "("
                 + KEY_CAT_ID + " INTEGER PRIMARY KEY,"
-                + KEY_NAME + " TEXT," + KEY_CAT_TYPE + " INTEGER)";
+                + KEY_NAME + " TEXT,"
+                + KEY_CAT_TYPE + " INTEGER)";
         db.execSQL(CREATE_CAT_TABLE);
 
         String CREATE_PAY_METH_TABLE = "CREATE TABLE " + PAY_METH_TABLE_NAME + "("
                 + KEY_PAY_METH_ID + " INTEGER PRIMARY KEY,"
-                + KEY_PAY_METH_NAME + " TEXT," + KEY_PAY_METH_BAL + " INTEGER)";
+                + KEY_PAY_METH_NAME + " TEXT,"
+                + KEY_PAY_METH_BAL + " INTEGER)";
         db.execSQL(CREATE_PAY_METH_TABLE);
 
         String CREATE_MESSAGE_TABLE = "CREATE TABLE " + MSG_TABLE_NAME + "("
-                + MSG_KEY_TYPE + " INTEGER," + MSG_KEY_DESCRIPTION + " TEXT,"
-                + MSG_KEY_AMOUNT + " TEXT," + MSG_KEY_CAT + " INTEGER,"
+                + MSG_KEY_TYPE + " INTEGER,"
+                + MSG_KEY_DESCRIPTION + " TEXT,"
+                + MSG_KEY_AMOUNT + " TEXT,"
+                + MSG_KEY_CAT + " INTEGER,"
                 + MSG_KEY_PAYMENT_METHOD + " INTEGER,"
-                + MSG_KEY_LEFT_BAL + " TEXT," + MSG_KEY_NAME + " TEXT,"
+                + MSG_KEY_LEFT_BAL + " TEXT,"
+                + MSG_KEY_NAME + " TEXT,"
                 + MSG_KEY_MSG + " TEXT)";
         db.execSQL(CREATE_MESSAGE_TABLE);
 
         String CREATE_MT_TABLE = "CREATE TABLE " + MT_TABLE_NAME + "("
                 + MT_KEY_DESCRIPTION + " TEXT,"
-                + MT_KEY_AMOUNT + " INTEGER," + MT_KEY_DATE + " INTEGER,"
-                + MT_KEY_DATE_MONTH + " INTEGER," + MT_KEY_DATE_YEAR
-                + " INTEGER," + MT_KEY_CAT_FROM + " INTEGER,"
+                + MT_KEY_AMOUNT + " INTEGER,"
+                + MT_KEY_DATE + " INTEGER,"
+                + MT_KEY_DATE_MONTH + " INTEGER,"
+                + MT_KEY_DATE_YEAR + " INTEGER,"
+                + MT_KEY_CAT_FROM + " INTEGER,"
                 + MT_KEY_CAT_TO + " INTEGER)";
         db.execSQL(CREATE_MT_TABLE);
 
         String CREATE_FILTER_TABLE = "CREATE TABLE " + F_TABLE_NAME + "("
                 + F_KEY_NAME + " TEXT PRIMARY KEY,"
-                + F_KEY_FILTER + " TEXT," + F_KEY_SHOW_DASH + " INTEGER)";
+                + F_KEY_FILTER + " TEXT,"
+                + F_KEY_SHOW_DASH + " INTEGER)";
         db.execSQL(CREATE_FILTER_TABLE);
+
+        String CREATE_AUTO_ADD_RECORDS_TABLE = "CREATE TABLE " + AA_TABLE_NAME + "("
+                + AA_KEY_NAME + " TEXT PRIMARY KEY,"
+                + AA_KEY_TYPE + " INTEGER,"
+                + AA_KEY_DESCRIPTION + " TEXT,"
+                + AA_KEY_AMOUNT + " INTEGER,"
+                + AA_KEY_DATE + " INTEGER,"
+                + KEY_CAT + " INTEGER, "
+                + AA_KEY_FREQUENCY + " INTEGER, "
+                + AA_KEY_FREQUENCY_DATA + " TEXT,"
+                + KEY_PAYMENT_METHOD + " INTEGER)";
+        db.execSQL(CREATE_AUTO_ADD_RECORDS_TABLE);
     }
 
     // Upgrading database
@@ -151,6 +182,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MSG_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MT_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + PAY_METH_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AA_TABLE_NAME);
         // Create tables again
         onCreate(db);
     }
@@ -380,6 +412,7 @@ public class DbHandler extends SQLiteOpenHelper {
             JSONArray jsonArraym = obj.getJSONArray(MSG_TABLE_NAME);
             JSONArray jsonArrayf = obj.getJSONArray(F_TABLE_NAME);
             JSONArray jsonArrayp = obj.getJSONArray(PAY_METH_TABLE_NAME);
+            JSONArray jsonArrayaa = obj.getJSONArray(AA_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -452,6 +485,22 @@ public class DbHandler extends SQLiteOpenHelper {
                 db.insert(F_TABLE_NAME, null, values);
             }
 
+            final int lenaa = jsonArrayaa.length();
+            for (int i = 0; i < lenaa; i++) {
+                JSONObject jsonObj = jsonArrayaa.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(AA_KEY_NAME, jsonObj.getString(AA_KEY_NAME));
+                values.put(AA_KEY_DESCRIPTION, jsonObj.getString(AA_KEY_DESCRIPTION));
+                values.put(AA_KEY_AMOUNT, jsonObj.getInt(AA_KEY_AMOUNT));
+                values.put(AA_KEY_DATE, jsonObj.getLong(AA_KEY_DATE));
+                values.put(AA_KEY_FREQUENCY, jsonObj.getInt(AA_KEY_FREQUENCY));
+                values.put(AA_KEY_FREQUENCY_DATA, jsonObj.getString(AA_KEY_FREQUENCY_DATA));
+                values.put(KEY_CAT, jsonObj.getLong(KEY_CAT));
+                values.put(KEY_PAYMENT_METHOD, jsonObj.getLong(KEY_PAYMENT_METHOD));
+                values.put(AA_KEY_TYPE, jsonObj.getInt(AA_KEY_TYPE));
+                db.insert(AA_TABLE_NAME, null, values);
+            }
+
             db.close(); // Closing database connection
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
@@ -465,6 +514,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.delete(MSG_TABLE_NAME, null, null);
         db.delete(F_TABLE_NAME, null, null);
         db.delete(PAY_METH_TABLE_NAME, null, null);
+        db.delete(AA_TABLE_NAME, null, null);
         db.close();
     }
 
@@ -885,6 +935,53 @@ public class DbHandler extends SQLiteOpenHelper {
             cursor.close();
         }
 
+        JSONArray jsonArrayaa = new JSONArray();
+        cursor = db.rawQuery("SELECT "
+                + AA_KEY_NAME + ","
+                + AA_KEY_DESCRIPTION + ","
+                + AA_KEY_AMOUNT + ","
+                + AA_KEY_DATE + ","
+                + AA_KEY_FREQUENCY + ","
+                + AA_KEY_FREQUENCY_DATA + ","
+                + KEY_CAT + ","
+                + KEY_PAYMENT_METHOD + ","
+                + AA_KEY_TYPE
+                + " FROM " + AA_TABLE_NAME, null);
+
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            final int name = cursor.getColumnIndex(AA_KEY_NAME);
+            final int des = cursor.getColumnIndex(AA_KEY_DESCRIPTION);
+            final int amount = cursor.getColumnIndex(AA_KEY_AMOUNT);
+            final int date = cursor.getColumnIndex(AA_KEY_DATE);
+            final int freq = cursor.getColumnIndex(AA_KEY_FREQUENCY);
+            final int freqData = cursor.getColumnIndex(AA_KEY_FREQUENCY_DATA);
+            final int cat = cursor.getColumnIndex(KEY_CAT);
+            final int paym = cursor.getColumnIndex(KEY_PAYMENT_METHOD);
+            final int type = cursor.getColumnIndex(AA_KEY_TYPE);
+
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(AA_KEY_NAME, cursor.getString(name));
+                    jsonObject.put(AA_KEY_DESCRIPTION, cursor.getString(des));
+                    jsonObject.put(AA_KEY_AMOUNT, cursor.getInt(amount));
+                    jsonObject.put(AA_KEY_DATE, cursor.getLong(date));
+                    jsonObject.put(AA_KEY_FREQUENCY, cursor.getInt(freq));
+                    jsonObject.put(AA_KEY_FREQUENCY_DATA, cursor.getString(freqData));
+                    jsonObject.put(KEY_CAT, cursor.getLong(cat));
+                    jsonObject.put(KEY_PAYMENT_METHOD, cursor.getLong(paym));
+                    jsonObject.put(AA_KEY_TYPE, cursor.getInt(type));
+
+                    jsonArrayaa.put(jsonObject);
+                } catch (JSONException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
+            }
+            cursor.close();
+        }
+
         JSONObject obj = new JSONObject();
         try {
             obj.put(TABLE_NAME, jsonArray);
@@ -892,6 +989,7 @@ public class DbHandler extends SQLiteOpenHelper {
             obj.put(MSG_TABLE_NAME, jsonArraym);
             obj.put(F_TABLE_NAME, jsonArrayf);
             obj.put(PAY_METH_TABLE_NAME, jsonArrayp);
+            obj.put(AA_TABLE_NAME, jsonArrayaa);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -2022,5 +2120,160 @@ public class DbHandler extends SQLiteOpenHelper {
             return res;
         }
         return res;
+    }
+
+    public boolean addAutoAddRecord(AutoAddRecord record) {
+        ContentValues values = new ContentValues();
+        values.put(AA_KEY_NAME, record.getName());
+        values.put(AA_KEY_TYPE, record.getType());
+        values.put(AA_KEY_DESCRIPTION, record.getDesciption());
+        values.put(AA_KEY_AMOUNT, record.getAmount());
+        values.put(AA_KEY_DATE, intializeSDateForDay(new Date()).getTime());
+        values.put(KEY_CAT, getIdOfCategory(record.getCategory(), record.getType()));
+        values.put(KEY_PAYMENT_METHOD, getIdOfPaymentMethod(record.getPaymentMethod()));
+        values.put(AA_KEY_FREQUENCY, record.getFreq());
+        if (record.getFreq() == 0) {
+            values.put(AA_KEY_FREQUENCY_DATA, "");
+        } else {
+            values.put(AA_KEY_FREQUENCY_DATA, record.getFreqData());
+        }
+
+        LoggerCus.d(TAG, values.toString());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.insert(AA_TABLE_NAME, null, values);
+        db.close();
+        if (result != -1)
+            return true;
+        else
+            return false;
+    }
+
+    public ArrayList<AutoAddRecord> getAutoAddRecords() {
+        ArrayList<AutoAddRecord> autoAddRecords = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        String query = "";
+        query = "SELECT "
+                + AA_KEY_NAME + ","
+                + AA_KEY_DESCRIPTION + ","
+                + AA_KEY_AMOUNT + ","
+                + AA_KEY_DATE + ","
+                + AA_KEY_FREQUENCY + ","
+                + AA_KEY_FREQUENCY_DATA + ","
+                + getSQLQueryForCat() + ","
+                + getSQLQueryForPayMeth() + ","
+                + AA_KEY_TYPE
+                + " FROM " + AA_TABLE_NAME;
+        LoggerCus.d(TAG, query);
+        cursor = db.rawQuery(query, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            final int name = cursor.getColumnIndex(AA_KEY_NAME);
+            final int des = cursor.getColumnIndex(AA_KEY_DESCRIPTION);
+            final int amount = cursor.getColumnIndex(AA_KEY_AMOUNT);
+            final int date = cursor.getColumnIndex(AA_KEY_DATE);
+            final int freq = cursor.getColumnIndex(AA_KEY_FREQUENCY);
+            final int freqData = cursor.getColumnIndex(AA_KEY_FREQUENCY_DATA);
+            final int cat = cursor.getColumnIndex(KEY_CAT);
+            final int paym = cursor.getColumnIndex(KEY_PAYMENT_METHOD);
+            final int type = cursor.getColumnIndex(AA_KEY_TYPE);
+
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                AutoAddRecord temp = new AutoAddRecord(
+                        cursor.getString(name),
+                        cursor.getInt(freq),
+                        cursor.getString(freqData),
+                        cursor.getLong(date),
+                        cursor.getString(des),
+                        cursor.getInt(type),
+                        cursor.getInt(amount),
+                        cursor.getString(cat),
+                        cursor.getString(paym)
+                );
+                autoAddRecords.add(temp);
+            }
+            cursor.close();
+        }
+        db.close();
+        return autoAddRecords;
+    }
+
+    public AutoAddRecord getAutoAddRecord(String rName) {
+        AutoAddRecord res = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        String query = "";
+        query = "SELECT "
+                + AA_KEY_NAME + ","
+                + AA_KEY_DESCRIPTION + ","
+                + AA_KEY_AMOUNT + ","
+                + AA_KEY_DATE + ","
+                + AA_KEY_FREQUENCY + ","
+                + AA_KEY_FREQUENCY_DATA + ","
+                + getSQLQueryForCat() + ","
+                + getSQLQueryForPayMeth() + ","
+                + AA_KEY_TYPE
+                + " FROM " + AA_TABLE_NAME
+                + " WHERE " + AA_KEY_NAME + " = '" + rName + "'";
+        LoggerCus.d(TAG, query);
+        cursor = db.rawQuery(query, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            final int name = cursor.getColumnIndex(AA_KEY_NAME);
+            final int des = cursor.getColumnIndex(AA_KEY_DESCRIPTION);
+            final int amount = cursor.getColumnIndex(AA_KEY_AMOUNT);
+            final int date = cursor.getColumnIndex(AA_KEY_DATE);
+            final int freq = cursor.getColumnIndex(AA_KEY_FREQUENCY);
+            final int freqData = cursor.getColumnIndex(AA_KEY_FREQUENCY_DATA);
+            final int cat = cursor.getColumnIndex(KEY_CAT);
+            final int paym = cursor.getColumnIndex(KEY_PAYMENT_METHOD);
+            final int type = cursor.getColumnIndex(AA_KEY_TYPE);
+
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                res = new AutoAddRecord(
+                        cursor.getString(name),
+                        cursor.getInt(freq),
+                        cursor.getString(freqData),
+                        cursor.getLong(date),
+                        cursor.getString(des),
+                        cursor.getInt(type),
+                        cursor.getInt(amount),
+                        cursor.getString(cat),
+                        cursor.getString(paym)
+                );
+            }
+            cursor.close();
+        }
+        db.close();
+        return res;
+    }
+
+    public boolean deleteAutoRecord(String name) {
+        SQLiteDatabase db = getWritableDatabase();
+        int res = db.delete(AA_TABLE_NAME, AA_KEY_NAME + " = '" + name + "'", null);
+        db.close();
+        if (res > 0)
+            return true;
+        else
+            return false;
+    }
+
+    public boolean updateAutoAddRecordTime(long time, String name) {
+        ContentValues values = new ContentValues();
+        values.put(AA_KEY_DATE, time);
+
+        SQLiteDatabase db = getWritableDatabase();
+        int res = db.update(AA_TABLE_NAME, values,
+                AA_KEY_NAME + " = '" + name + "'", null);
+        db.close();
+        if (res > 0)
+            return true;
+        else
+            return false;
     }
 }

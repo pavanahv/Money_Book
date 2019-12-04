@@ -21,7 +21,7 @@
 
         <item
             android:id="@+id/graphs"
-            android:icon="@drawable/ic_payment_method"
+            android:icon="@drawable/graphs"
             android:title="Graphs" />
 
     </group>

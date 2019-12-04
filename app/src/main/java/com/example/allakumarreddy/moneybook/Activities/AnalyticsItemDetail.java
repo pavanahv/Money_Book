@@ -177,10 +177,14 @@ public class AnalyticsItemDetail extends AppCompatActivity {
             tcate.setVisibility(View.GONE);
             findViewById(R.id.cattoitemtext).setVisibility(View.GONE);
             des.setText(mbrOld.getDescription());
+            String typeData[] = new String[]{"Spent", "Earn", "Due", "Loan", "MoneyTransfer"};
+            if (mType == GlobalConstants.TYPE_DUE_REPAYMENT ||
+                    mType == GlobalConstants.TYPE_LOAN_REPAYMENT) {
+                typeData = new String[]{"Spent", "Earn", "Due", "Loan", "MoneyTransfer", "Due Payment",
+                        "Loan Payment", "Due Repayment", "Loan Repayment"};
+            }
             ArrayAdapter aa = new ArrayAdapter(this,
-                    android.R.layout.simple_spinner_dropdown_item,
-                    new String[]{"Spent", "Earn", "Due", "Loan", "MoneyTransfer", "Due Payment",
-                            "Loan Payment", "Due Repayment", "Loan Repayment"});
+                    android.R.layout.simple_spinner_dropdown_item, typeData);
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             type.setAdapter(aa);
             type.setSelection(mType);

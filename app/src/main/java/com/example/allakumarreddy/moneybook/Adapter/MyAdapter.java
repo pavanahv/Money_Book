@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 public class MyAdapter extends ArrayAdapter<MBRecord> {
 
-    private final int type;
     private final HomeAdapterInterface mHomeAdapterInterface;
     private ArrayList<MBRecord> dataSet;
     Context mContext;
@@ -42,7 +41,6 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         super(context, R.layout.record, data);
         this.dataSet = data;
         this.mContext = context;
-        this.type = type;
         mHomeAdapterInterface = homeAdapterInterface;
     }
 

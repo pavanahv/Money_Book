@@ -6,10 +6,11 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.example.allakumarreddy.moneybook.utils.MessageParserBase;
+import com.example.allakumarreddy.moneybook.utils.AutoAddManager;
 import com.example.allakumarreddy.moneybook.utils.Backup;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
+import com.example.allakumarreddy.moneybook.utils.MessageParserBase;
 
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP;
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
@@ -31,6 +32,7 @@ public class MoneyBookIntentService extends IntentService {
             if (ACTION_MSG_PARSE_BY_DATE.equals(action)) {
                 handler = intent.getParcelableExtra(GlobalConstants.HANDLER_NAME);
                 new MessageParserBase(getApplicationContext()).handleActionMsgParse();
+                new AutoAddManager(getApplicationContext()).process();
                 Message msg = new Message();
                 msg.what = GlobalConstants.MSG_PARSING_COMPLETED;
                 try {
