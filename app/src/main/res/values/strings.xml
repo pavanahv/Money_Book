@@ -13,6 +13,7 @@
     <string name="dummy_button">Go To Full Screen</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_analytics_item_detail">AnalyticsItemDetail</string>
+    <string name="shared_anim_analytics_item">shared_anim_analytics_item</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

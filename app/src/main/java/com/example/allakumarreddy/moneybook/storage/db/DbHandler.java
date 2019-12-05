@@ -412,7 +412,7 @@ public class DbHandler extends SQLiteOpenHelper {
             JSONArray jsonArraym = obj.getJSONArray(MSG_TABLE_NAME);
             JSONArray jsonArrayf = obj.getJSONArray(F_TABLE_NAME);
             JSONArray jsonArrayp = obj.getJSONArray(PAY_METH_TABLE_NAME);
-            //JSONArray jsonArrayaa = obj.getJSONArray(AA_TABLE_NAME);
+            JSONArray jsonArrayaa = obj.getJSONArray(AA_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -485,7 +485,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 db.insert(F_TABLE_NAME, null, values);
             }
 
-            /*final int lenaa = jsonArrayaa.length();
+            final int lenaa = jsonArrayaa.length();
             for (int i = 0; i < lenaa; i++) {
                 JSONObject jsonObj = jsonArrayaa.getJSONObject(i);
                 ContentValues values = new ContentValues();
@@ -499,7 +499,7 @@ public class DbHandler extends SQLiteOpenHelper {
                 values.put(KEY_PAYMENT_METHOD, jsonObj.getLong(KEY_PAYMENT_METHOD));
                 values.put(AA_KEY_TYPE, jsonObj.getInt(AA_KEY_TYPE));
                 db.insert(AA_TABLE_NAME, null, values);
-            }*/
+            }
 
             db.close(); // Closing database connection
         } catch (JSONException e) {

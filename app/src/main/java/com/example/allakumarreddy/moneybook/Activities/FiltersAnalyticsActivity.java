@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +17,11 @@ import android.widget.TextView;
 import com.example.allakumarreddy.moneybook.Adapter.FilterMainMenuAdapter;
 import com.example.allakumarreddy.moneybook.Adapter.FilterSubMenuAdapter;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.interfaces.IDate;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
-import com.example.allakumarreddy.moneybook.interfaces.IDate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,8 +56,11 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filters_analytics);
-        getSupportActionBar().setTitle("Analytics Filters");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("Analytics Filters");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         init();
         initMainMenu();
@@ -181,23 +185,24 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
                 initSubMenu(subMenuListData.get(position), true, subMenuListDataSelection.get(position));
                 break;
             case 6: // "Category"
-                if (moneyTypeSubItemChanged) {
-                    moneyTypeSubItemChanged = false;
-                    int type = -1;
-                    for (int i = 0; i < mAnalyticsFilterData.subMenuMoneyTypeDataBool.length; i++) {
-                        if (mAnalyticsFilterData.subMenuMoneyTypeDataBool[i]) {
-                            type = i;
-                            break;
-                        }
-                    }
-                    initCategories(null, db, mAnalyticsFilterData, type);
-                    subMenuListData.set(6, mAnalyticsFilterData.subMenuCatogeoryData);
-                    subMenuListDataSelection.set(6, mAnalyticsFilterData.subMenuCatogeoryDataBool);
-                }
+                refreshCat();
             case 7: // "Payment Method"
                 initSubMenu(subMenuListData.get(position), false, subMenuListDataSelection.get(position));
                 break;
         }
+    }
+
+    private void refreshCat() {
+        int type = -1;
+        for (int i = 0; i < mAnalyticsFilterData.subMenuMoneyTypeDataBool.length; i++) {
+            if (mAnalyticsFilterData.subMenuMoneyTypeDataBool[i]) {
+                type = i;
+                break;
+            }
+        }
+        initCategories(null, db, mAnalyticsFilterData, type);
+        subMenuListData.set(6, mAnalyticsFilterData.subMenuCatogeoryData);
+        subMenuListDataSelection.set(6, mAnalyticsFilterData.subMenuCatogeoryDataBool);
     }
 
     private void initSubMenu(String[] data, boolean isRadioOrCheck, boolean[] selection) {
@@ -233,9 +238,6 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
 
     public void subMenuItemSelected(int position) {
         if (mIsRadioOrCheck) {
-            if (mMainMenuSelectedItemPosition == 2) {
-                moneyTypeSubItemChanged = true;
-            }
             setAllSubMenuItemsNotChecked(mIsRadioOrCheck);
             mSubMenuArrayListSelection.set(position, true);
             subMenuListDataSelection.get(mMainMenuSelectedItemPosition)[position] = true;
@@ -263,6 +265,9 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
             }
         }
         mSubMenuAdapter.notifyDataSetChanged();
+        if (mMainMenuSelectedItemPosition == 2) {
+            refreshCat();
+        }
     }
 
     private void checkDateCustomItem(int position) {

@@ -1,6 +1,7 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -115,7 +116,7 @@ public class RePaymentActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_analytics_detail_edit:
-                startDetailActivity(mbr);
+                startDetailActivity(mbr, findViewById(R.id.desc));
                 finish();
                 break;
             case android.R.id.home:
@@ -125,10 +126,11 @@ public class RePaymentActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void startDetailActivity(MBRecord mbRecord) {
+    private void startDetailActivity(MBRecord mbRecord, View view) {
         Intent intent = new Intent(this, AnalyticsItemDetail.class);
         intent.putExtra("MBRecord", mbRecord);
-        startActivity(intent);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, view,
+                getResources().getString(R.string.shared_anim_analytics_item)).toBundle());
     }
 
     private void initViews() {
@@ -146,8 +148,8 @@ public class RePaymentActivity extends AppCompatActivity {
         lv = (ListView) findViewById(R.id.rv);
         dataList = new ArrayList<>();
 
-        adapter = new RePaymentAdapter(this, dataList, mbRecord -> {
-            startDetailActivity(mbRecord);
+        adapter = new RePaymentAdapter(this, dataList, (mbRecord, finalConvertView) -> {
+            startDetailActivity(mbRecord, finalConvertView);
         });
         lv.setAdapter(adapter);
 

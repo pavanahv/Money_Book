@@ -1,6 +1,7 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +53,7 @@ public class AnalyticsActivity extends AppCompatActivity {
     private int graphType = 0;
     private AnalyticsFilterData mAnalyticsFilterData;
     private boolean mStartItemDetailActivity = true;
+    private ListView analyticsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,22 +135,24 @@ public class AnalyticsActivity extends AppCompatActivity {
         return true;
     }
 
-    public void startDetailActivity(int pos) {
+    public void startDetailActivity(int pos, View view) {
         if (mStartItemDetailActivity) {
             MBRecord mbr = dataList.get(pos);
             LoggerCus.d(TAG, mbr.toString());
+            Intent intent = null;
             if (mbr.getType() == GlobalConstants.TYPE_DUE ||
                     mbr.getType() == GlobalConstants.TYPE_LOAN ||
                     mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT ||
                     mbr.getType() == GlobalConstants.TYPE_LOAN_PAYMENT) {
-                Intent intent = new Intent(AnalyticsActivity.this, RePaymentActivity.class);
+                intent = new Intent(AnalyticsActivity.this, RePaymentActivity.class);
                 intent.putExtra("MBRecord", mbr);
-                startActivity(intent);
             } else {
-                Intent intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
+                intent = new Intent(AnalyticsActivity.this, AnalyticsItemDetail.class);
                 intent.putExtra("MBRecord", mbr);
-                startActivity(intent);
             }
+            startActivity(intent,
+                    ActivityOptions.makeSceneTransitionAnimation(this, view,
+                            getResources().getString(R.string.shared_anim_analytics_item)).toBundle());
         } else {
             Toast.makeText(this, "Record can't be edited when GROUPBY filter is selected", Toast.LENGTH_LONG).show();
         }
@@ -184,7 +188,7 @@ public class AnalyticsActivity extends AppCompatActivity {
         main.removeView(prevView);
         prevView = view;
         main.addView(view);
-        ListView analyticsListView = (ListView) view.findViewById(R.id.analyticslv);
+        analyticsListView = (ListView) view.findViewById(R.id.analyticslv);
         searchView = (SearchView) view.findViewById(R.id.sv);
         list = new ArrayList<>();
         dataList = (ArrayList<MBRecord>) list.clone();

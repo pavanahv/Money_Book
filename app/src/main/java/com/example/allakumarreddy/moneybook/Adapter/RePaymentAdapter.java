@@ -72,7 +72,8 @@ public class RePaymentAdapter extends ArrayAdapter<MBRecord> {
             result = convertView;
         }
 
-        convertView.setOnClickListener(v -> mRePaymentAdapterInterface.onClickItem(dataModel));
+        View finalConvertView = convertView;
+        convertView.setOnClickListener(v -> mRePaymentAdapterInterface.onClickItem(dataModel, finalConvertView));
 
         Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);
