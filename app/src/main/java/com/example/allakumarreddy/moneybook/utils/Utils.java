@@ -27,6 +27,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.charts.RadarChart;
 import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -35,10 +36,17 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.data.RadarData;
 import com.github.mikephil.charting.data.RadarDataSet;
+import com.github.mikephil.charting.data.RadarEntry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import org.json.JSONArray;
@@ -309,76 +317,175 @@ public class Utils {
     public static View drawLineGraph(int len, String[] label, String[] data, Context context) {
         LineChart chart = new LineChart(context);
 
+        chart.getXAxis().setDrawLabels(true);
+        chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int val = (int) (value * 100);
+                val = val % 100;
+                if (val == 0)
+                    return label[(int) value];
+                else
+                    return "";
+            }
+        });
+
         ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new Entry(Float.parseFloat(i + ""),
+                    Float.parseFloat(data[i]),
+                    label[i]));
         }
         LineDataSet dataSet = new LineDataSet(entry, "Amount");
-        LineData lineData = new LineData(labels, dataSet);
+        ArrayList<ILineDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        LineData lineData = new LineData(list);
         chart.setData(lineData);
 
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.CIRCLE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
         chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        chart.getDescription().setEnabled(false);
+        //dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
         return chart;
     }
 
     public static View drawBarGraph(int len, String[] label, String[] data, Context context) {
         BarChart chart = new BarChart(context);
 
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.CIRCLE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
         ArrayList<BarEntry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<String>();
         for (int i = 0; i < len; i++) {
-            entry.add(new BarEntry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new BarEntry(i, Float.parseFloat(data[i]), label[i]));
         }
+        chart.getXAxis().setDrawLabels(true);
+        chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int val = (int) (value * 100);
+                val = val % 100;
+                if (val == 0)
+                    return label[(int) value];
+                else
+                    return "";
+            }
+        });
         BarDataSet dataSet = new BarDataSet(entry, "Amount");
-        BarData barData = new BarData(labels, dataSet);
+        ArrayList<IBarDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        BarData barData = new BarData(list);
         chart.setData(barData);
 
         chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        chart.getDescription().setEnabled(false);
+        dataSet.setColors(getColors());
         return chart;
     }
 
     public static View drawPieGraph(int len, String[] label, String[] data, Context context) {
         PieChart chart = new PieChart(context);
 
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.CIRCLE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+        ArrayList<PieEntry> entry = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new PieEntry(Float.parseFloat(data[i]), label[i]));
         }
         PieDataSet dataSet = new PieDataSet(entry, "Amount");
-        PieData barData = new PieData(labels, dataSet);
+        PieData barData = new PieData(dataSet);
         chart.setData(barData);
 
         chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        dataSet.setColors(getColors());
         return chart;
+    }
+
+    public static ArrayList<Integer> getColors() {
+        ArrayList<Integer> colors = new ArrayList<>();
+
+        for (int c : ColorTemplate.VORDIPLOM_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.JOYFUL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.LIBERTY_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.PASTEL_COLORS)
+            colors.add(c);
+        return colors;
     }
 
     public static View drawRadarGraph(int len, String[] label, String[] data, Context context) {
         RadarChart chart = new RadarChart(context);
 
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<RadarEntry> entry = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new RadarEntry(Float.parseFloat(data[i]), label[i]));
         }
         RadarDataSet dataSet = new RadarDataSet(entry, "Amount");
-        RadarData barData = new RadarData(labels, dataSet);
+        ArrayList<IRadarDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        RadarData barData = new RadarData(list);
         chart.setData(barData);
 
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.CIRCLE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+        chart.getXAxis().setDrawLabels(true);
+        chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if ((value - 1) >= 0)
+                    value--;
+                int val = (int) (value * 100);
+                val = val % 100;
+                if (val == 0)
+                    return label[(int) (value)];
+                else
+                    return "";
+            }
+        });
+
         chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        chart.getDescription().setEnabled(false);
+        dataSet.setColors(getColors());
         return chart;
     }
 
@@ -386,18 +493,41 @@ public class Utils {
         ScatterChart chart = new ScatterChart(context);
 
         ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new Entry(i, Float.parseFloat(data[i]), label[i]));
         }
         ScatterDataSet dataSet = new ScatterDataSet(entry, "Amount");
-        ScatterData barData = new ScatterData(labels, dataSet);
+        ArrayList<IScatterDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        ScatterData barData = new ScatterData(list);
         chart.setData(barData);
 
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.CIRCLE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+        chart.getXAxis().setDrawLabels(true);
+        chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int val = (int) (value * 100);
+                val = val % 100;
+                if (val == 0 && (((int) value) < label.length))
+                    return label[(int) value];
+                else
+                    return "";
+            }
+        });
+
         chart.animateXY(2000, 2000);
-        chart.setDescription("");
-        dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        chart.getDescription().setEnabled(false);
+        dataSet.setColors(getColors());
         return chart;
     }
 

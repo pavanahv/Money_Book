@@ -17,10 +17,16 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.data.RadarData;
 import com.github.mikephil.charting.data.RadarDataSet;
+import com.github.mikephil.charting.data.RadarEntry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
@@ -91,13 +97,21 @@ public class GraphCus {
         }
     }
 
-    private void setLayout(Object o) {
-        ((View)o).setLayoutParams(glp);
+    private void setLayout(View o) {
+        o.setLayoutParams(glp);
         if (layoutType) {
-            layout.addView((View)o);
+            layout.addView(o);
+        } else {
+            graphLayout.addView(o);
         }
-        else {
-            graphLayout.addView((View) o);
+    }
+
+    private void setLayout(BarChart o) {
+        o.setLayoutParams(glp);
+        if (layoutType) {
+            layout.addView(o);
+        } else {
+            graphLayout.addView(o);
         }
     }
 
@@ -106,55 +120,56 @@ public class GraphCus {
         setLayout(chart);
 
         ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new Entry(Float.parseFloat(i + ""),
+                    Float.parseFloat(data[i]),
+                    label[i]));
         }
         LineDataSet dataSet = new LineDataSet(entry, "Amount");
-        LineData lineData = new LineData(labels, dataSet);
+        ArrayList<ILineDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        LineData lineData = new LineData(list);
         chart.setData(lineData);
 
-        chart.animateXY(2000,2000);
-        chart.setDescription("");
+        chart.animateXY(2000, 2000);
+        chart.getDescription().setEnabled(false);
         dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+
     }
 
     private void drawBarGraph() {
         BarChart chart = new BarChart(mainActivity);
         setLayout(chart);
 
+        chart.animateXY(2000, 2000);
+        chart.getDescription().setEnabled(false);
+
         ArrayList<BarEntry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<String>();
         for (int i = 0; i < len; i++) {
-            entry.add(new BarEntry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new BarEntry(Float.parseFloat(data[i])
+                    , Float.parseFloat("" + i)));
         }
         BarDataSet dataSet = new BarDataSet(entry, "Amount");
-        BarData barData = new BarData(labels, dataSet);
-        chart.setData(barData);
-
-        chart.animateXY(2000,2000);
-        chart.setDescription("");
         dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+        ArrayList<IBarDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        BarData barData = new BarData(list);
+        //chart.setData(barData);
     }
 
     private void drawPieGraph() {
         PieChart chart = new PieChart(mainActivity);
         setLayout(chart);
 
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<PieEntry> entry = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new PieEntry(Float.parseFloat(data[i]), label[i]));
         }
         PieDataSet dataSet = new PieDataSet(entry, "Amount");
-        PieData barData = new PieData(labels, dataSet);
+        PieData barData = new PieData(dataSet);
         chart.setData(barData);
 
-        chart.animateXY(2000,2000);
-        chart.setDescription("");
+        chart.animateXY(2000, 2000);
         dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
     }
 
@@ -162,18 +177,18 @@ public class GraphCus {
         RadarChart chart = new RadarChart(mainActivity);
         setLayout(chart);
 
-        ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<RadarEntry> entry = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new RadarEntry(Float.parseFloat(data[i]), label[i]));
         }
         RadarDataSet dataSet = new RadarDataSet(entry, "Amount");
-        RadarData barData = new RadarData(labels, dataSet);
+        ArrayList<IRadarDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        RadarData barData = new RadarData(list);
         chart.setData(barData);
 
-        chart.animateXY(2000,2000);
-        chart.setDescription("");
+        chart.animateXY(2000, 2000);
+        chart.getDescription().setEnabled(false);
         dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
     }
 
@@ -182,17 +197,17 @@ public class GraphCus {
         setLayout(chart);
 
         ArrayList<Entry> entry = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            entry.add(new Entry(Float.parseFloat(data[i]), i));
-            labels.add(label[i]);
+            entry.add(new Entry(Float.parseFloat(data[i]), Float.parseFloat("" + i), label[i]));
         }
         ScatterDataSet dataSet = new ScatterDataSet(entry, "Amount");
-        ScatterData barData = new ScatterData(labels, dataSet);
+        ArrayList<IScatterDataSet> list = new ArrayList<>();
+        list.add(dataSet);
+        ScatterData barData = new ScatterData(list);
         chart.setData(barData);
 
-        chart.animateXY(2000,2000);
-        chart.setDescription("");
+        chart.animateXY(2000, 2000);
+        chart.getDescription().setEnabled(false);
         dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
     }
 }

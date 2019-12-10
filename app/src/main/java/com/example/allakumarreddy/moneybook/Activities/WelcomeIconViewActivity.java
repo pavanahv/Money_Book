@@ -60,5 +60,7 @@ public class WelcomeIconViewActivity extends AppCompatActivity {
     private void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+        finish();
     }
 }
