@@ -2,7 +2,6 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -13,7 +12,7 @@ import com.example.allakumarreddy.moneybook.fragments.MessageListFragment;
 import com.example.allakumarreddy.moneybook.interfaces.ChunksFragmentInteractionListener;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 
-public class MessageParseActivity extends AppCompatActivity implements ChunksFragmentInteractionListener {
+public class MessageParseActivity extends BaseActivity implements ChunksFragmentInteractionListener {
 
     private String mChunkData;
     private String des;
@@ -45,6 +44,7 @@ public class MessageParseActivity extends AppCompatActivity implements ChunksFra
         switch (id) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
         }
         return super.onOptionsItemSelected(item);

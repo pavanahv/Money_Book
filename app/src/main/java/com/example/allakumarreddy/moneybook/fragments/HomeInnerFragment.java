@@ -145,6 +145,7 @@ public class HomeInnerFragment extends Fragment {
             intent.putExtra("MBRecord", mbr);
             startActivity(intent);
         }
+        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
 }

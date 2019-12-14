@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.example.allakumarreddy.moneybook.R;
 
-public class RestoreActivity extends AppCompatActivity {
+public class RestoreActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

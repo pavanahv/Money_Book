@@ -1042,6 +1042,9 @@ public class DbHandler extends SQLiteOpenHelper {
                                                 boolean[] categoryBool, String[] category,
                                                 int sortingOrder,
                                                 boolean[] payBool, String[] payMeth) {
+        LoggerCus.d(TAG,"sdate : "+sDate.getTime());
+        LoggerCus.d(TAG,"edate : "+eDate.getTime());
+
         this.total = 0;
 
         ArrayList<MBRecord> mbr = new ArrayList<>();
@@ -1321,7 +1324,7 @@ public class DbHandler extends SQLiteOpenHelper {
         return this.total;
     }
 
-    private Date intializeSDateForDay(Date sDate) {
+    public Date intializeSDateForDay(Date sDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(sDate);
         cal.set(Calendar.HOUR_OF_DAY, cal.getMinimum(Calendar.HOUR_OF_DAY));
@@ -1331,7 +1334,7 @@ public class DbHandler extends SQLiteOpenHelper {
         return cal.getTime();
     }
 
-    private Date intializeEDateForDay(Date eDate) {
+    public Date intializeEDateForDay(Date eDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(eDate);
         cal.set(Calendar.HOUR_OF_DAY, cal.getMaximum(Calendar.HOUR_OF_DAY));
@@ -1341,28 +1344,28 @@ public class DbHandler extends SQLiteOpenHelper {
         return cal.getTime();
     }
 
-    private Date intializeSDateForMonth(Date sDate) {
+    public Date intializeSDateForMonth(Date sDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(sDate);
         cal.set(Calendar.DATE, cal.getMinimum(Calendar.DATE));
         return cal.getTime();
     }
 
-    private Date intializeEDateForMonth(Date eDate) {
+    public Date intializeEDateForMonth(Date eDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(eDate);
         cal.set(Calendar.DATE, cal.getMaximum(Calendar.DATE));
         return cal.getTime();
     }
 
-    private Date intializeSDateForYear(Date sDate) {
+    public Date intializeSDateForYear(Date sDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(sDate);
         cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
         return cal.getTime();
     }
 
-    private Date intializeEDateForYear(Date eDate) {
+    public Date intializeEDateForYear(Date eDate) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(eDate);
         cal.set(Calendar.MONTH, cal.getMaximum(Calendar.MONTH));

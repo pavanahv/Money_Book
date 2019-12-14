@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class RePaymentActivity extends AppCompatActivity {
+public class RePaymentActivity extends BaseActivity {
 
     private static final int ADD_ACTIVITY = 1001;
     private static final String TAG = RePaymentActivity.class.getSimpleName();
@@ -68,6 +67,7 @@ public class RePaymentActivity extends AppCompatActivity {
         intent.putExtra("type", GlobalConstants.TYPE_LOAN_REPAYMENT);
         intent.putExtra(GlobalConstants.CATEGORY_TYPE, mMainType);
         startActivityForResult(intent, ADD_ACTIVITY);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     @Override
@@ -121,6 +121,7 @@ public class RePaymentActivity extends AppCompatActivity {
                 break;
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
         }
         return super.onOptionsItemSelected(item);

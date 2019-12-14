@@ -78,6 +78,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
                 break;
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
         }
         return super.onOptionsItemSelected(item);

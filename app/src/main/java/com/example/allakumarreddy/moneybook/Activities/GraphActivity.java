@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -25,7 +24,7 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class GraphActivity extends AppCompatActivity {
+public class GraphActivity extends BaseActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -162,9 +161,11 @@ public class GraphActivity extends AppCompatActivity {
                 Intent intent = new Intent(GraphActivity.this, AddActivity.class);
                 intent.putExtra("type", GlobalConstants.SAVE_FILTER_SCREEN);
                 startActivityForResult(intent, ADD_ACTIVITY);
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
         }
         return super.onOptionsItemSelected(item);

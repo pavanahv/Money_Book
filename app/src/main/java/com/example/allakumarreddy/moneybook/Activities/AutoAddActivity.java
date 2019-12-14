@@ -2,7 +2,6 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,7 +11,7 @@ import com.example.allakumarreddy.moneybook.fragments.AutoAddAddFragment;
 import com.example.allakumarreddy.moneybook.fragments.AutoAddListFragment;
 import com.example.allakumarreddy.moneybook.utils.AutoAddRecord;
 
-public class AutoAddActivity extends AppCompatActivity implements
+public class AutoAddActivity extends BaseActivity implements
         AutoAddListFragment.OnAutoAddListFragmentInteractionListener,
         AutoAddAddFragment.OnAutoAddAddFragmentInteractionListener {
 
@@ -45,6 +44,7 @@ public class AutoAddActivity extends AppCompatActivity implements
         switch (id) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
 
             default:

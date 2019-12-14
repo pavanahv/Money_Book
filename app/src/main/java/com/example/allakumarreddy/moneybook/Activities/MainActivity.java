@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +28,7 @@ import com.example.allakumarreddy.moneybook.fragments.DashboardFilterFragment;
 import com.example.allakumarreddy.moneybook.fragments.DashboardFragment;
 import com.example.allakumarreddy.moneybook.fragments.HomeFragment;
 import com.example.allakumarreddy.moneybook.fragments.PaymentMethodFragment;
+import com.example.allakumarreddy.moneybook.fragments.ReportsFragment;
 import com.example.allakumarreddy.moneybook.handler.MoneyBookIntentServiceHandler;
 import com.example.allakumarreddy.moneybook.interfaces.DashUIUpdateInterface;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
@@ -49,7 +49,7 @@ import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_IMPORT;
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_MSG_PARSE_BY_DATE;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, DashUIUpdateInterface {
 
     final static String TAG = "MainActivity";
@@ -147,13 +147,16 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.action_msgParser:
                 startActivity(new Intent(this, MessagesActivity.class));
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
 
             case R.id.action_auto_add:
                 startActivity(new Intent(this, AutoAddActivity.class));
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
             /*case R.id.action_test:
                 //db.exec();
@@ -328,19 +331,40 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        //showProgressBar();
-        if (id == R.id.dash) {
-            showCategory();
-        } else if (id == R.id.home) {
-            showHome();
-        } else if (id == R.id.payment_method) {
-            showPaymentMethod();
-        } else if (id == R.id.graphs) {
-            showGraphs();
+        switch (id) {
+            default:
+            case R.id.home:
+                showHome();
+                break;
+
+            case R.id.dash:
+                showCategory();
+                break;
+
+            case R.id.payment_method:
+                showPaymentMethod();
+                break;
+
+            case R.id.graphs:
+                showGraphs();
+                break;
+
+            case R.id.reports:
+                showReports();
+                break;
         }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showReports() {
+        showReportsActionBar();
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(mainLayout, new ReportsFragment());
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.commit();
     }
 
     private void showGraphs() {
@@ -353,6 +377,10 @@ public class MainActivity extends AppCompatActivity
 
     private void showGraphsActionBar() {
         getSupportActionBar().setTitle("Graphs");
+    }
+
+    private void showReportsActionBar() {
+        getSupportActionBar().setTitle("Reports");
     }
 
     private void showPaymentMethod() {
@@ -398,6 +426,7 @@ public class MainActivity extends AppCompatActivity
 
     public void goToAnalytics(String name) {
         startActivity(new Intent(MainActivity.this, AnalyticsActivity.class).putExtra("name", name));
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     private void showHomeActionBar() {
@@ -413,18 +442,10 @@ public class MainActivity extends AppCompatActivity
             LoggerCus.d(TAG, "" + isSmartRemainderNoti);
             showHome();
         }
-        int type = -1;
-        for (int i = 0; i < GlobalConstants.REPORTS_NOTI.length; i++) {
-            if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI[i], false)) {
-                type = i;
-                break;
-            }
-        }
-        if (type != -1) {
+
+        if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
             isShown = true;
-            LoggerCus.d(TAG, "" + type);
-            //mHomeViewPager.setCurrentItem(type, false);
-            showHome();
+            showReports();
         }
         if (!isShown)
             showHome();

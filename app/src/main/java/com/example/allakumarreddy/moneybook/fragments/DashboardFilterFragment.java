@@ -147,7 +147,13 @@ public class DashboardFilterFragment extends Fragment implements DashBoardFilter
             in.putExtra("type", Utils.getFilterGraphType(filterName));
             in.putExtra("activateType", GlobalConstants.ACTIVATE_GRAPH_ACTIVITY_WITHOUT_ADD_TO_SCREEN_MENU);
 
-            getActivity().runOnUiThread(() -> startActivity(in));
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(in);
+                    getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+                }
+            });
 
         }).start();
 

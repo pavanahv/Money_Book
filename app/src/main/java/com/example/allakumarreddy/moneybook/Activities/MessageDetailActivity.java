@@ -1,7 +1,6 @@
 package com.example.allakumarreddy.moneybook.Activities;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +14,7 @@ import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 
 import java.util.ArrayList;
 
-public class MessageDetailActivity extends AppCompatActivity {
+public class MessageDetailActivity extends BaseActivity {
 
     private String msgName;
     private DbHandler db;
@@ -50,6 +49,7 @@ public class MessageDetailActivity extends AppCompatActivity {
                 break;
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 return true;
         }
         return super.onOptionsItemSelected(item);

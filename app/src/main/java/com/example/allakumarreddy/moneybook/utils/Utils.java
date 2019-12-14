@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
@@ -53,6 +54,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -352,7 +354,7 @@ public class Utils {
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
 
-        chart.animateXY(2000, 2000);
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         chart.getDescription().setEnabled(false);
         //dataSet.setColors(ColorTemplate.JOYFUL_COLORS);
         return chart;
@@ -393,7 +395,7 @@ public class Utils {
         BarData barData = new BarData(list);
         chart.setData(barData);
 
-        chart.animateXY(2000, 2000);
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         chart.getDescription().setEnabled(false);
         dataSet.setColors(getColors());
         return chart;
@@ -420,8 +422,9 @@ public class Utils {
         PieData barData = new PieData(dataSet);
         chart.setData(barData);
 
-        chart.animateXY(2000, 2000);
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         dataSet.setColors(getColors());
+        chart.getDescription().setEnabled(false);
         return chart;
     }
 
@@ -483,7 +486,7 @@ public class Utils {
             }
         });
 
-        chart.animateXY(2000, 2000);
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         chart.getDescription().setEnabled(false);
         dataSet.setColors(getColors());
         return chart;
@@ -525,10 +528,42 @@ public class Utils {
             }
         });
 
-        chart.animateXY(2000, 2000);
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         chart.getDescription().setEnabled(false);
         dataSet.setColors(getColors());
         return chart;
+    }
+
+    public static File getGraphShareMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DCIM);
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                LoggerCus.d(TAG, "failed to create or open directory");
+                return null;
+            }
+        }
+
+        File mediaFile;
+        String filename = "";
+        filename += "shared_graph" + ".png";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
+        return mediaFile;
+    }
+
+    public static void deleteGraphShareMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DCIM);
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                LoggerCus.d(TAG, "failed to create or open directory");
+            }
+        }
+
+        File mediaFile;
+        String filename = "";
+        filename += "shared_graph" + ".png";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
+        if (mediaFile.exists())
+            mediaFile.delete();
     }
 
     public static int getFilterGraphType(String s) {
@@ -644,6 +679,17 @@ public class Utils {
             String desc = des.substring(0, inda) + des.substring(indb + 2, des.length());
             mbr.setDescription(desc);
             mbr.setRefIdForLoanDue(temp);
+        }
+    }
+
+    public static String getNameFromEntryData(Object data) {
+        try {
+            String temp = ((String[]) data)[0];
+            int ind = temp.indexOf("(");
+            return temp.substring(0, ind).trim();
+        } catch (Exception e) {
+            LoggerCus.d(TAG, "Error while parsing entry data for getting name -> " + e.getMessage());
+            return null;
         }
     }
 }

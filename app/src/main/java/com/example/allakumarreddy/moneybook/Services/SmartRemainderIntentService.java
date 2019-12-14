@@ -17,9 +17,8 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
-import com.example.allakumarreddy.moneybook.utils.MessageParserBase;
-import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.Activities.LoginActivity;
+import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
@@ -85,8 +84,39 @@ public class SmartRemainderIntentService extends Service {
     }
 
     private void handleActionReports() {
-        new MessageParserBase(getApplicationContext()).handleActionMsgParse();
-        performPendingTasks();
+        /*new MessageParserBase(getApplicationContext()).handleActionMsgParse();
+        performPendingTasks();*/
+        showReportNotification();
+    }
+
+    private void showReportNotification() {
+        int reqCode = (int) System.currentTimeMillis();
+        Context context = getApplicationContext();
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.putExtra(GlobalConstants.REPORTS_NOTI, true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, GlobalConstants.NOTIFICATION_CHANNLE_ID)
+                .setSmallIcon(R.drawable.ic_smart_remainder)
+                .setContentTitle("Reports")
+                .setContentText("It's Time To Have A Look At Reports !")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            notificationManager = context.getSystemService(NotificationManager.class);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationChannel channel = new NotificationChannel(GlobalConstants.NOTIFICATION_CHANNLE_ID, GlobalConstants.NOTIFICATION_CHANNLE_NAME, importance);
+                channel.setDescription(GlobalConstants.NOTIFICATION_CHANNLE_DESCRIPTION);
+                notificationManager.createNotificationChannel(channel);
+            }
+            notificationManager.notify(GlobalConstants.TYPE_NOTIFICATION_ID[0], builder.build());
+        }
     }
 
     private void performPendingTasks() {
@@ -110,7 +140,7 @@ public class SmartRemainderIntentService extends Service {
         int reqCode = (int) System.currentTimeMillis();
         Context mContext = getApplicationContext();
         Intent intent = new Intent(mContext, LoginActivity.class);
-        intent.putExtra(GlobalConstants.REPORTS_NOTI[index], true);
+        //intent.putExtra(GlobalConstants.REPORTS_NOTI[index], true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

@@ -98,6 +98,7 @@ public class DashboardFragment extends Fragment {
         Intent intent = new Intent(getContext(), AddActivity.class);
         intent.putExtra("type", GlobalConstants.CATERGORY_SCREEN);
         startActivityForResult(intent, ADD_ACTIVITY);
+        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     @Override

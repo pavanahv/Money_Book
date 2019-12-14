@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 public class FilterUtils {
 
+    private static final String TAG = FilterUtils.class.getSimpleName();
+
     public static void initCategories(String tempCat, DbHandler db, AnalyticsFilterData analyticsFilterData, int type) {
         // categories initialization
         String[] cat = null;

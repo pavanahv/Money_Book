@@ -12,7 +12,7 @@ import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
-public class CreateSmartPinActivity extends AppCompatActivity {
+public class CreateSmartPinActivity extends BaseActivity {
 
     private static final String TAG = "CreateSmartPinActivity";
     private String str = "";

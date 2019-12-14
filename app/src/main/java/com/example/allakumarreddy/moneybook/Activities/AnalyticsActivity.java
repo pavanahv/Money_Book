@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,14 +28,13 @@ import com.example.allakumarreddy.moneybook.utils.Utils;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initCategories;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initFilters;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initPaymentMethods;
 import static com.example.allakumarreddy.moneybook.utils.FilterUtils.initType;
 
-public class AnalyticsActivity extends AppCompatActivity {
+public class AnalyticsActivity extends BaseActivity {
 
     private static final String TAG = "AnalyticsActivity";
     private static final int ANALYTICS_FILTER_ACTIVITY = 1001;
@@ -101,11 +99,13 @@ public class AnalyticsActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, FiltersAnalyticsActivity.class);
                 intent.putExtra(GlobalConstants.ANALYTICS_FILTER_ACTIVITY, mAnalyticsFilterData);
                 startActivityForResult(intent, ANALYTICS_FILTER_ACTIVITY);
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
             case R.id.save_filter:
                 Intent lIntent = new Intent(AnalyticsActivity.this, AddActivity.class);
                 lIntent.putExtra("type", GlobalConstants.SAVE_FILTER_SCREEN);
                 startActivityForResult(lIntent, ADD_ACTIVITY);
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
 
             case R.id.analytics_save_xl:
@@ -120,6 +120,7 @@ public class AnalyticsActivity extends AppCompatActivity {
 
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
 
             default:
@@ -180,6 +181,7 @@ public class AnalyticsActivity extends AppCompatActivity {
         in.putExtra("jsonStrFiltr", jsonStrFiltr);
         in.putExtra("activateType", GlobalConstants.ACTIVATE_GRAPH_ACTIVITY_WITH_ADD_TO_SCREEN_MENU);
         startActivity(in);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     public void processTabs() {
@@ -192,7 +194,7 @@ public class AnalyticsActivity extends AppCompatActivity {
         searchView = (SearchView) view.findViewById(R.id.sv);
         list = new ArrayList<>();
         dataList = (ArrayList<MBRecord>) list.clone();
-        analyticsAdapter = new AnalyticsAdapter(list, this);
+        analyticsAdapter = new AnalyticsAdapter(list, this, (pos, v) -> AnalyticsActivity.this.startDetailActivity(pos, v));
         analyticsListView.setAdapter(analyticsAdapter);
         totalTv = (TextView) view.findViewById(R.id.total);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -217,8 +219,6 @@ public class AnalyticsActivity extends AppCompatActivity {
         int catType = intent.getIntExtra(GlobalConstants.CATEGORY_TYPE, -1);
         initType(mAnalyticsFilterData, catType);
         initCategories(temp, db, mAnalyticsFilterData, catType);
-        LoggerCus.d(TAG, "cat: " + temp + " cat type: " + catType);
-        LoggerCus.d(TAG, Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryData) + " -> " + Arrays.toString(mAnalyticsFilterData.subMenuCatogeoryDataBool));
         temp = intent.getStringExtra("paymentMethod");
         initPaymentMethods(temp, db, mAnalyticsFilterData);
         initFilters(db, mAnalyticsFilterData);

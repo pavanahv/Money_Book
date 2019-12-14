@@ -2,7 +2,6 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +22,7 @@ import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public class AnalyticsItemDetail extends AppCompatActivity {
+public class AnalyticsItemDetail extends BaseActivity {
 
     private static final String TAG = AnalyticsItemDetail.class.getSimpleName();
     private MBRecord mbrOld;
@@ -89,6 +88,7 @@ public class AnalyticsItemDetail extends AppCompatActivity {
 
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
 
             case R.id.action_analytics_detail_save:

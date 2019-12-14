@@ -107,6 +107,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         Intent intent = new Intent(getContext(), AddActivity.class);
         intent.putExtra("type", GlobalConstants.PAYMENT_METHOD_SCREEN);
         startActivityForResult(intent, ADD_ACTIVITY);
+        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     @Override
@@ -172,6 +173,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     @Override
     public void viewOnClick(String dataText) {
         startActivity(new Intent(getActivity(), AnalyticsActivity.class).putExtra("paymentMethod", dataText));
+        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     @Override
@@ -186,6 +188,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         intent.putExtra("type", GlobalConstants.PAYMENT_METHOD_MONEY_TRANSFER_SCREEN);
         intent.putExtra("tcategory", categoryName.toLowerCase());
         startActivityForResult(intent, ADD_ACTIVITY_MT);
+        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     @Override

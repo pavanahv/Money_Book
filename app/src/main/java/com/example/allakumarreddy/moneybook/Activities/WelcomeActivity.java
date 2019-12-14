@@ -24,7 +24,7 @@ import com.google.api.services.drive.DriveScopes;
 
 import java.util.Collections;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class WelcomeActivity extends BaseActivity {
 
     private static final String TAG = "WelcomeActivity";
     private static final int REQUEST_CODE_SIGN_IN = 100;
@@ -53,6 +53,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // The result of the sign-in Intent is handled in onActivityResult.
         startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
 
@@ -89,6 +90,7 @@ public class WelcomeActivity extends AppCompatActivity {
         PreferencesCus sp = new PreferencesCus(this);
         sp.setData(Utils.getEmail(), GoogleSignIn.getLastSignedInAccount(this).getEmail());
         startActivity(new Intent(this, LoginActivity.class));
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
         finish();
     }
 
@@ -97,6 +99,7 @@ public class WelcomeActivity extends AppCompatActivity {
             startActivity(new Intent(WelcomeActivity.this, RestoreActivity.class));
         else
             startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
         finish();
     }
 }

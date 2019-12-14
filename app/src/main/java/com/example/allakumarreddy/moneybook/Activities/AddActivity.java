@@ -3,7 +3,6 @@ package com.example.allakumarreddy.moneybook.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -25,7 +24,7 @@ import com.example.allakumarreddy.moneybook.utils.MBRecord;
 
 import java.util.ArrayList;
 
-public class AddActivity extends AppCompatActivity implements android.view.View.OnClickListener {
+public class AddActivity extends BaseActivity implements android.view.View.OnClickListener {
 
     private static final String TAG = "AddActivity";
     private int type;
@@ -62,6 +61,7 @@ public class AddActivity extends AppCompatActivity implements android.view.View.
         switch (id) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -1,5 +1,6 @@
 package com.example.allakumarreddy.moneybook.Adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.Activities.AnalyticsActivity;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
@@ -23,8 +23,9 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
 
     private final SimpleDateFormat format;
     private ArrayList<MBRecord> dataSet;
-    AnalyticsActivity mContext;
+    Context mContext;
     private boolean groupBy;
+    private AnalyticsAdapterInterface mAnalyticsAdapterInterface;
 
     public void setGroupBy(boolean groupBy) {
         this.groupBy = groupBy;
@@ -45,12 +46,14 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
         View statusView;
     }
 
-    public AnalyticsAdapter(ArrayList<MBRecord> data, AnalyticsActivity context) {
+    public AnalyticsAdapter(ArrayList<MBRecord> data, Context context,
+                            AnalyticsAdapterInterface analyticsAdapterInterface) {
         super(context, R.layout.record, data);
         this.dataSet = data;
         this.mContext = context;
         format = new SimpleDateFormat("dd - MM - yyyy");
         groupBy = false;
+        mAnalyticsAdapterInterface = analyticsAdapterInterface;
     }
 
     private int lastPosition = -1;
@@ -95,7 +98,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContext.startDetailActivity(pos,v);
+                mAnalyticsAdapterInterface.startDetailActivity(pos, v);
             }
         });
 

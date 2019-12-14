@@ -24,5 +24,10 @@
             android:icon="@drawable/graphs"
             android:title="Graphs" />
 
+        <item
+            android:id="@+id/reports"
+            android:icon="@drawable/reports"
+            android:title="Reports" />
+
     </group>
 </menu>

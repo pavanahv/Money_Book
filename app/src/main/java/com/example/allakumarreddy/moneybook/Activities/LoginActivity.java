@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,16 +13,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.utils.FingerPrintManager;
 import com.example.allakumarreddy.moneybook.interfaces.FingerPrintInterface;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.example.allakumarreddy.moneybook.utils.FingerPrintManager;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.Random;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     private static final String TAG = "LoginActivity";
     private int n1 = 2;
@@ -43,9 +42,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         PreferencesCus sp = new PreferencesCus(this);
-        LoggerCus.d(TAG,sp.getData(Utils.getEmail())+" login data");
+        LoggerCus.d(TAG, sp.getData(Utils.getEmail()) + " login data");
         if (sp.getData(Utils.getEmail()) == null) {
             startActivity(new Intent(this, WelcomeActivity.class));
+            overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
             finish();
             return;
         }
@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                     enableSmartLock();
                     break;
             }
-        }else{
+        } else {
             loginSuccess();
         }
     }
@@ -143,13 +143,11 @@ public class LoginActivity extends AppCompatActivity {
         if (getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false)) {
             intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
         }
-        for (int i = 0; i < GlobalConstants.REPORTS_NOTI.length; i++) {
-            if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI[i], false)) {
-                intent.putExtra(GlobalConstants.REPORTS_NOTI[i], true);
-                break;
-            }
+        if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
+            intent.putExtra(GlobalConstants.REPORTS_NOTI, true);
         }
         startActivity(intent);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
         finish();
     }
 

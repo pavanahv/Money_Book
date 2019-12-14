@@ -13,7 +13,7 @@ import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
 
-public class CreatePinActivity extends AppCompatActivity {
+public class CreatePinActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

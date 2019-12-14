@@ -69,6 +69,7 @@ public class HomeFragment extends Fragment {
         intent.putExtra("type", GlobalConstants.HOME_SCREEN);
         intent.putExtra(GlobalConstants.CATEGORY_TYPE, mHomeViewPager.getCurrentItem());
         startActivityForResult(intent, ADD_ACTIVITY);
+        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     @Override

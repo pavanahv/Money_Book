@@ -10,7 +10,7 @@ import android.view.animation.ScaleAnimation;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
-public class WelcomeIconViewActivity extends AppCompatActivity {
+public class WelcomeIconViewActivity extends BaseActivity {
 
     private static final String TAG = WelcomeIconViewActivity.class.getSimpleName();
 

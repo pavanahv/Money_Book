@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
-import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Services.SmartRemainderIntentService;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -35,7 +34,6 @@ public class SmartRemainderAlarmReceiver extends BroadcastReceiver {
         } else {
             context.startService(sIntent);
         }
-        Toast.makeText(context, "Smart Remainder on receive", Toast.LENGTH_LONG).show();
 
         wl.release();
     }
