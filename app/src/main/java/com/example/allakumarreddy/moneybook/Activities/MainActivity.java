@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.example.allakumarreddy.moneybook.utils.GlobalConstants.ACTION_BACKUP_MAIN_ACTIVITY_OPEN;
@@ -59,12 +61,22 @@ public class MainActivity extends BaseActivity
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
     public static final int ADD_ACTIVITY = 1001;
     private static final String LOCAL_BACKUP = "LOCAL_BACKUP";
+    private static final int FRAGMENT_HOME = 0;
+    private static final int FRAGMENT_CATEGORY = 1;
+    private static final int FRAGMENT_PAYMENT_METHOD = 2;
+    private static final int FRAGMENT_GRAPHS = 3;
+    private static final int FRAGMENT_REPORTS = 4;
     private int currentScreen = 0;
     private View mProgressBAr;
     private String bfrPermissionAction;
     private int mainLayout;
     private boolean closeActivity = false;
+    private View mainView;
     private View main;
+    private View calenderLayout;
+    private CalendarView calender;
+    private int currentFragmentIndex = -1;
+    private PreferencesCus preferencesCus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +147,9 @@ public class MainActivity extends BaseActivity
 
         //noinspection SimplifiableIfStatement
         switch (id) {
+            case R.id.action_calender:
+                showCalenderView();
+                break;
             case R.id.action_backup:
                 //backup(true);
                 backupToGoogleDrive();
@@ -281,7 +296,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void showCurrentFragment() {
-
+        showFragment(currentFragmentIndex, false);
     }
 
     @Override
@@ -334,23 +349,23 @@ public class MainActivity extends BaseActivity
         switch (id) {
             default:
             case R.id.home:
-                showHome();
+                showFragment(FRAGMENT_HOME, true);
                 break;
 
             case R.id.dash:
-                showCategory();
+                showFragment(FRAGMENT_CATEGORY, true);
                 break;
 
             case R.id.payment_method:
-                showPaymentMethod();
+                showFragment(FRAGMENT_PAYMENT_METHOD, true);
                 break;
 
             case R.id.graphs:
-                showGraphs();
+                showFragment(FRAGMENT_GRAPHS, true);
                 break;
 
             case R.id.reports:
-                showReports();
+                showFragment(FRAGMENT_REPORTS, true);
                 break;
         }
 
@@ -415,13 +430,42 @@ public class MainActivity extends BaseActivity
         transaction.commit();
     }
 
+    private void showFragment(int index, boolean isDeleteCurrDate) {
+        if (isDeleteCurrDate) {
+            if (currentFragmentIndex == FRAGMENT_HOME)
+                preferencesCus.setCurrentDate(new Date().getTime());
+        }
+        currentFragmentIndex = index;
+        switch (index) {
+            case FRAGMENT_HOME:
+                showHome();
+                break;
+
+            case FRAGMENT_CATEGORY:
+                showCategory();
+                break;
+
+            case FRAGMENT_PAYMENT_METHOD:
+                showPaymentMethod();
+                break;
+
+            case FRAGMENT_GRAPHS:
+                showGraphs();
+                break;
+
+            case FRAGMENT_REPORTS:
+                showReports();
+                break;
+        }
+    }
+
     private void showProgressBar() {
         mProgressBAr.setVisibility(View.VISIBLE);
-        main.setVisibility(View.GONE);
+        mainView.setVisibility(View.GONE);
     }
 
     private void hideProgressBar() {
-        AnimationUtils.revealAnimation(mProgressBAr, main, main);
+        AnimationUtils.revealAnimation(mProgressBAr, mainView, mainView);
     }
 
     public void goToAnalytics(String name) {
@@ -440,15 +484,15 @@ public class MainActivity extends BaseActivity
         if (isSmartRemainderNoti) {
             isShown = true;
             LoggerCus.d(TAG, "" + isSmartRemainderNoti);
-            showHome();
+            showFragment(FRAGMENT_HOME, true);
         }
 
         if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
             isShown = true;
-            showReports();
+            showFragment(FRAGMENT_REPORTS, true);
         }
         if (!isShown)
-            showHome();
+            showFragment(FRAGMENT_HOME, true);
         makeLocalBackup();
         hideProgressBar();
     }
@@ -476,8 +520,13 @@ public class MainActivity extends BaseActivity
     }
 
     private void init() {
+        preferencesCus = new PreferencesCus(this);
+        preferencesCus.setCurrentDate(new Date().getTime());
         mainLayout = R.id.main;
-        main = findViewById(mainLayout);
+        mainView = findViewById(R.id.main_view);
+        main = findViewById(R.id.main);
+        calenderLayout = findViewById(R.id.calender_layout);
+        calender = (CalendarView) findViewById(R.id.calendarView);
         showProgressBar();
         startMsgParserService();
     }
@@ -508,5 +557,32 @@ public class MainActivity extends BaseActivity
     @Override
     public void switchScreen() {
 
+    }
+
+    private void showCalenderView() {
+        Date tempDate = preferencesCus.getCurrentDate();
+        if (tempDate != null)
+            calender.setDate(tempDate.getTime());
+        main.setVisibility(View.GONE);
+        calenderLayout.setVisibility(View.VISIBLE);
+        calender.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, year);
+            cal.set(Calendar.MONTH, month);
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            hideCalenderView(cal);
+        });
+    }
+
+    private void hideCalenderView(Calendar cal) {
+        if (cal != null)
+            preferencesCus.setCurrentDate(cal.getTimeInMillis());
+        calenderLayout.setVisibility(View.GONE);
+        main.setVisibility(View.VISIBLE);
+        showCurrentFragment();
+    }
+
+    public void calenderLayoutClick(View view) {
+        hideCalenderView(null);
     }
 }

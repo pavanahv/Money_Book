@@ -63,6 +63,7 @@ public class GlobalConstants {
     public static final int TYPE_DUE_PAYMENT = 5;
     public static final int TYPE_LOAN_PAYMENT = 6;
     public static final int TYPE_MONEY_TRANSFER = 4;
+    public static final String PREF_CURRENT_DATE = "PREF_CURRENT_DATE";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.ExportActivity">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:elevation="5dp"
+        android:padding="5dp"
+        app:cardCornerRadius="5dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ScrollView
+                android:id="@+id/main_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Select Fields To Include"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/colorPrimary" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/sno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="S.NO" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/des"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Description" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/amt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Amount" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Date" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/type"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Type" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/cat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Category" />
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/paym"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Payment Method" />
+
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:text="Select Export Type"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/colorPrimary" />
+
+                    <android.support.v7.widget.AppCompatSpinner
+                        android:padding="2dp"
+                        android:layout_margin="2dp"
+                        android:id="@+id/type_ex"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_margin="2dp"
+                        android:padding="2dp"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.v7.widget.AppCompatButton
+                            android:layout_weight="1"
+                            android:text="Cancel"
+                            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                            android:layout_width="match_parent"
+                            android:onClick="cancel"
+                            android:layout_height="wrap_content" />
+
+                        <android.support.v7.widget.AppCompatButton
+                            android:layout_weight="1"
+                            android:text="Export"
+                            android:onClick="export"
+                            style="@style/Widget.AppCompat.Button.Colored"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </LinearLayout>
+            </ScrollView>
+
+
+         <FrameLayout
+             android:visibility="gone"
+             android:id="@+id/progress"
+             android:background="@color/black_overlay"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+             <ProgressBar
+                 android:layout_gravity="center"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content" />
+         </FrameLayout>
+        </FrameLayout>
+
+    </android.support.v7.widget.CardView>
+</FrameLayout>

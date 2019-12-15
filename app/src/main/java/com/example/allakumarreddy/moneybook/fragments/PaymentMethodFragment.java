@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -17,8 +19,8 @@ import android.widget.Toast;
 import com.example.allakumarreddy.moneybook.Activities.AddActivity;
 import com.example.allakumarreddy.moneybook.Activities.AnalyticsActivity;
 import com.example.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
-import com.example.allakumarreddy.moneybook.interfaces.DashBoardAdapterInterface;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.interfaces.DashBoardAdapterInterface;
 import com.example.allakumarreddy.moneybook.interfaces.DashUIUpdateInterface;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.DashBoardRecord;
@@ -66,6 +68,13 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = new DbHandler(getActivity());
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.findItem(R.id.action_calender).setVisible(false);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

@@ -14,8 +14,10 @@ import com.example.allakumarreddy.moneybook.Activities.RePaymentActivity;
 import com.example.allakumarreddy.moneybook.Adapter.MyAdapter;
 import com.example.allakumarreddy.moneybook.R;
 import com.example.allakumarreddy.moneybook.interfaces.HomeAdapterInterface;
+import com.example.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
@@ -46,6 +48,9 @@ public class HomeInnerFragment extends Fragment {
     private View mainView;
     private View progress;
     private View noData;
+    private Date curDate;
+    private PreferencesCus pref;
+    private TextView dateTv;
 
     public HomeInnerFragment() {
         // Required empty public constructor
@@ -63,12 +68,20 @@ public class HomeInnerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         readBundle(getArguments());
-        Date curDate = new Date();
+        curDate = new Date();
+        pref = new PreferencesCus(getContext());
         format = new SimpleDateFormat("yyyy/MM/dd");
-        curDateStr = format.format(curDate);
+        initDate();
         mDbHandler = new DbHandler(getContext());
         mbr = new ArrayList<>();
         mAdapter = new MyAdapter(mbr, getContext(), mType, mHomeAdapterInterface);
+    }
+
+    private void initDate() {
+        Date tempDate = pref.getCurrentDate();
+        if (tempDate != null)
+            curDate = tempDate;
+        curDateStr = format.format(curDate);
     }
 
     @Override
@@ -85,10 +98,15 @@ public class HomeInnerFragment extends Fragment {
         mListView = layout.findViewById(R.id.lv);
         mListView.setAdapter(mAdapter);
         mTotalTextView = layout.findViewById(R.id.total_tv);
-        TextView dateTv = (TextView) layout.findViewById(R.id.date_text);
-        dateTv.setText(new SimpleDateFormat("dd MMM yyyy").format(new Date()));
-        dateTv.setTextColor(Utils.getColor(mType, getContext()));
+        dateTv = (TextView) layout.findViewById(R.id.date_text);
+        initDateView();
         return layout;
+    }
+
+    private void initDateView() {
+        dateTv.setText(new SimpleDateFormat("dd MMM yyyy").format(curDate));
+        dateTv.setTextColor(Utils.getColor(mType, getContext()));
+        LoggerCus.d(TAG,new SimpleDateFormat("dd MMM yyyy").format(curDate));
     }
 
     private void readBundle(Bundle args) {
@@ -104,6 +122,9 @@ public class HomeInnerFragment extends Fragment {
     }
 
     public void updataUI() {
+        initDate();
+        initDateView();
+
         new Thread(() -> {
             mbr = mDbHandler.getRecords(curDateStr, mType);
             getActivity().runOnUiThread(() -> {

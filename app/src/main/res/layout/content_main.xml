@@ -9,12 +9,35 @@
     tools:showIn="@layout/app_bar_main">
 
     <FrameLayout
-        android:visibility="gone"
-        android:id="@+id/main"
+        android:id="@+id/main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <FrameLayout
+            android:visibility="gone"
+            android:onClick="calenderLayoutClick"
+            android:background="@color/black_overlay"
+            android:id="@+id/calender_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+            <CalendarView
+                android:layout_gravity="center"
+                android:background="@color/white"
+                android:id="@+id/calendarView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </CalendarView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        </FrameLayout>
     </FrameLayout>
 
     <FrameLayout

@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.example.allakumarreddy.moneybook.Adapter.AnalyticsAdapter;
 import com.example.allakumarreddy.moneybook.R;
-import com.example.allakumarreddy.moneybook.storage.XLStore;
 import com.example.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.example.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.example.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -25,7 +24,6 @@ import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 import com.example.allakumarreddy.moneybook.utils.MBRecord;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -109,13 +107,10 @@ public class AnalyticsActivity extends BaseActivity {
                 break;
 
             case R.id.analytics_save_xl:
-                try {
-                    new XLStore("MoneyBook", dataList);
-                    Toast.makeText(AnalyticsActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    LoggerCus.d("analyticsactivity", e.getMessage());
-                    Toast.makeText(AnalyticsActivity.this, "Error in Saving ! " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                Intent tintent = new Intent(AnalyticsActivity.this, ExportActivity.class);
+                tintent.putExtra("list",dataList);
+                startActivity(tintent);
+                overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
 
             case android.R.id.home:

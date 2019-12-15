@@ -80,7 +80,7 @@ public class DashboardFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflater.inflate(R.menu.dashboard_action_bar, menu);
+        menu.findItem(R.id.action_calender).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -2,7 +2,6 @@ package com.example.allakumarreddy.moneybook.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
@@ -31,7 +30,7 @@ public class WelcomeIconViewActivity extends BaseActivity {
                 Animation.RELATIVE_TO_SELF, 0f, // Pivot point of X scaling
                 Animation.RELATIVE_TO_SELF, 1f); // Pivot point of Y scaling
         //anim.setFillAfter(true); // Needed to keep the result of the animation
-        //anim.setDuration(300);
+        anim.setDuration(300);
         anim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {

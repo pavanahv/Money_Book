@@ -9,6 +9,7 @@ import com.example.allakumarreddy.moneybook.utils.LoggerCus;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -96,5 +97,20 @@ public class PreferencesCus {
 
     public int getLockPinData() {
         return mSharedPreference.getInt(GlobalConstants.PREF_LOCK_PIN, -1);
+    }
+
+    public void setCurrentDate(long val) {
+        mSharedPreference.edit().putLong(GlobalConstants.PREF_CURRENT_DATE, val).apply();
+    }
+
+    public Date getCurrentDate() {
+        long val = mSharedPreference.getLong(GlobalConstants.PREF_CURRENT_DATE, -1);
+        if (val == -1)
+            return null;
+        else {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(val);
+            return cal.getTime();
+        }
     }
 }

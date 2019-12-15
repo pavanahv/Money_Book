@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
 public class AnimationUtils {
 
@@ -28,7 +30,7 @@ public class AnimationUtils {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
-                    progress.setVisibility(View.INVISIBLE);
+                    progress.setVisibility(View.GONE);
                 }
             });
             // make the view visible and start the animation
@@ -38,5 +40,13 @@ public class AnimationUtils {
             // set the view to invisible without a circular reveal animation below Lollipop
             mainView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public static Animation translateAnimation(View animatedView,float fromX,float toX,float fromY,float toY) {
+        Animation animation = new TranslateAnimation(fromX, toX, fromY, toY);
+        animation.setDuration(300);
+        animatedView.startAnimation(animation);
+        animatedView.setVisibility(View.VISIBLE);
+        return animation;
     }
 }
