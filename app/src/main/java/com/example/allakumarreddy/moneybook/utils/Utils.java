@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
@@ -339,6 +340,10 @@ public class Utils {
                     label[i]));
         }
         LineDataSet dataSet = new LineDataSet(entry, "Amount");
+        dataSet.setColor(ColorTemplate.getHoloBlue());
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(ColorTemplate.getHoloBlue());
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         ArrayList<ILineDataSet> list = new ArrayList<>();
         list.add(dataSet);
         LineData lineData = new LineData(list);
@@ -421,6 +426,7 @@ public class Utils {
         PieDataSet dataSet = new PieDataSet(entry, "Amount");
         PieData barData = new PieData(dataSet);
         chart.setData(barData);
+        chart.setEntryLabelColor(Color.BLACK);
 
         chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         dataSet.setColors(getColors());

@@ -1,7 +1,6 @@
 package com.example.allakumarreddy.moneybook.Adapter;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,9 +10,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.allakumarreddy.moneybook.interfaces.DashBoardFilterAdapterInterface;
 import com.example.allakumarreddy.moneybook.Activities.MainActivity;
 import com.example.allakumarreddy.moneybook.R;
+import com.example.allakumarreddy.moneybook.interfaces.DashBoardFilterAdapterInterface;
 import com.example.allakumarreddy.moneybook.utils.Utils;
 
 public class DashBoardFilterAdapter extends RecyclerView.Adapter<DashBoardFilterAdapter.ViewHolder> {
@@ -66,7 +65,9 @@ public class DashBoardFilterAdapter extends RecyclerView.Adapter<DashBoardFilter
         //holder.mLinearLayout.setText(mDataset[position]);
         View view = Utils.getGraphFromParelableJSONString(mJsonDataTitle[position][1], mContext);
         ((TextView) holder.mLinearLayout.findViewById(R.id.title)).setText(mJsonDataTitle[position][0].toUpperCase());
-        ((CardView) holder.mLinearLayout.findViewById(R.id.cv)).addView(view);
+        LinearLayout linearLayout = (LinearLayout) holder.mLinearLayout.findViewById(R.id.cv);
+        linearLayout.addView(view, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
 
         final PopupMenu popup = new PopupMenu(mContext, ((ImageButton) holder.mLinearLayout.findViewById(R.id.menu)));
         //Inflating the Popup using xml file

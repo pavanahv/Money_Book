@@ -76,6 +76,9 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
             case R.id.analytics_clear_all:
                 clearAll();
                 break;
+            case R.id.apply:
+                apply(null);
+                break;
             case android.R.id.home:
                 finish();
                 overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
@@ -167,7 +170,10 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
 
     public void mainMenuItemSelected(int position) {
         setAllMainMenuItemsNormalStyle();
-        ((TextView) mainMenu.getChildAt(position).findViewById(R.id.menutitle)).setTypeface(null, Typeface.BOLD);
+        View view = mainMenu.getChildAt(position);
+        if (view != null) {
+            ((TextView) view.findViewById(R.id.menutitle)).setTypeface(null, Typeface.BOLD);
+        }
         setSubMenu(position);
     }
 
@@ -220,8 +226,14 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
 
     private void setAllMainMenuItemsNormalStyle() {
         final int len = mAnalyticsFilterData.mainMenuData.length;
-        for (int i = 0; i < len; i++)
-            ((TextView) mainMenu.getChildAt(i).findViewById(R.id.menutitle)).setTypeface(null, Typeface.NORMAL);
+        for (int i = 0; i < len; i++) {
+            View view = mainMenu.getChildAt(i);
+            if (view != null) {
+                TextView tv = ((TextView) view.findViewById(R.id.menutitle));
+                if (tv != null)
+                    tv.setTypeface(null, Typeface.NORMAL);
+            }
+        }
     }
 
     public void cancel(View view) {

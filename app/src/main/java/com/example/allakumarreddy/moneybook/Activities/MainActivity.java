@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Messenger;
@@ -388,6 +389,12 @@ public class MainActivity extends BaseActivity
         transaction.replace(mainLayout, new DashboardFilterFragment());
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         transaction.commit();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        showCurrentFragment();
+        super.onConfigurationChanged(newConfig);
     }
 
     private void showGraphsActionBar() {
