@@ -10,7 +10,7 @@
     <!-- Allows the user to choose a ringtone in the 'notification' category. -->
     <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
     <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
-    <com.example.allakumarreddy.moneybook.utils.TimePreference
+    <com.pavanahv.allakumarreddy.moneybook.utils.TimePreference
         android:dependency="PREF_REPORTS_SWITCH"
         android:key="PREF_REPORTS_TIME"
         android:title="Reports Time"/>
@@ -21,7 +21,7 @@
         android:key="PREF_REPORTS_REMAINDER_SWITCH"
         android:title="@string/record_remainder_name" />
 
-    <com.example.allakumarreddy.moneybook.utils.TimePreference
+    <com.pavanahv.allakumarreddy.moneybook.utils.TimePreference
         android:dependency="PREF_REPORTS_REMAINDER_SWITCH"
         android:key="PREF_REPORTS_REMAINDER_TIME"
         android:title="Smart Remainder Time"/>

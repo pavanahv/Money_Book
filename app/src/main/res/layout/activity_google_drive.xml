@@ -4,6 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.allakumarreddy.moneybook.Activities.GoogleDriveActivity">
+    tools:context="com.pavanahv.allakumarreddy.moneybook.Activities.GoogleDriveActivity">
 
 </android.support.constraint.ConstraintLayout>
