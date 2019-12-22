@@ -43,11 +43,11 @@ public class LoginActivity extends BaseActivity {
 
         PreferencesCus sp = new PreferencesCus(this);
         LoggerCus.d(TAG, sp.getData(Utils.getEmail()) + " login data");
-        if (sp.getData(Utils.getEmail()) == null) {
-            /*startActivity(new Intent(this, WelcomeActivity.class));
+        if (sp.getData(Utils.getEmail()) == null && !sp.getRestoreStatus()) {
+            startActivity(new Intent(this, WelcomeActivity.class));
             overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
             finish();
-            return;*/
+            return;
         }
 
         init();

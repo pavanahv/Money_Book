@@ -18,12 +18,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pavanahv.allakumarreddy.moneybook.R;
-import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
-import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.ReportsAlarmReceiver;
-import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.SmartRemainderAlarmReceiver;
-import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -50,12 +44,21 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
+import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver;
+import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.ReportsAlarmReceiver;
+import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.SmartRemainderAlarmReceiver;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -163,20 +166,45 @@ public class Utils {
         }
     }
 
-    public static boolean isOnline(Context context) {
-        boolean status = false;
+    public static void isOnline(Context context, BackupToGoogleDriveService.Callback callback) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager
                 .getActiveNetworkInfo();
 
+        boolean isThreadStarted = false;
         // Check internet connection and accrding to state change the
-        if (networkInfo != null && networkInfo.isConnected()) {
-            status = true;
-            LoggerCus.d(TAG, "Connected to internet");
-            Toast.makeText(context, "MoneyBook : Connected to Internet", Toast.LENGTH_SHORT).show();
+        if (networkInfo != null) {
+            if (networkInfo.isConnected()) {
+                isThreadStarted = true;
+                new Thread(() -> {
+                    boolean status = isInternetAvailable();
+                    if (status)
+                        LoggerCus.d(TAG, "Connected to internet");
+                    else
+                        LoggerCus.d(TAG, "Not Connected to internet");
+                    callback.isInternetAvilable(status);
+                }).start();
+
+            } else {
+                LoggerCus.d(TAG, "Network is not connected");
+            }
+        } else {
+            LoggerCus.d(TAG, "Network Info is null");
         }
-        return status;
+        if (!isThreadStarted) {
+            callback.isInternetAvilable(false);
+        }
+    }
+
+    public static boolean isInternetAvailable() {
+        try {
+            InetAddress address = InetAddress.getByName("www.google.com");
+            return !address.equals("");
+        } catch (UnknownHostException e) {
+            // Log error
+        }
+        return false;
     }
 
     public static void setAlarmForGoogleDriveBackup(Context context) {

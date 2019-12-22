@@ -15,7 +15,7 @@ public class GlobalConstants {
     public static final String PREF_EMAIL = "EMAIL";
     public static final String PREF_BACKUP_FREQUENCY = "backup_frequency";
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_NAME = "PREF_GOOGLE_DRIVE_BACKUP_FILE_NAME";
-    public static final String GOOGLE_DRIVE_BACKUP_FILE_NAME = "MoneyBook.json";
+    public static final String GOOGLE_DRIVE_BACKUP_FILE_NAME = "MoneyBook.mb";
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE = "PREF_GOOGLE_DRIVE_BACKUP_FILE_SIZE";
     public static final String PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE = "PREF_GOOGLE_DRIVE_BACKUP_FILE_DATE";
     public static final String ACTION_INTERNET_CONNECTED = "ACTION_INTERNET_CONNECTED";
@@ -64,6 +64,8 @@ public class GlobalConstants {
     public static final int TYPE_LOAN_PAYMENT = 6;
     public static final int TYPE_MONEY_TRANSFER = 4;
     public static final String PREF_CURRENT_DATE = "PREF_CURRENT_DATE";
+    public static final String ACTION_STOP_BACKUP_SERVICE = "ACTION_STOP_BACKUP_SERVICE";
+    public static final String RESTORE_DONE = "RESTORE_DONE";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

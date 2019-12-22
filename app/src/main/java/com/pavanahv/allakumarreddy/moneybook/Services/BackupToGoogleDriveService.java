@@ -9,20 +9,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
+import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.pavanahv.allakumarreddy.moneybook.R;
-import com.pavanahv.allakumarreddy.moneybook.utils.Backup;
-import com.pavanahv.allakumarreddy.moneybook.utils.GoogleDriveBackup;
 import com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.NetworkConnectionReceiver;
 import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.Backup;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.pavanahv.allakumarreddy.moneybook.utils.GoogleDriveBackup;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
-import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 
 public class BackupToGoogleDriveService extends Service {
 
@@ -36,6 +35,7 @@ public class BackupToGoogleDriveService extends Service {
     private NotificationCompat.Builder builder;
     private NetworkConnectionReceiver receiver;
     private boolean isRegesteredForInternet = false;
+    private String mAction;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -49,11 +49,16 @@ public class BackupToGoogleDriveService extends Service {
             mPref = new PreferencesCus(this);
             switch (action) {
                 case GlobalConstants.BACKUP_TO_GOOGLE_DRIVE:
-                    startForegroundServiceForBackupToGoogleDrive();
+                    mAction = GlobalConstants.BACKUP_TO_GOOGLE_DRIVE;
                     LoggerCus.d(TAG, "foreground service started for backup to google drive");
+                    startForegroundServiceForBackupToGoogleDrive();
                     break;
                 case GlobalConstants.ACTION_INTERNET_CONNECTED:
+                    mAction = GlobalConstants.ACTION_INTERNET_CONNECTED;
                     resumeBackup();
+                    break;
+                case GlobalConstants.ACTION_STOP_BACKUP_SERVICE:
+                    stopForegroundService();
                     break;
             }
         }
@@ -68,7 +73,7 @@ public class BackupToGoogleDriveService extends Service {
     }
 
     private void startForegroundServiceForBackupToGoogleDrive() {
-        LoggerCus.d(TAG, "Start foreground service.");
+        LoggerCus.d(TAG, "Starting foreground service.");
 
         Intent notificationIntent = new Intent();
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -86,21 +91,30 @@ public class BackupToGoogleDriveService extends Service {
             notificationManager.createNotificationChannel(channel);
         }
         builder.setOngoing(true);
-        builder.setProgress(100, 0, false);
+        builder.setPriority(NotificationCompat.PRIORITY_LOW);
+        builder.setProgress(100, 0, true);
         startForeground(NOTIFICATION_ID, notification);
         startBackupToDriveIfInternetAvailable();
     }
 
     private void startBackupToDriveIfInternetAvailable() {
-        if (Utils.isOnline(this)) {
-            unRegisterBroadCast();
-            backupToDrive();
-        } else {
-            builder.setContentText("Waiting for Network!");
-            notificationManager.notify(NOTIFICATION_ID, builder.build());
-            initBroadCast();
-            isWaitingForInternet = true;
-        }
+        LoggerCus.d(TAG, "Checking for Internet");
+        Callback callback = isOn -> {
+            if (isOn) {
+                unRegisterBroadCast();
+                backupToDrive();
+            } else {
+                if (mAction.compareToIgnoreCase(GlobalConstants.BACKUP_TO_GOOGLE_DRIVE) == 0) {
+                    LoggerCus.d(TAG, "No internet so waiting for network");
+                    builder.setContentText("Waiting for Network!");
+                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    initBroadCast();
+                    isWaitingForInternet = true;
+                }
+            }
+        };
+
+        Utils.isOnline(BackupToGoogleDriveService.this, callback);
     }
 
     private void unRegisterBroadCast() {
@@ -119,7 +133,6 @@ public class BackupToGoogleDriveService extends Service {
         receiver = new NetworkConnectionReceiver();
         IntentFilter ifilter = new IntentFilter();
         ifilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        ifilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         registerReceiver(receiver, ifilter);
     }
 
@@ -130,7 +143,7 @@ public class BackupToGoogleDriveService extends Service {
             GoogleDriveBackup gdb = new GoogleDriveBackup(BackupToGoogleDriveService.this);
             MediaHttpUploaderProgressListener uploadProgressCallback = uploader -> {
                 LoggerCus.d(TAG, uploader.getNumBytesUploaded() + "");
-                int percent = (int) uploader.getProgress();
+                int percent = (int) (uploader.getProgress() * 100);
                 builder.setProgress(100, percent, false);
                 builder.setContentText("" + uploader.getNumBytesUploaded() + " Bytes " + " " + percent + "%");
                 notificationManager.notify(NOTIFICATION_ID, builder.build());
@@ -148,5 +161,9 @@ public class BackupToGoogleDriveService extends Service {
 
         // Stop the foreground service.
         stopSelf();
+    }
+
+    public interface Callback {
+        void isInternetAvilable(boolean isOn);
     }
 }

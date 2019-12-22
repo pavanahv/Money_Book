@@ -138,7 +138,7 @@ public class TestActivity extends AppCompatActivity {
         if (mDriveServiceHelper != null) {
             Log.d(TAG, "Reading file " + fileId);
 
-            mDriveServiceHelper.readFile(fileId)
+            mDriveServiceHelper.readFile(fileId, null)
                     .addOnSuccessListener(nameAndContent -> {
                         String name = nameAndContent.first;
                         String content = nameAndContent.second;

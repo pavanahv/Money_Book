@@ -7,12 +7,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.support.v4.util.Pair;
-import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
+import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
@@ -61,7 +61,8 @@ public class DriveServiceHelper {
      * Opens the file identified by {@code fileId} and returns a {@link Pair} of its name and
      * contents.
      */
-    public Task<Pair<String, String>> readFile(String fileId) {
+    public Task<Pair<String, String>> readFile(String fileId,
+                                               MediaHttpDownloaderProgressListener listener) {
         return Tasks.call(mExecutor, () -> {
             // Retrieve the metadata as a File object.
             File metadata = mDriveService.files().get(fileId).execute();
@@ -69,12 +70,10 @@ public class DriveServiceHelper {
 
             // Stream the file contents to a String.
             Drive.Files.Get file = mDriveService.files().get(fileId);
-            file.getMediaHttpDownloader().setProgressListener(new MediaHttpDownloaderProgressListener() {
-                @Override
-                public void progressChanged(MediaHttpDownloader downloader) throws IOException {
-                    Log.d("pavanlog", downloader.getNumBytesDownloaded() + "");
-                }
-            });
+            MediaHttpDownloader downloader = file.getMediaHttpDownloader();
+            downloader.setDirectDownloadEnabled(false);
+            downloader.setChunkSize(MediaHttpUploader.MINIMUM_CHUNK_SIZE);
+            downloader.setProgressListener(listener);
             StringBuilder stringBuilder = new StringBuilder("");
             file.executeMediaAndDownloadTo(new OutputStream() {
                 @Override
@@ -101,7 +100,10 @@ public class DriveServiceHelper {
 
             // Update the metadata and contents.
             Drive.Files.Update update = mDriveService.files().update(fileId, metadata, contentStream);
-            update.getMediaHttpUploader().setProgressListener(uploadProgressCallback);
+            MediaHttpUploader uploader = update.getMediaHttpUploader();
+            uploader.setDirectUploadEnabled(false);
+            uploader.setChunkSize(MediaHttpUploader.MINIMUM_CHUNK_SIZE);
+            uploader.setProgressListener(uploadProgressCallback);
             update.execute();
 
             return null;

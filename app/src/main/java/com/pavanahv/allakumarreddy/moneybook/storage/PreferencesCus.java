@@ -113,4 +113,12 @@ public class PreferencesCus {
             return cal.getTime();
         }
     }
+
+    public boolean getRestoreStatus() {
+        return mSharedPreference.getBoolean(GlobalConstants.RESTORE_DONE, false);
+    }
+
+    public void setRestoreStatus() {
+        mSharedPreference.edit().putBoolean(GlobalConstants.RESTORE_DONE, true).apply();
+    }
 }

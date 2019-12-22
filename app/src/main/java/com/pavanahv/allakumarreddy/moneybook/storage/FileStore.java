@@ -29,12 +29,15 @@ public class FileStore {
         this.restoredFileName = "Restore";
     }
 
-    public String readFile() {
-        String outs = "";
+    public String readLocalFile(boolean isBackup) {
+        String outs = null;
         try {
-            RandomAccessFile rs = new RandomAccessFile(getMediaFile(true), "rw");
-            for (String s = ""; s != null; s = rs.readLine())
+            RandomAccessFile rs = new RandomAccessFile(getMediaFile(isBackup), "rw");
+            for (String s = ""; s != null; s = rs.readLine()) {
+                if (outs == null)
+                    outs = "";
                 outs += s;
+            }
             rs.close();
         } catch (FileNotFoundException e) {
             LoggerCus.d(TAG, e.getMessage());
@@ -44,7 +47,7 @@ public class FileStore {
         return outs;
     }
 
-    public File writeFile(String s,boolean isBackup) throws IOException {
+    public File writeFile(String s, boolean isBackup) throws IOException {
         File f = getMediaFile(isBackup);
         RandomAccessFile rs = new RandomAccessFile(f, "rw");
         rs.setLength(0);
@@ -69,8 +72,25 @@ public class FileStore {
         else
             filename += this.restoredFileName + ".mb";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
-        if (mediaFile.exists())
-            mediaFile.delete();
+        /*if (mediaFile.exists())
+            mediaFile.delete();*/
         return mediaFile;
+    }
+
+    public File checkAndGetBackupMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "MBStore");
+        if (!mediaStorageDir.exists()) {
+            LoggerCus.d(TAG, "Local Backup Not Found to restore..");
+            return null;
+        }
+
+        File mediaFile;
+        String filename = "";
+        filename += this.fileName + ".mb";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename);
+        if (mediaFile.exists())
+            return mediaFile;
+        else
+            return null;
     }
 }

@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.pavanahv.allakumarreddy.moneybook.R;
-import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
-import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,6 +16,10 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.Collections;
 
@@ -88,7 +88,7 @@ public class WelcomeActivity extends BaseActivity {
                         .build();
         PreferencesCus sp = new PreferencesCus(this);
         sp.setData(Utils.getEmail(), GoogleSignIn.getLastSignedInAccount(this).getEmail());
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, RestoreActivity.class));
         overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
         finish();
     }

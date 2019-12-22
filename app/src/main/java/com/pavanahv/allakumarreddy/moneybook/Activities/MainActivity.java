@@ -204,7 +204,6 @@ public class MainActivity extends BaseActivity
             startActivityForResult(mediaIntent, REQUESTCODE_PICK_JSON);
         } else {
             bfrPermissionAction = ACTION_IMPORT;
-            bfrPermissionAction = ACTION_IMPORT;
             requestPermissionForReadWriteStorage();
         }
     }
