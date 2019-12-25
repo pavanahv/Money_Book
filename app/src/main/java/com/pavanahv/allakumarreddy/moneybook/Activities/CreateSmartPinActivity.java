@@ -8,19 +8,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
-import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 
 public class CreateSmartPinActivity extends BaseActivity {
 
     private static final String TAG = "CreateSmartPinActivity";
     private String str = "";
-    private boolean isLastOp;
+    private boolean isLastOp = false;
     private TextView mStatus;
     private TextView mPinView;
-    private boolean isVar;
+    private boolean isVar = false;
     private int opCount = 0;
     private int varCount = 0;
+    private boolean isLastNum = false;
+    private String numChar = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,7 @@ public class CreateSmartPinActivity extends BaseActivity {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString(GlobalConstants.PREF_LOCK_TYPE, "2").apply();
         Toast.makeText(this, "Lock Disabled!\nPlease select lock from settings again.", Toast.LENGTH_LONG).show();
         finish();
+        overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
     }
 
     public void onCancel(View view) {
@@ -62,7 +65,55 @@ public class CreateSmartPinActivity extends BaseActivity {
 
     public void create(View view) {
 
+        boolean res = checkFormula();
+        if (res) {
+            PreferencesCus pref = new PreferencesCus(this);
+            pref.setLockSmartPinData(str);
+            finish();
+            overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
+        }
+    }
 
+    private boolean checkFormula() {
+        String s = str;
+        int numC = 0, varC = 0, opC = 0;
+        boolean lastNum = false;
+        for (char c : s.toCharArray()) {
+            if (c == '+' || c == '*') {
+                opC++;
+                if (lastNum) {
+                    numC++;
+                    lastNum = false;
+                }
+            } else if (c == 'X') {
+                varC++;
+                if (lastNum) {
+                    numC++;
+                    lastNum = false;
+                }
+            } else {
+                lastNum = true;
+            }
+        }
+        if (lastNum) {
+            numC++;
+        }
+
+        if (numC < 1) {
+            error("Atleast one number should be used in formula");
+            return false;
+        }
+
+        if (opC < 1) {
+            error("Atleast one Operator should be used in formula");
+            return false;
+        }
+
+        if (varC < 1) {
+            error("Variable should be used in formula");
+            return false;
+        }
+        return true;
     }
 
     public void buttonFire(View view) {
@@ -117,30 +168,23 @@ public class CreateSmartPinActivity extends BaseActivity {
     private void del() {
         final int len = str.length();
         if (len > 0) {
+            String temp = str.substring(0, len - 1);
             reset();
-            for (char cc : str.toCharArray()) {
-                if (cc == '*' || cc == '+')
-                    opCount++;
-                else if (cc == 'X')
-                    varCount++;
+            for (char cc : temp.toCharArray()) {
+                calc(cc);
             }
-            char lc = str.charAt(str.length() - 1);
-            if (lc == '*' || lc == '+')
-                isLastOp = true;
-            else if (lc == 'X')
-                isVar = true;
-            str = str.substring(0, len - 1);
-            updateTextView();
-            LoggerCus.d(TAG, " isVar:" + isVar + " isLastop:" + isLastOp + " varcount:" + varCount + " opcount" + opCount);
         }
-        hideStatus();
     }
 
     private void reset() {
         isLastOp = false;
         isVar = false;
+        isLastNum = false;
         varCount = 0;
         opCount = 0;
+        str = "";
+        numChar = "";
+        updateTextView();
     }
 
     private void calc(char c) {
@@ -149,49 +193,77 @@ public class CreateSmartPinActivity extends BaseActivity {
         boolean op = false;
         if (c == '*' || c == '+')
             op = true;
-        if (op && isLastOp) {
-            error("Cannot Put Two Operands Side By Side");
-            return;
-        }
-        if (op) {
-            if (str.length() == 0) {
-                error("You Cannot start with operand");
-                return;
-            }
-            opCount++;
-            if (opCount > 2) {
-                opCount--;
-                error("Cannot use more than two operands");
-                return;
-            }
-        }
 
         boolean varb = false;
         if (c == 'X') {
             varb = true;
         }
 
-        LoggerCus.d(TAG, "varb:" + varb + " isVar:" + isVar + " op:" + op + " isLastop:" + isLastOp + " varcount:" + varCount + " opcount" + opCount);
-        if (isVar && varb || (varb && varCount == 1)) {
-            error("Only One Operand Is allowed");
-            return;
-        }
-        if (!isLastOp && varb) {
-            error("Cannot Add Variable After Number. Please Add Operand In Between\n Ex. 2*x+19");
-            return;
-        }
-
         boolean isNum = false;
         if (!varb && !op)
             isNum = true;
 
-        isVar = varb;
-        if (varb)
+        if (op) {
+            if (isLastOp) {
+                error("Cannot Put Two Operators Side By Side");
+                return;
+            }
+
+            if (str.length() == 0) {
+                error("You Cannot start with operator");
+                return;
+            }
+
+            opCount++;
+
+            if (opCount > 2) {
+                opCount--;
+                error("Cannot use more than two operators");
+                return;
+            }
+        }
+
+        if (varb) {
+            if (isVar || (varCount == 1)) {
+                error("Only One Operand Is allowed");
+                return;
+            }
+
+            if (!isLastOp && isLastNum) {
+                error("Cannot Add Variable After Number. Please Add Operator In Between\n Ex. 2*x+19");
+                return;
+            }
+
             varCount++;
+        }
+
+        if (isNum) {
+            if (isVar) {
+                error("Cannot User Number After Variable. Use Operator In Middle");
+                return;
+            }
+
+            if (isLastNum) {
+                int tempNum = Integer.parseInt(numChar + c);
+                if (tempNum >= 100) {
+                    error("Number Cannot be more than 100");
+                    return;
+                }
+                numChar += c;
+            } else {
+                numChar = "" + c;
+            }
+        } else {
+            numChar = "";
+        }
+
+        isVar = varb;
         isLastOp = op;
+        isLastNum = isNum;
         hideStatus();
         str = str + c;
         updateTextView();
+        //LoggerCus.d(TAG, "varb:" + varb + " isVar:" + isVar + " op:" + op + " isLastop:" + isLastOp + " varcount:" + varCount + " opcount" + opCount);
     }
 
     private void updateTextView() {

@@ -121,4 +121,12 @@ public class PreferencesCus {
     public void setRestoreStatus() {
         mSharedPreference.edit().putBoolean(GlobalConstants.RESTORE_DONE, true).apply();
     }
+
+    public void setLockSmartPinData(String lockData) {
+        mSharedPreference.edit().putString(GlobalConstants.PREF_LOCK_SMART_PIN, lockData).apply();
+    }
+
+    public String getLockSmartPinData() {
+        return mSharedPreference.getString(GlobalConstants.PREF_LOCK_SMART_PIN, null);
+    }
 }

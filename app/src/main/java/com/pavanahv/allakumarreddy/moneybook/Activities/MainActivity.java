@@ -155,9 +155,9 @@ public class MainActivity extends BaseActivity
                 //backup(true);
                 backupToGoogleDrive();
                 return true;
-            case R.id.action_import:
+            /*case R.id.action_import:
                 importAction();
-                return true;
+                return true;*/
             case R.id.action_analytics:
                 goToAnalytics("0");
                 break;
@@ -178,9 +178,7 @@ public class MainActivity extends BaseActivity
                 //db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
-                //test();
-                AutoAddManager am = new AutoAddManager(this);
-                am.process();
+                test();
                 break;*/
         }
         return super.onOptionsItemSelected(item);

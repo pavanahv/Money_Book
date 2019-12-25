@@ -58,6 +58,7 @@ public class CreatePinActivity extends BaseActivity {
             preferenceCus.setLockPinData(pin);
             Toast.makeText(this, "Lock Pin Set Successfully!", Toast.LENGTH_SHORT).show();
             finish();
+            overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
         } else {
             TextView tv = ((TextView) findViewById(R.id.status));
             tv.setText("Pin & Confirm Pin are not equal");

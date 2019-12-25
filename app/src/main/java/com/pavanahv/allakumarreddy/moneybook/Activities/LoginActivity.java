@@ -20,6 +20,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class LoginActivity extends BaseActivity {
@@ -43,7 +44,7 @@ public class LoginActivity extends BaseActivity {
 
         PreferencesCus sp = new PreferencesCus(this);
         LoggerCus.d(TAG, sp.getData(Utils.getEmail()) + " login data");
-        if (sp.getData(Utils.getEmail()) == null && !sp.getRestoreStatus()) {
+        if (sp.getData(Utils.getEmail()) == null || !sp.getRestoreStatus()) {
             startActivity(new Intent(this, WelcomeActivity.class));
             overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
             finish();
@@ -153,10 +154,10 @@ public class LoginActivity extends BaseActivity {
 
     private void generateRandNumber() {
         Random randomGenerator = new Random();
-        orgResult = randomGenerator.nextInt(10) + 1;
-        numberView.setText("" + orgResult);
-        input = orgResult;
-        orgResult = calResult();
+        input = randomGenerator.nextInt(10) + 1;
+        numberView.setText("" + input);
+        calResult();
+        LoggerCus.d(TAG, "orgresult : " + orgResult);
     }
 
     public void login(View view) {
@@ -177,18 +178,119 @@ public class LoginActivity extends BaseActivity {
 
     }
 
-    private int calResult() {
-        int result = getResOnOp(n1, input, op1);
-        result = getResOnOp(result, n2, op2);
+    private void calResult() {
+        String pin = new PreferencesCus(this).getLockSmartPinData();
+        if (pin == null) {
+            Toast.makeText(this, "Something Went Wrong With SmartPin\nTry Another Way To Login", Toast.LENGTH_LONG).show();
+            orgResult = 9999;
+            return;
+        }
+        LoggerCus.d(TAG, pin);
+        int opCount = 0;
+        for (char c : pin.toCharArray()) {
+            if (c == '*' || c == '+') {
+                opCount++;
+            }
+        }
+
+        LoggerCus.d(TAG, "opcount : " + opCount);
+        if (opCount == 2) {
+            // There are two operators , so first calculate where * is there according to BODMAS rule
+            // So getting two things other sides of *
+            String vals[] = new String[]{
+                    "", "", ""
+            };
+            char ops[] = new char[]{
+                    '+', '+'
+            };
+
+            int ind = 0;
+            boolean isMulFirst = false;
+            boolean isOpFixed = false;
+            for (char c : pin.toCharArray()) {
+                if (c == '*' || c == '+') {
+                    ops[ind] = c;
+                    if (!isOpFixed) {
+                        isOpFixed = true;
+                        if (c == '*') {
+                            isMulFirst = true;
+                        } else {
+                            isMulFirst = false;
+                        }
+                    }
+                    ind++;
+                    continue;
+                }
+                vals[ind] += c;
+            }
+
+            LoggerCus.d(TAG, "vals array : " + Arrays.toString(vals));
+
+            if (isMulFirst) {
+                orgResult = calculateResultOnIndex(vals, 0, 1, 2, ops[0], ops[1]);
+            } else {
+                orgResult = calculateResultOnIndex(vals, 1, 2, 0, ops[0], ops[1]);
+            }
+        } else {
+            String vals[] = new String[]{
+                    "", ""
+            };
+
+            int ind = 0;
+            char op = '+';
+            for (char c : pin.toCharArray()) {
+                if (c == '*' || c == '+') {
+                    op = c;
+                    ind++;
+                    continue;
+                }
+                vals[ind] += c;
+            }
+
+            LoggerCus.d(TAG, "vals array : " + Arrays.toString(vals));
+
+            int val1 = getIntOfVarb(vals[0]);
+            int val2 = getIntOfVarb(vals[1]);
+            if (val1 == -1) {
+                orgResult = getResOnOp(input, val2, op);
+            } else if (val2 == -1) {
+                orgResult = getResOnOp(val1, input, op);
+            }
+        }
+    }
+
+    private int calculateResultOnIndex(String vals[], int a, int b, int c, char op1, char op2) {
+        int result = 0;
+        int val1 = getIntOfVarb(vals[a]);
+        int val2 = getIntOfVarb(vals[b]);
+        if (val1 == -1) {
+            result = getResOnOp(input, val2, op1);
+        } else if (val2 == -1) {
+            result = getResOnOp(val1, input, op1);
+        } else {
+            result = getResOnOp(val1, val2, op1);
+        }
+        // rest thing
+        val1 = getIntOfVarb(vals[c]);
+        if (val1 == -1) {
+            result = getResOnOp(result, input, op2);
+        } else {
+            result = getResOnOp(result, val1, op2);
+        }
         return result;
+    }
+
+    private int getIntOfVarb(String s) {
+        if (s.charAt(0) == 'X')
+            return -1;
+        else
+            return Integer.parseInt(s);
     }
 
     private int getResOnOp(int a, int b, char op) {
         switch (op) {
             case '+':
                 return a + b;
-            case '-':
-                return a - b;
             case '*':
                 return a * b;
         }

@@ -18,8 +18,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
-import com.pavanahv.allakumarreddy.moneybook.utils.FingerPrintManager;
 import com.pavanahv.allakumarreddy.moneybook.utils.Backup;
+import com.pavanahv.allakumarreddy.moneybook.utils.FingerPrintManager;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.TimePreference;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
@@ -84,6 +84,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                         break;
                                     case 1:
                                         // smart lock
+                                        context.startActivity(new Intent(context, CreateSmartPinActivity.class));
                                         break;
                                 }
                             }
@@ -125,11 +126,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         case GlobalConstants.PREF_LOCK_FINGERPRINT:
                             if ((boolean) value) {
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                                    FingerPrintManager fm = new FingerPrintManager(context, null);
-                                    boolean res = fm.init();
+                                    FingerPrintManager fm = new FingerPrintManager(context, (isSuccess, message) -> {
+
+                                    });
+                                    boolean res = fm.main();
                                     if (!res) {
+                                        //PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(GlobalConstants.PREF_LOCK_FINGERPRINT, false).apply();
                                         Toast.makeText(context, fm.getErrorText(), Toast.LENGTH_LONG).show();
-                                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(GlobalConstants.PREF_LOCK_FINGERPRINT, false).apply();
+                                        return false;
                                     } else {
                                         Toast.makeText(context, "Fingerprint Successfully Enabled !", Toast.LENGTH_LONG).show();
                                     }
