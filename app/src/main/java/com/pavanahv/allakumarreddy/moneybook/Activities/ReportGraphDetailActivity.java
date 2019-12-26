@@ -9,6 +9,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.pavanahv.allakumarreddy.moneybook.Adapter.ReportsViewPagerAdapter;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.fragments.ReportsGraphDetailHeaderFragment;
@@ -20,13 +27,6 @@ import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.ReportData;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.io.File;
 import java.text.ParseException;
@@ -63,6 +63,8 @@ public class ReportGraphDetailActivity extends BaseActivity implements
     private int ttype = -1;
     private int lineGraphCurrentPos = -1;
     private boolean lineFirst = true;
+    private ArrayList<String[]> labels;
+    private ArrayList<String[]> datas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,8 +177,8 @@ public class ReportGraphDetailActivity extends BaseActivity implements
 
     private void drawLineGraphFull() {
 
-        ArrayList<String[]> labels = new ArrayList<>();
-        ArrayList<String[]> datas = new ArrayList<>();
+        labels = new ArrayList<>();
+        datas = new ArrayList<>();
         for (AnalyticsFilterData tempData : mAnalyticsFilterDataList) {
             ArrayList<MBRecord> mbrList = db.getRecordsAsList(tempData);
             final int size = mbrList.size();
@@ -190,6 +192,7 @@ public class ReportGraphDetailActivity extends BaseActivity implements
             labels.add(label);
             datas.add(data);
         }
+        Utils.parseToGraphData(datas, labels);
         lineChart = GraphUtils.drawLineGraph(labels, datas, this, mTitle);
         View view = (View) lineChart;
         lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -243,7 +246,8 @@ public class ReportGraphDetailActivity extends BaseActivity implements
 
         // setting date
         try {
-            String temps = Utils.getNameFromEntryData(entry.getData());
+            String[] tempArr = (String[]) entry.getData();
+            String temps = tempArr[0];
             LoggerCus.d(TAG, "date:" + temps);
 
             SimpleDateFormat formater = null;
@@ -385,7 +389,7 @@ public class ReportGraphDetailActivity extends BaseActivity implements
     }
 
     private void drawGraph(int pos) {
-        ArrayList<MBRecord> mbrList = db.getRecordsAsList(mAnalyticsFilterDataList.get(pos));
+        /*ArrayList<MBRecord> mbrList = db.getRecordsAsList(mAnalyticsFilterDataList.get(pos));
         final int size = mbrList.size();
         String[] label = new String[size];
         String[] data = new String[size];
@@ -393,8 +397,8 @@ public class ReportGraphDetailActivity extends BaseActivity implements
             MBRecord mbr = mbrList.get(i);
             label[i] = mbr.getDescription();
             data[i] = mbr.getAmount() + "";
-        }
-        lineChart = GraphUtils.drawLineGraph(label, data, this, mTitle, pos);
+        }*/
+        lineChart = GraphUtils.drawLineGraph(labels.get(pos), datas.get(pos), this, mTitle, pos);
         View view = (View) lineChart;
         lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override

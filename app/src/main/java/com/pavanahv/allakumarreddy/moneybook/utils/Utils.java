@@ -64,8 +64,11 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.TreeSet;
 
 /**
  * Created by alla.kumarreddy on 09-Apr-18.
@@ -725,5 +728,105 @@ public class Utils {
             LoggerCus.d(TAG, "Error while parsing entry data for getting name -> " + e.getMessage());
             return null;
         }
+    }
+
+    public static void parseToGraphData(ArrayList<String[]> datas, ArrayList<String[]> labels) {
+
+        final int len = labels.size();
+        SimpleDateFormat sdf = null;
+        boolean isMonth = false;
+        if (len > 0 && labels.get(0).length > 0) {
+            String temp = labels.get(0)[0];
+            temp = getNameFromEntry(temp);
+            int strLen = temp.split("-").length;
+            if (strLen > 2) {
+                sdf = new SimpleDateFormat("dd - MM - yyyy");
+            } else {
+                isMonth = true;
+                sdf = new SimpleDateFormat("MM - yyyy");
+            }
+
+            TreeSet<Long> set = new TreeSet<>();
+            HashMap<String, String> maps[] = new HashMap[4];
+            int ind = 0;
+            for (String[] labelArr : labels) {
+                LoggerCus.d(TAG, Arrays.toString(labelArr));
+                maps[ind] = new HashMap<>();
+                int i = 0;
+                String[] tempDataList = datas.get(ind);
+                for (String label : labelArr) {
+                    String tempLabel = getNameFromEntry(label);
+                    if (tempLabel != null) {
+                        maps[ind].put(tempLabel, tempDataList[i]);
+                        i++;
+                        try {
+                            Date d = sdf.parse(tempLabel);
+                            d = intializeSDateForDay(d);
+                            if (isMonth)
+                                d = intializeSDateForMonth(d);
+                            set.add(d.getTime());
+                        } catch (ParseException e) {
+                            LoggerCus.d(TAG, "error : " + e.getMessage());
+                        }
+                    }
+                }
+                ind++;
+            }
+
+            LoggerCus.d(TAG, set.toString());
+
+            labels.clear();
+            datas.clear();
+
+            for (int i = 0; i < len; i++) {
+                HashMap<String, String> map = maps[i];
+                String[] label = new String[set.size()];
+                String[] data = new String[set.size()];
+                int j = 0;
+                for (Long date : set) {
+                    String dateStr = sdf.format(date);
+                    label[j] = dateStr;
+                    if (map.containsKey(dateStr)) {
+                        data[j] = map.get(dateStr);
+                    } else {
+                        data[j] = "0";
+                    }
+                    j++;
+                }
+                LoggerCus.d(TAG, "final label " + i + " -> " + Arrays.toString(label));
+                LoggerCus.d(TAG, "final data " + i + " -> " + Arrays.toString(data));
+                labels.add(label);
+                datas.add(data);
+            }
+        } else
+            LoggerCus.d(TAG, "labels size is 0");
+
+    }
+
+    private static String getNameFromEntry(String temp) {
+        try {
+            int ind = temp.indexOf("(");
+            return temp.substring(0, ind).trim();
+        } catch (Exception e) {
+            LoggerCus.d(TAG, "Error while parsing entry data for getting name -> " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static Date intializeSDateForMonth(Date sDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sDate);
+        cal.set(Calendar.DATE, cal.getMinimum(Calendar.DATE));
+        return cal.getTime();
+    }
+
+    public static Date intializeSDateForDay(Date sDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sDate);
+        cal.set(Calendar.HOUR_OF_DAY, cal.getMinimum(Calendar.HOUR_OF_DAY));
+        cal.set(Calendar.MINUTE, cal.getMinimum(Calendar.MINUTE));
+        cal.set(Calendar.SECOND, cal.getMinimum(Calendar.SECOND));
+        cal.set(Calendar.MILLISECOND, cal.getMinimum(Calendar.MILLISECOND));
+        return cal.getTime();
     }
 }

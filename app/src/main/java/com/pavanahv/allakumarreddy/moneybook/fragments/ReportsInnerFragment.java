@@ -18,6 +18,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.GraphUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.ReportData;
+import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -238,6 +239,7 @@ public class ReportsInnerFragment extends Fragment {
             analyticsFilterData.add(mAnalyticsFilterData);
         }
 
+        Utils.parseToGraphData(datas, labels);
         String title = "Date Wise Analysis For " + getDateStr(type);
         getActivity().runOnUiThread(new Runnable() {
             @Override

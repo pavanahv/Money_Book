@@ -34,6 +34,7 @@ public class ReportsGraphRecordsFragment extends Fragment {
     private DbHandler db;
     private View noData;
     private View mMainView;
+    private View lessData;
 
     public ReportsGraphRecordsFragment() {
         // Required empty public constructor
@@ -72,6 +73,9 @@ public class ReportsGraphRecordsFragment extends Fragment {
         mProgress.setVisibility(View.VISIBLE);
         noData = root.findViewById(R.id.no_data);
         noData.setVisibility(View.VISIBLE);
+        lessData = root.findViewById(R.id.less_data);
+        lessData.setVisibility(View.GONE);
+
         mListView.setVisibility(View.GONE);
 
         list = new ArrayList<>();
@@ -123,8 +127,14 @@ public class ReportsGraphRecordsFragment extends Fragment {
                     @Override
                     public void run() {
                         mAdapter.notifyDataSetChanged();
-                        mListView.setVisibility(View.VISIBLE);
                         noData.setVisibility(View.GONE);
+                        if (list.size() == 0) {
+                            lessData.setVisibility(View.VISIBLE);
+                            mListView.setVisibility(View.GONE);
+                        } else {
+                            lessData.setVisibility(View.GONE);
+                            mListView.setVisibility(View.VISIBLE);
+                        }
                         showMainView();
                     }
                 });

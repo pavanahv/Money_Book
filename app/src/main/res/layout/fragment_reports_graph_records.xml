@@ -29,6 +29,19 @@
             android:textSize="20dp"
             android:textStyle="bold" />
 
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/less_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:text="No Data"
+            android:visibility="gone"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
         <ListView
             android:id="@+id/lv"
             android:layout_width="match_parent"
