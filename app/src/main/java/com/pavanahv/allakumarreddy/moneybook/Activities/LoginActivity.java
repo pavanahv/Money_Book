@@ -139,15 +139,22 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void loginSuccess() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.putExtra(GlobalConstants.LOGIN_CHECK, true);
-        if (getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false)) {
+        /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.putExtra(GlobalConstants.LOGIN_CHECK, true);*/
+        Intent forwordedIntent = getIntent();
+        forwordedIntent.setClass(LoginActivity.this, MainActivity.class);
+        forwordedIntent.putExtra(GlobalConstants.LOGIN_CHECK, true);
+        /*if (forwordedIntent.getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false)) {
             intent.putExtra(GlobalConstants.SMART_REMAINDER_NOTI, true);
         }
-        if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
+        if (forwordedIntent.getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
             intent.putExtra(GlobalConstants.REPORTS_NOTI, true);
         }
-        startActivity(intent);
+        if (forwordedIntent.getBooleanExtra(GlobalConstants.MSG_PARSER_NOTI, false)) {
+            intent.putExtra(GlobalConstants.MSG_PARSER_NOTI, true);
+            intent.putExtra(GlobalConstants.MBRECORD, (MBRecord) getIntent().getSerializableExtra(GlobalConstants.MBRECORD));
+        }*/
+        startActivity(forwordedIntent);
         overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
         finish();
     }
@@ -161,7 +168,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void login(View view) {
-        //2*x+9
         try {
             input = Integer.parseInt(inputText.getText().toString());
         } catch (Exception e) {

@@ -338,6 +338,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToLongValue(findPreference(GlobalConstants.PREF_REPORTS_TIME));
             bindPreferenceSummaryToValueBool(findPreference(GlobalConstants.PREF_REPORTS_REMAINDER_SWITCH));
             bindPreferenceSummaryToLongValue(findPreference(GlobalConstants.PREF_REPORTS_REMAINDER_TIME));
+            bindPreferenceSummaryToValueBool(findPreference(GlobalConstants.PREF_MSG_PARSER_SWITCH));
         }
 
         @Override

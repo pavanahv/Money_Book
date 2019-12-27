@@ -13,7 +13,7 @@
     <com.pavanahv.allakumarreddy.moneybook.utils.TimePreference
         android:dependency="PREF_REPORTS_SWITCH"
         android:key="PREF_REPORTS_TIME"
-        android:title="Reports Time"/>
+        android:title="Reports Time" />
 
     <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
     <SwitchPreference
@@ -24,6 +24,11 @@
     <com.pavanahv.allakumarreddy.moneybook.utils.TimePreference
         android:dependency="PREF_REPORTS_REMAINDER_SWITCH"
         android:key="PREF_REPORTS_REMAINDER_TIME"
-        android:title="Smart Remainder Time"/>
+        android:title="Smart Remainder Time" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="PREF_MSG_PARSER_SWITCH"
+        android:summary="@string/record_msg_parser_des"
+        android:title="@string/record_msg_parser_name" />
 </PreferenceScreen>

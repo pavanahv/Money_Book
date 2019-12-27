@@ -31,7 +31,8 @@ public class MoneyBookIntentService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_MSG_PARSE_BY_DATE.equals(action)) {
                 handler = intent.getParcelableExtra(GlobalConstants.HANDLER_NAME);
-                new MessageParserBase(getApplicationContext()).handleActionMsgParse();
+                MessageParserBase msgParserBaser = new MessageParserBase(getApplicationContext());
+                msgParserBaser.handleActionMsgParse();
                 new AutoAddManager(getApplicationContext()).process();
                 Message msg = new Message();
                 msg.what = GlobalConstants.MSG_PARSING_COMPLETED;

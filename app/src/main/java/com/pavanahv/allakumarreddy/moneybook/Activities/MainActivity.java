@@ -39,6 +39,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.AnimationUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Backup;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.io.FileNotFoundException;
@@ -483,15 +484,16 @@ public class MainActivity extends BaseActivity
 
     private void performPendingTasks() {
 
+        Intent fwdIntent = getIntent();
         boolean isShown = false;
-        boolean isSmartRemainderNoti = getIntent().getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false);
+        boolean isSmartRemainderNoti = fwdIntent.getBooleanExtra(GlobalConstants.SMART_REMAINDER_NOTI, false);
         if (isSmartRemainderNoti) {
             isShown = true;
             LoggerCus.d(TAG, "" + isSmartRemainderNoti);
             showFragment(FRAGMENT_HOME, true);
         }
 
-        if (getIntent().getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
+        if (fwdIntent.getBooleanExtra(GlobalConstants.REPORTS_NOTI, false)) {
             isShown = true;
             showFragment(FRAGMENT_REPORTS, true);
         }
@@ -499,6 +501,12 @@ public class MainActivity extends BaseActivity
             showFragment(FRAGMENT_HOME, true);
         makeLocalBackup();
         hideProgressBar();
+
+        if (fwdIntent.getBooleanExtra(GlobalConstants.MSG_PARSER_NOTI, false)) {
+            MBRecord mbr = ((MBRecord) fwdIntent.getSerializableExtra(GlobalConstants.MBRECORD));
+            LoggerCus.d(TAG, mbr.toString());
+            startDetailActivity(mbr);
+        }
     }
 
     private void makeLocalBackup() {
@@ -589,4 +597,20 @@ public class MainActivity extends BaseActivity
     public void calenderLayoutClick(View view) {
         hideCalenderView(null);
     }
+
+    public void startDetailActivity(MBRecord mbr) {
+        int mType = mbr.getType();
+        if (mType == GlobalConstants.TYPE_DUE || mType == GlobalConstants.TYPE_LOAN) {
+            Intent intent = new Intent(MainActivity.this, RePaymentActivity.class);
+            intent.putExtra("MBRecord", mbr);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(MainActivity.this, AnalyticsItemDetail.class);
+            mbr.setType(mType);
+            intent.putExtra("MBRecord", mbr);
+            startActivity(intent);
+        }
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+    }
+
 }

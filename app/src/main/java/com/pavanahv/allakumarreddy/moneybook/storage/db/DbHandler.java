@@ -366,7 +366,7 @@ public class DbHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public boolean addRecordWithCatAsID(MBRecord mbr, int type) {
+    public MBRecord addRecordWithCatAsID(MBRecord mbr, int type) {
         DateConverter dc = new DateConverter(intializeSDateForDay(mbr.getDate()));
         ContentValues values = new ContentValues();
         values.put(KEY_TYPE, type);
@@ -382,10 +382,17 @@ public class DbHandler extends SQLiteOpenHelper {
         // Inserting Row
         long result = db.insert(TABLE_NAME, null, values);
         db.close();
-        if (result != -1)
-            return true;
-        else
-            return false;
+        if (result != -1) {
+            MBRecord resMbr = new MBRecord(
+                    values.getAsString(KEY_DESCRIPTION),
+                    values.getAsInteger(KEY_AMOUNT),
+                    new Date(values.getAsLong(KEY_DATE)),
+                    values.getAsInteger(KEY_TYPE),
+                    getNameOfCategory(values.getAsLong(KEY_CAT)),
+                    getNameOfPaymentMethod(values.getAsLong(KEY_PAYMENT_METHOD)));
+            return resMbr;
+        } else
+            return null;
     }
 
     public boolean updateBalLeft(long payId, int bal) {
@@ -1042,8 +1049,8 @@ public class DbHandler extends SQLiteOpenHelper {
                                                 boolean[] categoryBool, String[] category,
                                                 int sortingOrder,
                                                 boolean[] payBool, String[] payMeth) {
-        LoggerCus.d(TAG,"sdate : "+sDate.getTime());
-        LoggerCus.d(TAG,"edate : "+eDate.getTime());
+        LoggerCus.d(TAG, "sdate : " + sDate.getTime());
+        LoggerCus.d(TAG, "edate : " + eDate.getTime());
 
         this.total = 0;
 
@@ -2279,4 +2286,5 @@ public class DbHandler extends SQLiteOpenHelper {
         else
             return false;
     }
+
 }

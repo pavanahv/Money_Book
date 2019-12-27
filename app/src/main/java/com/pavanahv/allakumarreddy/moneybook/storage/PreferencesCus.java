@@ -129,4 +129,8 @@ public class PreferencesCus {
     public String getLockSmartPinData() {
         return mSharedPreference.getString(GlobalConstants.PREF_LOCK_SMART_PIN, null);
     }
+
+    public boolean getMessageParserNotificationStatus() {
+        return mSharedPreference.getBoolean(GlobalConstants.PREF_MSG_PARSER_SWITCH, false);
+    }
 }

@@ -99,4 +99,6 @@
     <string name="title_activity_re_payment">RePaymentActivity</string>
     <string name="action_auto_add">Auto Add</string>
     <string name="title_activity_auto_add">AutoAddActivity</string>
+    <string name="record_msg_parser_name">Message Parser Records</string>
+    <string name="record_msg_parser_des">Show the records parsed by Message Parser</string>
 </resources>

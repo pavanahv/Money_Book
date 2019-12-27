@@ -67,6 +67,12 @@ public class GlobalConstants {
     public static final String ACTION_STOP_BACKUP_SERVICE = "ACTION_STOP_BACKUP_SERVICE";
     public static final String RESTORE_DONE = "RESTORE_DONE";
     public static final String PREF_LOCK_SMART_PIN = "PREF_LOCK_SMART_PIN";
+    public static final String MSG_PARSER_NOTI = "MSG_PARSER_NOTI";
+    public static final String MBRECORD = "MBRECORD";
+    public static final String NOTIFICATION_CHANNLE_MSG_PARSER_ID = "NOTIFICATION_CHANNLE_MSG_PARSER_ID";
+    public static final String NOTIFICATION_CHANNLE_MESSAGE_PARSER_DESCRIPTION = "NOTIFICATION_CHANNLE_MESSAGE_PARSER_DESCRIPTION";
+    public static final String NOTIFICATION_CHANNLE_MSG_PARSER_NAME = "NOTIFICATION_CHANNLE_MSG_PARSER_NAME";
+    public static final String PREF_MSG_PARSER_SWITCH = "PREF_MSG_PARSER_SWITCH";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";
