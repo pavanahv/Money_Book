@@ -41,7 +41,7 @@ public class ThemeUtils {
     // And 2-> dimension will have three values in side -> theme, them_noActionBar, FullScreenTheme
     private static int themeArr[][] = new int[][]{
             {R.style.AppTheme, R.style.AppTheme_NoActionBar, R.style.FullscreenTheme},
-            {R.style.AppThemeDark, R.style.AppThemeDark_NoActionBar, R.style.FullscreenThemeDark},
+            /*{R.style.AppThemeDark, R.style.AppThemeDark_NoActionBar, R.style.FullscreenThemeDark},*/
             {R.style.AppThemeRed, R.style.AppThemeRed_NoActionBar, R.style.FullscreenThemeRed},
             {R.style.AppThemeBlue, R.style.AppThemeBlue_NoActionBar, R.style.FullscreenThemeBlue},
             {R.style.AppThemeLightGreen, R.style.AppThemeLightGreen_NoActionBar, R.style.FullscreenThemeLightGreen},
