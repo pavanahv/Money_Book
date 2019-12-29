@@ -1772,16 +1772,24 @@ public class DbHandler extends SQLiteOpenHelper {
         return s;
     }
 
-    public ArrayList<String> getMsgRecordsAsList() {
-        ArrayList<String> list = new ArrayList<>();
+    public ArrayList<HashMap<String, String>> getMsgRecordsAsList() {
+        ArrayList<HashMap<String, String>> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + " FROM " + MSG_TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT " + MSG_KEY_NAME + ","
+                + MSG_KEY_TYPE + "," + MSG_KEY_CAT
+                + "," + MSG_KEY_PAYMENT_METHOD
+                + " FROM " + MSG_TABLE_NAME, null);
         if (cursor != null) {
             final int len = cursor.getCount();
             for (int i = 0; i < len; i++) {
                 cursor.moveToPosition(i);
-                list.add(cursor.getString(0));
+                HashMap<String, String> map = new HashMap<>();
+                map.put("name", cursor.getString(0));
+                map.put("type", "" + cursor.getInt(1));
+                map.put("cat", "" + getNameOfCategory(cursor.getLong(2)));
+                map.put("paym", "" + getNameOfPaymentMethod(cursor.getLong(3)));
+                list.add(map);
             }
             cursor.close();
         }

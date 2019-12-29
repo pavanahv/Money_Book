@@ -5,20 +5,22 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.pavanahv.allakumarreddy.moneybook.Adapter.MessageParserAdapter;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MessagesActivity extends BaseActivity {
 
     private DbHandler db;
     private ListView mListView;
-    private ArrayAdapter<String> mArrayAdapter;
+    private ArrayList<HashMap<String, String>> list;
+    private MessageParserAdapter mArrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +42,21 @@ public class MessagesActivity extends BaseActivity {
     private void init() {
         db = new DbHandler(this);
         mListView = (ListView) findViewById(R.id.msg_list_view);
-        mArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        mListView.setAdapter(mArrayAdapter);
-        mListView.setOnItemClickListener((parent, view, position, id) -> {
+        list = new ArrayList<>();
+        mArrayAdapter = new MessageParserAdapter(list, this, name -> {
             Intent intent = new Intent(MessagesActivity.this, MessageDetailActivity.class);
-            intent.putExtra("name", mArrayAdapter.getItem(position));
+            intent.putExtra("name", name);
             startActivity(intent);
             overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
         });
+        mListView.setAdapter(mArrayAdapter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         new Thread(() -> {
-            ArrayList<String> list = db.getMsgRecordsAsList();
+            list = db.getMsgRecordsAsList();
             runOnUiThread(() -> {
                 mArrayAdapter.clear();
                 mArrayAdapter.addAll(list);
