@@ -22,6 +22,7 @@ import com.pavanahv.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.DashBoardAdapterInterface;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.DashUIUpdateInterface;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -54,6 +55,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     private DashUIUpdateInterface mDashUIUpdateInterface;
     private View mainView;
     private View progress;
+    private PreferencesCus mPref;
 
     public PaymentMethodFragment() {
         // Required empty public constructor
@@ -68,6 +70,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = new DbHandler(getActivity());
+        mPref = new PreferencesCus(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -102,6 +105,8 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         dateM = ((TextView) view.findViewById(R.id.dashmonth));
         dateY = ((TextView) view.findViewById(R.id.dashyear));
 
+        initColors();
+
         FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fab.setVisibility(View.VISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +115,18 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
                 startAddActivity();
             }
         });
+    }
+
+    private void initColors() {
+        int tempColor = Utils.getDayWiseColor(mPref);
+        dataD.setTextColor(tempColor);
+        totalD.setTextColor(tempColor);
+        tempColor = Utils.getMonthWiseColor(mPref);
+        dateM.setTextColor(tempColor);
+        totalM.setTextColor(tempColor);
+        tempColor = Utils.getYearWiseColor(mPref);
+        dateY.setTextColor(tempColor);
+        totalY.setTextColor(tempColor);
     }
 
     private void startAddActivity() {
@@ -170,13 +187,14 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
                 dashBoardAdapter.addAll(dbr);
                 dashBoardAdapter.notifyDataSetChanged();
                 mDashUIUpdateInterface.switchScreen();
+                initColors();
                 showMainView();
             });
         }).start();
     }
 
     private void showMainView() {
-        revealAnimation(progress, mainView,getView());
+        revealAnimation(progress, mainView, getView());
     }
 
     @Override

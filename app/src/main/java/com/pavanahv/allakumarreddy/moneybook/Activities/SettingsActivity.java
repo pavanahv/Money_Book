@@ -14,10 +14,15 @@ import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.pavanahv.allakumarreddy.moneybook.Dialog.ColorPickerDialog;
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.Backup;
 import com.pavanahv.allakumarreddy.moneybook.utils.FingerPrintManager;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -88,6 +93,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                         break;
                                 }
                             }
+                            break;
+
+                        case GlobalConstants.PREF_DISPLAY_THEME:
+                            /*int tempVal = Integer.parseInt((String) value);
+                            if (tempVal == 1)
+                                Utils.setDarkTheme(true);
+                            else
+                                Utils.setDarkTheme(false);*/
+
+                            Intent intent = new Intent(context, MainActivity.class);
+                            intent.putExtra(GlobalConstants.LOGIN_CHECK, true);
+                            context.startActivity(intent);
                             break;
                     }
                 }
@@ -259,7 +276,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || NotificationPreferenceFragment.class.getName().equals(fragmentName)
+                || DisplayPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
@@ -304,6 +322,66 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }).start();
                 return false;
             });
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class DisplayPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            PreferencesCus pref = new PreferencesCus(context);
+            addPreferencesFromResource(R.xml.pref_display);
+            setHasOptionsMenu(true);
+
+            bindPreferenceSummaryToValue(findPreference(GlobalConstants.PREF_DISPLAY_THEME));
+            String colorPrefArr[] = new String[]{
+                    GlobalConstants.PREF_DISPLAY_SPENT,
+                    GlobalConstants.PREF_DISPLAY_EARN,
+                    GlobalConstants.PREF_DISPLAY_DUE,
+                    GlobalConstants.PREF_DISPLAY_LOAN,
+                    GlobalConstants.PREF_DISPLAY_DUE_PAYMENT,
+                    GlobalConstants.PREF_DISPLAY_LOAN_PAYMENT,
+                    GlobalConstants.PREF_DISPLAY_MONEY_TRANSFER,
+                    GlobalConstants.PREF_DISPLAY_DAY_WISE,
+                    GlobalConstants.PREF_DISPLAY_MONTH_WISE,
+                    GlobalConstants.PREF_DISPLAY_YEAR_WISE,
+            };
+            for (String str : colorPrefArr)
+                bindColorPreferences(str, pref);
+        }
+
+        private void bindColorPreferences(String prefStr, PreferencesCus cusPref) {
+            String consStr = "Tap to select color";
+            Preference pref = findPreference(prefStr);
+            bindPreferenceSummaryToValue(pref);
+            pref.setOnPreferenceClickListener(preference -> {
+                new ColorPickerDialog(context,
+                        color -> {
+                            setSummary(consStr, color, pref);
+                            cusPref.setColor(prefStr, color);
+                        },
+                        cusPref.getColor(prefStr)).show();
+                return false;
+            });
+            setSummary(consStr, cusPref.getColor(prefStr), pref);
+        }
+
+        private void setSummary(String consStr, int color, Preference spentPref) {
+            Spannable spanString = new SpannableString(consStr);
+            spanString.setSpan(new ForegroundColorSpan(color), 0, consStr.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spentPref.setSummary(spanString);
         }
 
         @Override

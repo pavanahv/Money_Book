@@ -12,7 +12,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="Welcome To MoneyBook"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="?colorPrimaryDark"
         android:textSize="50dp"
         android:textStyle="bold" />
 
@@ -23,7 +23,7 @@
         android:gravity="center"
         android:padding="5dp"
         android:text="Please make sure internet is on. And please select google account for your data backup. It uses internet only for backup. Click next to continue..."
-        android:textColor="@color/colorPrimary"
+        android:textColor="?colorPrimary"
         android:textSize="15dp" />
 
     <android.support.v7.widget.AppCompatButton

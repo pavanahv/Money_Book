@@ -1,0 +1,50 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_display_theme_list_titles"
+        android:entryValues="@array/pref_diaplay_theme_list_values"
+        android:key="display_theme"
+        android:title="@string/pref_title_diplay_theme" />
+
+    <Preference
+        android:key="PREF_DISPLAY_SPENT"
+        android:title="Spent Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_EARN"
+        android:title="Earn Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_DUE"
+        android:title="Due Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_LOAN"
+        android:title="Loan Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_MONEY_TRANSFER"
+        android:title="Money Transfer Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_DUE_PAYMENT"
+        android:title="Due Repayment Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_LOAN_PAYMENT"
+        android:title="Loan Repayment Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_DAY_WISE"
+        android:title="Day Wise Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_MONTH_WISE"
+        android:title="Month Wise Color" />
+
+    <Preference
+        android:key="PREF_DISPLAY_YEAR_WISE"
+        android:title="Year Wise Color" />
+
+</PreferenceScreen>

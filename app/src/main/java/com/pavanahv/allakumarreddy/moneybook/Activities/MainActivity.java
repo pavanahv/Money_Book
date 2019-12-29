@@ -4,7 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Messenger;
@@ -40,6 +42,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.Backup;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.io.FileNotFoundException;
@@ -83,6 +86,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_main);
 
         // To check whether it is launched from login activity or not. if not just finish this.
@@ -102,6 +106,11 @@ public class MainActivity extends BaseActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        if (Utils.isDarkTheme()) {
+            navigationView.setItemTextColor(ColorStateList.valueOf(Color.WHITE));
+            navigationView.setItemIconTintList(ColorStateList.valueOf(Color.WHITE));
+        }
 
         PreferencesCus sp = new PreferencesCus(this);
         View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);

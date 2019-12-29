@@ -155,7 +155,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_move_to_inbox_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_settings_brightness_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -172,11 +172,24 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                      <entry key="textAsset">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="fontFamily" value="Arial" />
+                                                <entry key="text" value="DP" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                     </map>
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="message_parser" />
+                                      <entry key="assetType" value="TEXT" />
+                                      <entry key="outputName" value="due_payment" />
                                     </map>
                                   </option>
                                 </PersistentState>

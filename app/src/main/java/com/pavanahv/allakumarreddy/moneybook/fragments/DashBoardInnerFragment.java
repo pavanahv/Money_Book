@@ -12,8 +12,9 @@ import android.widget.TextView;
 
 import com.pavanahv.allakumarreddy.moneybook.Activities.AnalyticsActivity;
 import com.pavanahv.allakumarreddy.moneybook.Adapter.DashBoardAdapter;
-import com.pavanahv.allakumarreddy.moneybook.interfaces.DashBoardAdapterInterface;
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.interfaces.DashBoardAdapterInterface;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
@@ -41,6 +42,7 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
     private View mainView;
     private View progress;
     private int mType = -1;
+    private PreferencesCus mPref;
 
     public DashBoardInnerFragment() {
 
@@ -58,6 +60,7 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = new DbHandler(getContext());
+        mPref = new PreferencesCus(getContext());
         setHasOptionsMenu(true);
         readBundle(getArguments());
     }
@@ -103,9 +106,23 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
         dateM.setText(new SimpleDateFormat("MMM").format(new Date()));
         dateY.setText(new SimpleDateFormat("yyyy").format(new Date()));
 
+        initColors();
+
         dbr = new ArrayList<>();
         dashBoardAdapter = new DashBoardAdapter(dbr, getContext(), this, mType);
         dashBoardList.setAdapter(dashBoardAdapter);
+    }
+
+    private void initColors() {
+        int tempColor = Utils.getDayWiseColor(mPref);
+        dataD.setTextColor(tempColor);
+        totalD.setTextColor(tempColor);
+        tempColor = Utils.getMonthWiseColor(mPref);
+        dateM.setTextColor(tempColor);
+        totalM.setTextColor(tempColor);
+        tempColor = Utils.getYearWiseColor(mPref);
+        dateY.setTextColor(tempColor);
+        totalY.setTextColor(tempColor);
     }
 
     @Override
@@ -127,6 +144,7 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
                 dashBoardAdapter.clear();
                 dashBoardAdapter.addAll(dbr);
                 dashBoardAdapter.notifyDataSetChanged();
+                initColors();
                 showMainView();
             });
         }).start();

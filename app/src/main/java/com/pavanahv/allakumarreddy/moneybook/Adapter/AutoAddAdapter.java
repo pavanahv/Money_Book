@@ -11,13 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.AutoAddRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.ArrayList;
 
 public class AutoAddAdapter extends ArrayAdapter<AutoAddRecord> {
     private final AutoAddAdapterInterface mAutoAddAdapterInterface;
+    private final PreferencesCus mPref;
     private ArrayList<AutoAddRecord> dataSet;
     Context mContext;
 
@@ -37,6 +40,7 @@ public class AutoAddAdapter extends ArrayAdapter<AutoAddRecord> {
         this.dataSet = data;
         this.mContext = context;
         mAutoAddAdapterInterface = autoAddAdapterInterface;
+        mPref = new PreferencesCus(context);
     }
 
     private int lastPosition = -1;
@@ -97,6 +101,7 @@ public class AutoAddAdapter extends ArrayAdapter<AutoAddRecord> {
                 viewHolder.imageView.setImageResource(R.drawable.ic_loan);
                 break;
         }
+        Utils.setTint(mPref, viewHolder.imageView, dataModel.getType());
         // Return the completed view to render on screen
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override

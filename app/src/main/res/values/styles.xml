@@ -1,12 +1,14 @@
 <resources>
 
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+
+        <item name="colorPrimary">#008000</item>
+        <item name="colorPrimaryDark">#008000</item>
+        <item name="colorAccent">#228B22</item>
+        <item name="android:navigationBarColor">#008000</item>
+
 
         <!-- enabling window content transitions -->
         <item name="android:windowActivityTransitions">true</item>
@@ -18,10 +20,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="android:windowActionBarOverlay">true</item>
@@ -29,6 +27,200 @@
         <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
         <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
     </style>
+
+
+    <!-- Red theme -->
+    <style name="AppThemeRed" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#d9534f</item>
+        <item name="colorPrimaryDark">#d9534f</item>
+        <item name="colorAccent">#d9534f</item>
+        <item name="android:navigationBarColor">#d9534f</item>
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeRed.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeRed" parent="AppThemeRed">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <!-- blue theme -->
+    <style name="AppThemeBlue" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#0275d8</item>
+        <item name="colorPrimaryDark">#0275d8</item>
+        <item name="colorAccent">#0275d8</item>
+        <item name="android:navigationBarColor">#0275d8</item>
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeBlue.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeBlue" parent="AppThemeBlue">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+
+    <!-- Light Green theme -->
+    <style name="AppThemeLightGreen" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#5cb85c</item>
+        <item name="colorPrimaryDark">#5cb85c</item>
+        <item name="colorAccent">#5cb85c</item>
+        <item name="android:navigationBarColor">#5cb85c</item>
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeLightGreen.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeLightGreen" parent="AppThemeLightGreen">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <!-- Light blue theme -->
+    <style name="AppThemeLightBlue" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#5bc0de</item>
+        <item name="colorPrimaryDark">#5bc0de</item>
+        <item name="colorAccent">#5bc0de</item>
+        <item name="android:navigationBarColor">#5bc0de</item>
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeLightBlue.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeLightBlue" parent="AppThemeLightBlue">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <!-- yellow theme -->
+    <style name="AppThemeYellow" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#f0ad4e</item>
+        <item name="colorPrimaryDark">#f0ad4e</item>
+        <item name="colorAccent">#f0ad4e</item>
+        <item name="android:navigationBarColor">#f0ad4e</item>
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeYellow.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeYellow" parent="AppThemeYellow">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <!-- black theme -->
+    <style name="AppThemeBlack" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#292b2c</item>
+        <item name="colorPrimaryDark">#292b2c</item>
+        <item name="colorAccent">#292b2c</item>
+        <item name="android:navigationBarColor">#292b2c</item>
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeBlack.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeBlack" parent="AppThemeBlack">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <!-- Dark theme -->
+    <style name="AppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#292b2c</item>
+        <item name="colorPrimaryDark">#292b2c</item>
+        <item name="colorAccent">#292b2c</item>
+        <item name="android:navigationBarColor">#292b2c</item>
+
+        <item name="android:colorBackground">#292b2c</item>
+        <item name="android:background">#292b2c</item>
+        <item name="android:textColor">#FFFFFF</item>
+
+
+
+        <!-- enabling window content transitions -->
+        <item name="android:windowActivityTransitions">true</item>
+
+    </style>
+
+    <style name="AppThemeDark.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="FullscreenThemeDark" parent="AppThemeDark">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>

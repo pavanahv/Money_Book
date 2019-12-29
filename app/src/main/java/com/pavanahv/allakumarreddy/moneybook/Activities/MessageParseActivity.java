@@ -11,6 +11,7 @@ import com.pavanahv.allakumarreddy.moneybook.fragments.ItemDetailFragment;
 import com.pavanahv.allakumarreddy.moneybook.fragments.MessageListFragment;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.ChunksFragmentInteractionListener;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 public class MessageParseActivity extends BaseActivity implements ChunksFragmentInteractionListener {
 
@@ -29,6 +30,7 @@ public class MessageParseActivity extends BaseActivity implements ChunksFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_message_parse);
         getSupportActionBar().setTitle("Message Parser");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

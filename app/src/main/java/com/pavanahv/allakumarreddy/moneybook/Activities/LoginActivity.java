@@ -18,6 +18,7 @@ import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.FingerPrintManager;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.Arrays;
@@ -40,9 +41,15 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_login);
 
         PreferencesCus sp = new PreferencesCus(this);
+        /*if (sp.getTheme() == 1) {
+            Utils.setDarkTheme(true);
+        } else {
+            Utils.setDarkTheme(false);
+        }*/
         LoggerCus.d(TAG, sp.getData(Utils.getEmail()) + " login data");
         if (sp.getData(Utils.getEmail()) == null || !sp.getRestoreStatus()) {
             startActivity(new Intent(this, WelcomeActivity.class));

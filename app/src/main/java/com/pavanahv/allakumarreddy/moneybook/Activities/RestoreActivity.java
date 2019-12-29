@@ -17,6 +17,7 @@ import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.GoogleDriveBackup;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.io.File;
@@ -54,6 +55,7 @@ public class RestoreActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_restore);
         LoggerCus.d(TAG, "onCreate");
         init();

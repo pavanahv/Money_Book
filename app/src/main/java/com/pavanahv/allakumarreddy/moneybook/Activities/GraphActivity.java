@@ -5,19 +5,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 /**
@@ -110,6 +112,7 @@ public class GraphActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
 
         setContentView(R.layout.activity_graph);
 
@@ -280,8 +283,11 @@ public class GraphActivity extends BaseActivity {
     }
 
     private void addFullScreenToggle() {
-        ImageButton im = new ImageButton(this);
+        ImageView im = new ImageView(this);
         im.setImageResource(R.drawable.ic_graph_full_screen);
+        im.setBackgroundColor(getResources().getColor(R.color.white));
+        im.setColorFilter(ContextCompat.getColor(this,
+                R.color.colorPrimary), android.graphics.PorterDuff.Mode.MULTIPLY);
         im.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

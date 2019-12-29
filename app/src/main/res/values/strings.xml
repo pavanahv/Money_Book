@@ -52,6 +52,27 @@
         <item>3</item>
     </string-array>
 
+    <string-array name="pref_display_theme_list_titles">
+        <item>Default</item>
+        <!--<item>Dark</item>-->
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Light Green</item>
+        <item>Light Blue</item>
+        <item>Yellow</item>
+        <item>Black</item>
+    </string-array>
+    <string-array name="pref_diaplay_theme_list_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <!--<item>7</item>-->
+    </string-array>
+
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Lock</string>
 
@@ -101,4 +122,6 @@
     <string name="title_activity_auto_add">AutoAddActivity</string>
     <string name="record_msg_parser_name">Message Parser Records</string>
     <string name="record_msg_parser_des">Show the records parsed by Message Parser</string>
+    <string name="pref_title_diplay_theme">Theme</string>
+    <string name="pref_header_display">Display</string>
 </resources>

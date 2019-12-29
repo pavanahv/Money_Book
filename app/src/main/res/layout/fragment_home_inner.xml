@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".home.HomeSpentFragment">
+    android:layout_height="match_parent">
 
     <ProgressBar
         android:id="@+id/progress"
@@ -28,14 +26,14 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/date_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:paddingTop="10dp"
                 android:text=""
-                android:textColor="@color/colorPrimary"
+                android:textColor="?colorPrimary"
                 android:textStyle="bold" />
 
             <TextView
@@ -45,27 +43,27 @@
                 android:gravity="center"
                 android:paddingBottom="10dp"
                 android:text="TextView"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="?colorPrimary"
                 android:textSize="25dp"
                 android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="@color/colorPrimaryDark" />
+                android:background="?colorPrimaryDark" />
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:layout_gravity="center"
                     android:id="@+id/no_data"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:gravity="center"
                     android:text="Click + To Add Data"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="?colorPrimary"
                     android:textSize="20dp"
                     android:textStyle="bold" />
 

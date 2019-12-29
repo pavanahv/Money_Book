@@ -22,6 +22,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +55,7 @@ public class AnalyticsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_analytics);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

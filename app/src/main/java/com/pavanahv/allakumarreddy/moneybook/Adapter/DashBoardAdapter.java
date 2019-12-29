@@ -13,12 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.DashBoardAdapterInterface;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.DashBoardRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
-import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
 import java.util.ArrayList;
 
@@ -30,6 +31,7 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     private final DbHandler db;
     private final int type;
+    private final PreferencesCus mPref;
     private DashBoardAdapterInterface mDashBoardAdapterInterface;
     private ArrayList<DashBoardRecord> dataSet;
     Context mContext;
@@ -55,13 +57,14 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     }
 
-    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context, DashBoardAdapterInterface dashBoardAdapterInterface,int type) {
+    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context, DashBoardAdapterInterface dashBoardAdapterInterface, int type) {
         super(context, R.layout.dash_board_item, data);
         this.dataSet = data;
         this.mContext = context;
         this.db = new DbHandler(mContext);
         mDashBoardAdapterInterface = dashBoardAdapterInterface;
         this.type = type;
+        mPref = new PreferencesCus(context);
     }
 
 
@@ -108,10 +111,10 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
         final PopupMenu popup = new PopupMenu(mContext, viewHolder.imageView);
         //Inflating the Popup using xml file
-        if(type == 1){
+        if (type == 1) {
             popup.getMenuInflater()
                     .inflate(R.menu.dashboard_popmenu, popup.getMenu());
-        }else {
+        } else {
             popup.getMenuInflater()
                     .inflate(R.menu.payment_popmenu, popup.getMenu());
         }
@@ -156,13 +159,31 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         result.startAnimation(animation);
         lastPosition = position;
 
+        int dayColor = Utils.getDayWiseColor(mPref);
+        viewHolder.mCircularProgressbarDay.setColor(dayColor);
+        viewHolder.mCircularProgressbarDay.setBackgroundColor(dayColor);
+        viewHolder.mPercentDay.setTextColor(dayColor);
+        viewHolder.mPriceDay.setTextColor(dayColor);
+
         viewHolder.mCircularProgressbarDay.setProgress(dataModel.getPercentD());
         viewHolder.mPercentDay.setText(dataModel.getPercentD() + " %");
         viewHolder.mPriceDay.setText(Utils.getFormattedNumber(dataModel.getDay()));
 
+        int monthColor = Utils.getMonthWiseColor(mPref);
+        viewHolder.mCircularProgressbarMonth.setColor(monthColor);
+        viewHolder.mCircularProgressbarMonth.setBackgroundColor(monthColor);
+        viewHolder.mPercentMonth.setTextColor(monthColor);
+        viewHolder.mPriceMonth.setTextColor(monthColor);
+
         viewHolder.mCircularProgressbarMonth.setProgress(dataModel.getPercentM());
         viewHolder.mPercentMonth.setText(dataModel.getPercentM() + " %");
         viewHolder.mPriceMonth.setText(Utils.getFormattedNumber(dataModel.getMonth()));
+
+        int yearColor = Utils.getYearWiseColor(mPref);
+        viewHolder.mCircularProgressbarYear.setColor(yearColor);
+        viewHolder.mCircularProgressbarYear.setBackgroundColor(yearColor);
+        viewHolder.mPercentYear.setTextColor(yearColor);
+        viewHolder.mPriceYear.setTextColor(yearColor);
 
         viewHolder.mCircularProgressbarYear.setProgress(dataModel.getPercentY());
         viewHolder.mPercentYear.setText(dataModel.getPercentY() + " %");

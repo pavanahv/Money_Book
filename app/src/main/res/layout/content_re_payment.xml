@@ -38,8 +38,8 @@
                     android:layout_margin="5dp"
                     android:padding="5dp"
                     android:text="Description"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="25dp"
+                    android:textColor="?colorPrimary"
+                    android:textSize="20dp"
                     android:textStyle="bold" />k
 
                 <FrameLayout
@@ -48,23 +48,21 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
+                        android:layout_gravity="end"
                         android:id="@+id/status_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
                         android:layout_margin="5dp"
                         android:padding="5dp"
-                        android:tint="@color/colorPrimary"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/icon_saveas" />
 
                     <android.support.v7.widget.AppCompatTextView
                         android:id="@+id/left_bal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
                         android:layout_margin="5dp"
-                        android:layout_alignParentEnd="true"
+                        android:layout_gravity="end"
                         android:padding="5dp"
                         android:text="0"
                         android:textColor="@color/error_color"
@@ -90,6 +88,7 @@
                         android:layout_height="20dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/analytics_date" />
 
                     <TextView
@@ -116,6 +115,7 @@
                         android:layout_height="20dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/analytics_price" />
 
                     <TextView
@@ -150,6 +150,7 @@
                         android:layout_margin="3dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/ic_icon_categories" />
 
                     <TextView
@@ -177,7 +178,7 @@
                         android:layout_margin="3dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:tint="@color/colorPrimary"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/ic_payment_method" />
 
                     <TextView
@@ -205,7 +206,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="RePayment History"
                     android:textAlignment="center"

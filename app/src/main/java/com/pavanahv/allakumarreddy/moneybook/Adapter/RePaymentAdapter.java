@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.RePaymentAdapterInterface;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ public class RePaymentAdapter extends ArrayAdapter<MBRecord> {
     private final SimpleDateFormat format;
     private final RePaymentAdapterInterface mRePaymentAdapterInterface;
     private final Context mContext;
+    private final PreferencesCus mPref;
 
     // View lookup cache
     private static class ViewHolder {
@@ -38,6 +41,7 @@ public class RePaymentAdapter extends ArrayAdapter<MBRecord> {
         this.mContext = context;
         format = new SimpleDateFormat("dd - MM - yyyy");
         mRePaymentAdapterInterface = rePaymentAdapterInterface;
+        mPref = new PreferencesCus(context);
     }
 
     private int lastPosition = -1;
@@ -95,6 +99,7 @@ public class RePaymentAdapter extends ArrayAdapter<MBRecord> {
             default:
                 break;
         }
+        Utils.setTint(mPref, viewHolder.im, dataModel.getType());
         // Return the completed view to render on screen
         return convertView;
     }

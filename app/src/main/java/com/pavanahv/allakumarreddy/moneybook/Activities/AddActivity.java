@@ -21,6 +21,7 @@ import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import java.util.ArrayList;
 
@@ -45,6 +46,7 @@ public class AddActivity extends BaseActivity implements android.view.View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_add);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Add Item");

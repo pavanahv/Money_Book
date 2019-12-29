@@ -9,8 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
 
     private final SimpleDateFormat format;
+    private final PreferencesCus mPref;
     private ArrayList<MBRecord> dataSet;
     Context mContext;
     private boolean groupBy;
@@ -54,6 +57,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
         format = new SimpleDateFormat("dd - MM - yyyy");
         groupBy = false;
         mAnalyticsAdapterInterface = analyticsAdapterInterface;
+        mPref = new PreferencesCus(context);
     }
 
     private int lastPosition = -1;
@@ -164,6 +168,7 @@ public class AnalyticsAdapter extends ArrayAdapter<MBRecord> {
                 default:
                     break;
             }
+            Utils.setTint(mPref, viewHolder.im, dataModel.getType());
         }
         // Return the completed view to render on screen
         return convertView;

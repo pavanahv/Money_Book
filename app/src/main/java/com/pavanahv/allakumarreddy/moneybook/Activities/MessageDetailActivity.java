@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import java.util.ArrayList;
 
@@ -22,6 +23,7 @@ public class MessageDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_message_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

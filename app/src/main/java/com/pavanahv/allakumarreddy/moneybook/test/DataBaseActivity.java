@@ -8,6 +8,7 @@ import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.DateConverter;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +37,7 @@ public class DataBaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_data_base);
 
         mWebView = (WebView) findViewById(R.id.webview);

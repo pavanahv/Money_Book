@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
@@ -15,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -79,6 +81,7 @@ public class Utils {
     private static final String TAG = "Utils";
     private static String email = "EMAIL";
     private static String appFolder = "APP_FOLDER";
+    private static boolean darkTheme = false;
 
     public static String getBackupFile() {
         return backupFile;
@@ -697,6 +700,14 @@ public class Utils {
         return R.color.colorPrimary;
     }
 
+    public static boolean isDarkTheme() {
+        return darkTheme;
+    }
+
+    public static void setDarkTheme(boolean isDark) {
+        darkTheme = isDark;
+    }
+
     public static void addRefIdForLoanDueFromDes(MBRecord mbr) {
         String des = mbr.getDescription();
         int count = 0;
@@ -828,5 +839,86 @@ public class Utils {
         cal.set(Calendar.SECOND, cal.getMinimum(Calendar.SECOND));
         cal.set(Calendar.MILLISECOND, cal.getMinimum(Calendar.MILLISECOND));
         return cal.getTime();
+    }
+
+    public static int getSpentColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_SPENT);
+    }
+
+    public static int getLoanColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_LOAN);
+    }
+
+    public static void setTint(PreferencesCus pref, ImageView imv, int type) {
+        imv.setColorFilter(getColorPref(type, pref), PorterDuff.Mode.MULTIPLY);
+    }
+
+    public static int getMoneyTransferColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_MONEY_TRANSFER);
+    }
+
+    public static int getEarnColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_EARN);
+    }
+
+    public static int getDueColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_DUE);
+    }
+
+    public static int getDuePaymentColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_DUE_PAYMENT);
+    }
+
+    public static int getLoanPaymentColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_LOAN_PAYMENT);
+    }
+
+    public static int getDayWiseColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_DAY_WISE);
+    }
+
+    public static int getMonthWiseColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_MONTH_WISE);
+    }
+
+    public static int getYearWiseColor(PreferencesCus pref) {
+        return pref.getColor(GlobalConstants.PREF_DISPLAY_YEAR_WISE);
+    }
+
+    public static int getColorPref(int type, PreferencesCus pref) {
+        int res = 0;
+        switch (type) {
+            case GlobalConstants.TYPE_SPENT:
+                res = Utils.getSpentColor(pref);
+                break;
+            case GlobalConstants.TYPE_EARN:
+                res = Utils.getEarnColor(pref);
+                break;
+            case GlobalConstants.TYPE_DUE_PAYMENT:
+            case GlobalConstants.TYPE_DUE:
+                res = Utils.getDueColor(pref);
+                break;
+            case GlobalConstants.TYPE_LOAN_PAYMENT:
+            case GlobalConstants.TYPE_LOAN:
+                res = Utils.getLoanColor(pref);
+                break;
+            case GlobalConstants.TYPE_MONEY_TRANSFER:
+                res = Utils.getMoneyTransferColor(pref);
+                break;
+            case GlobalConstants.TYPE_DUE_REPAYMENT:
+                res = Utils.getDuePaymentColor(pref);
+                break;
+            case GlobalConstants.TYPE_LOAN_REPAYMENT:
+                res = Utils.getLoanPaymentColor(pref);
+                break;
+            default:
+                res = Color.RED;
+                break;
+        }
+        return res;
+    }
+
+    public static void setDark(ImageView imv) {
+        imv.setColorFilter(Color.GREEN, PorterDuff.Mode.MULTIPLY);
     }
 }

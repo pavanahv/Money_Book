@@ -26,6 +26,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.GraphUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.ReportData;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.io.File;
@@ -69,6 +70,7 @@ public class ReportGraphDetailActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_report_graph_detail);
 
         db = new DbHandler(this);
@@ -389,15 +391,6 @@ public class ReportGraphDetailActivity extends BaseActivity implements
     }
 
     private void drawGraph(int pos) {
-        /*ArrayList<MBRecord> mbrList = db.getRecordsAsList(mAnalyticsFilterDataList.get(pos));
-        final int size = mbrList.size();
-        String[] label = new String[size];
-        String[] data = new String[size];
-        for (int i = 0; i < size; i++) {
-            MBRecord mbr = mbrList.get(i);
-            label[i] = mbr.getDescription();
-            data[i] = mbr.getAmount() + "";
-        }*/
         lineChart = GraphUtils.drawLineGraph(labels.get(pos), datas.get(pos), this, mTitle, pos);
         View view = (View) lineChart;
         lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {

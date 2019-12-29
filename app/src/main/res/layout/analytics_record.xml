@@ -51,7 +51,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:tint="@color/colorPrimary"
+                        android:tint="?colorPrimary"
                         android:visibility="gone"
                         app:srcCompat="@drawable/icon_saveas" />
 
@@ -86,6 +86,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="13dp"
                             android:layout_weight="10"
+                            android:tint="?colorPrimary"
                             app:srcCompat="@drawable/analytics_date" />
 
                         <TextView
@@ -111,6 +112,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="13dp"
                             android:layout_weight="10"
+                            android:tint="?colorPrimary"
                             app:srcCompat="@drawable/analytics_price" />
 
                         <TextView
@@ -143,6 +145,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
+                            android:tint="?colorPrimary"
                             app:srcCompat="@drawable/ic_icon_categories" />
 
                         <TextView
@@ -168,7 +171,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:tint="@color/colorPrimary"
+                            android:tint="?colorPrimary"
                             app:srcCompat="@drawable/ic_payment_method" />
 
                         <TextView
@@ -204,7 +207,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="13dp"
-                        android:tint="@color/colorPrimary"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/analytics_price" />
 
                     <TextView
@@ -226,7 +229,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="13dp"
-                        android:tint="@color/colorPrimary"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/ic_record_count" />
 
                     <TextView

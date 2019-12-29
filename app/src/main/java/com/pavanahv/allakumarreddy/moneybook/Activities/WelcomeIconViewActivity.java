@@ -8,6 +8,7 @@ import android.view.animation.ScaleAnimation;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 public class WelcomeIconViewActivity extends BaseActivity {
 
@@ -16,6 +17,7 @@ public class WelcomeIconViewActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_welcome_icon_view);
 
         View icon = findViewById(R.id.imv);

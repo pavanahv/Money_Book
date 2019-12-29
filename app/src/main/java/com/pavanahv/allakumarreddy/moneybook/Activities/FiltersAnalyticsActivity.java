@@ -22,6 +22,7 @@ import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.AnalyticsFilterData;
 import com.pavanahv.allakumarreddy.moneybook.utils.DatePickerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,6 +56,7 @@ public class FiltersAnalyticsActivity extends AppCompatActivity implements IDate
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_filters_analytics);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

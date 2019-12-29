@@ -73,6 +73,17 @@ public class GlobalConstants {
     public static final String NOTIFICATION_CHANNLE_MESSAGE_PARSER_DESCRIPTION = "NOTIFICATION_CHANNLE_MESSAGE_PARSER_DESCRIPTION";
     public static final String NOTIFICATION_CHANNLE_MSG_PARSER_NAME = "NOTIFICATION_CHANNLE_MSG_PARSER_NAME";
     public static final String PREF_MSG_PARSER_SWITCH = "PREF_MSG_PARSER_SWITCH";
+    public static final String PREF_DISPLAY_THEME = "display_theme";
+    public static final String PREF_DISPLAY_SPENT = "PREF_DISPLAY_SPENT";
+    public static final String PREF_DISPLAY_EARN = "PREF_DISPLAY_EARN";
+    public static final String PREF_DISPLAY_DUE = "PREF_DISPLAY_DUE";
+    public static final String PREF_DISPLAY_LOAN = "PREF_DISPLAY_LOAN";
+    public static final String PREF_DISPLAY_DUE_PAYMENT = "PREF_DISPLAY_DUE_PAYMENT";
+    public static final String PREF_DISPLAY_LOAN_PAYMENT = "PREF_DISPLAY_LOAN_PAYMENT";
+    public static final String PREF_DISPLAY_MONEY_TRANSFER = "PREF_DISPLAY_MONEY_TRANSFER";
+    public static final String PREF_DISPLAY_DAY_WISE = "PREF_DISPLAY_DAY_WISE";
+    public static final String PREF_DISPLAY_MONTH_WISE = "PREF_DISPLAY_MONTH_WISE";
+    public static final String PREF_DISPLAY_YEAR_WISE = "PREF_DISPLAY_YEAR_WISE";
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

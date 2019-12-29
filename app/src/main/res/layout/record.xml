@@ -51,7 +51,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:tint="@color/colorPrimary"
+                        android:tint="?colorPrimary"
                         android:visibility="gone"
                         app:srcCompat="@drawable/icon_saveas" />
 
@@ -73,10 +73,12 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:id="@+id/price_imv"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="10"
                         android:gravity="center"
+                        android:tint="?colorPrimary"
                         app:srcCompat="@drawable/analytics_price" />
 
                     <TextView
@@ -102,10 +104,12 @@
                         android:orientation="horizontal">
 
                         <ImageView
+                            android:id="@+id/cat_imv"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
                             android:gravity="center"
+                            android:tint="?colorPrimary"
                             app:srcCompat="@drawable/ic_icon_categories" />
 
                         <TextView
@@ -126,11 +130,12 @@
                         android:orientation="horizontal">
 
                         <ImageView
+                            android:id="@+id/pay_imv"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="10"
                             android:gravity="center"
-                            android:tint="@color/colorPrimary"
+                            android:tint="?colorPrimary"
                             app:srcCompat="@drawable/ic_payment_method" />
 
                         <TextView

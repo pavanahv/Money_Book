@@ -6,10 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.pavanahv.allakumarreddy.moneybook.R;
-import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
-import com.pavanahv.allakumarreddy.moneybook.utils.DriveServiceHelper;
-import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,6 +16,11 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
+import com.pavanahv.allakumarreddy.moneybook.utils.DriveServiceHelper;
+import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import java.util.Collections;
 
@@ -34,6 +35,7 @@ public class TestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_test);
 
         requestSignIn();

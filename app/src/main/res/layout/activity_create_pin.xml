@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:background="@color/colorPrimary">
+        android:background="?colorPrimary">
 
         <EditText
             android:hint="Enter 4 Digit PIN"
@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:background="@color/colorPrimary">
+        android:background="?colorPrimary">
 
         <EditText
             android:hint="Confirm 4 Digit PIN"

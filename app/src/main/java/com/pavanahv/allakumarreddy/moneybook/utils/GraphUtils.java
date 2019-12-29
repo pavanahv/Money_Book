@@ -3,7 +3,6 @@ package com.pavanahv.allakumarreddy.moneybook.utils;
 import android.content.Context;
 import android.graphics.Color;
 
-import com.pavanahv.allakumarreddy.moneybook.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -15,10 +14,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 
 import java.util.ArrayList;
 
-import static com.pavanahv.allakumarreddy.moneybook.utils.Utils.getColor;
 import static com.pavanahv.allakumarreddy.moneybook.utils.Utils.getColors;
 
 public class GraphUtils {
@@ -66,6 +66,7 @@ public class GraphUtils {
     public static LineChart drawLineGraph(ArrayList<String[]> labels,
                                           ArrayList<String[]> datas, Context context, String title) {
 
+        PreferencesCus pref = new PreferencesCus(context);
         LineChart chart = new LineChart(context);
 
         chart.getXAxis().setDrawLabels(true);
@@ -96,11 +97,12 @@ public class GraphUtils {
                         new String[]{label[j], "" + j}));
             }
             LineDataSet dataSet = new LineDataSet(entry, typeStr[i]);
-            dataSet.setColor(getColor(i, context));
+            int tempColor = Utils.getColorPref(i, pref);
+            dataSet.setColor(tempColor);
             dataSet.setDrawValues(false);
-            dataSet.setCircleColor(getColor(i, context));
+            dataSet.setCircleColor(tempColor);
             dataSet.setDrawFilled(true);
-            dataSet.setFillColor(getColor(i, context));
+            dataSet.setFillColor(tempColor);
             dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             list.add(dataSet);
         }
@@ -133,6 +135,7 @@ public class GraphUtils {
                                           String[] data, Context context, String title,
                                           int type) {
 
+        PreferencesCus pref = new PreferencesCus(context);
         LineChart chart = new LineChart(context);
         chart.getXAxis().setDrawLabels(true);
         ArrayList<ILineDataSet> list = new ArrayList<>();
@@ -146,11 +149,12 @@ public class GraphUtils {
         }
 
         LineDataSet dataSet = new LineDataSet(entry, typeStr[type]);
-        dataSet.setColor(getColor(type, context));
+        int tempColor = Utils.getColorPref(type, pref);
+        dataSet.setColor(tempColor);
         dataSet.setDrawValues(false);
-        dataSet.setCircleColor(getColor(type, context));
+        dataSet.setCircleColor(tempColor);
         dataSet.setDrawFilled(true);
-        dataSet.setFillColor(getColor(type, context));
+        dataSet.setFillColor(tempColor);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         list.add(dataSet);
 

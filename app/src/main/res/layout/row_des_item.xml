@@ -17,7 +17,7 @@
         android:textStyle="bold" />
 
     <View
-        android:background="@color/colorPrimary"
+        android:background="?colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="2dp"/>
 </LinearLayout>

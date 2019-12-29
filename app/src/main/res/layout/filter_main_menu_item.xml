@@ -7,7 +7,7 @@
     tools:context=".Activities.FiltersAnalyticsActivity">
 
     <TextView
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="?colorPrimaryDark"
         android:textSize="20dp"
         android:layout_margin="10dp"
         android:text="TextView"

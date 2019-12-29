@@ -10,6 +10,7 @@ import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.fragments.AutoAddAddFragment;
 import com.pavanahv.allakumarreddy.moneybook.fragments.AutoAddListFragment;
 import com.pavanahv.allakumarreddy.moneybook.utils.AutoAddRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 public class AutoAddActivity extends BaseActivity implements
         AutoAddListFragment.OnAutoAddListFragmentInteractionListener,
@@ -20,6 +21,7 @@ public class AutoAddActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ThemeUtils.getTheme(getClass().getSimpleName(), this));
         setContentView(R.layout.activity_auto_add);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

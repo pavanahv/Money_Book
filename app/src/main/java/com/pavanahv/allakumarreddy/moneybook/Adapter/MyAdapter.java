@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.HomeAdapterInterface;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 public class MyAdapter extends ArrayAdapter<MBRecord> {
 
     private final HomeAdapterInterface mHomeAdapterInterface;
+    private final PreferencesCus mPref;
     private ArrayList<MBRecord> dataSet;
     Context mContext;
 
@@ -34,7 +37,10 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         TextView txtName;
         TextView txtRs;
         ImageView imageView;
-        View statusView;
+        ImageView statusView;
+        ImageView priceImv;
+        ImageView catImv;
+        ImageView payImv;
     }
 
     public MyAdapter(ArrayList<MBRecord> data, Context context, int type, HomeAdapterInterface homeAdapterInterface) {
@@ -42,6 +48,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         this.dataSet = data;
         this.mContext = context;
         mHomeAdapterInterface = homeAdapterInterface;
+        mPref = new PreferencesCus(context);
     }
 
     private int lastPosition = -1;
@@ -66,6 +73,9 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.catName = (TextView) convertView.findViewById(R.id.categoryhome);
             viewHolder.paymentMethod = (TextView) convertView.findViewById(R.id.payment_method);
             viewHolder.statusView = convertView.findViewById(R.id.status_view);
+            viewHolder.priceImv = convertView.findViewById(R.id.price_imv);
+            viewHolder.catImv = convertView.findViewById(R.id.cat_imv);
+            viewHolder.payImv = convertView.findViewById(R.id.pay_imv);
 
             result = convertView;
 
@@ -80,7 +90,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         lastPosition = position;
 
         viewHolder.txtName.setText(dataModel.getDescription());
-        viewHolder.txtRs.setText("Rs. " + dataModel.getAmount());
+        viewHolder.txtRs.setText("" + dataModel.getAmount());
         viewHolder.catName.setText(dataModel.getCategory());
         viewHolder.paymentMethod.setText(dataModel.getPaymentMethod());
         viewHolder.statusView.setVisibility(View.GONE);
@@ -101,6 +111,10 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
                 viewHolder.imageView.setImageResource(R.drawable.ic_loan);
                 break;
 
+            case GlobalConstants.TYPE_MONEY_TRANSFER:
+                viewHolder.imageView.setImageResource(R.drawable.ic_money_transfer);
+                break;
+
             case GlobalConstants.TYPE_DUE_PAYMENT:
                 viewHolder.imageView.setImageResource(R.drawable.due);
                 viewHolder.statusView.setVisibility(View.VISIBLE);
@@ -111,6 +125,8 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
                 viewHolder.statusView.setVisibility(View.VISIBLE);
                 break;
         }
+        Utils.setTint(mPref, viewHolder.imageView, dataModel.getType());
+
         // Return the completed view to render on screen
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override

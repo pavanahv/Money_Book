@@ -26,7 +26,7 @@
             android:id="@+id/no_data"
             android:textStyle="bold"
             android:textSize="20dp"
-            android:textColor="@color/colorPrimary"
+            android:textColor="?colorPrimary"
             android:text="No Graphs Data.\nAdd Graphs From Analytics"
             android:gravity="center"
             android:layout_width="match_parent"

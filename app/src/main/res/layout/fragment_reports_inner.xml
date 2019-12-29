@@ -40,7 +40,7 @@
                 android:layout_gravity="center"
                 android:text="No Data \nPlease Add Data In Home Screen"
                 android:textAlignment="center"
-                android:textColor="@color/colorPrimary"
+                android:textColor="?colorPrimary"
                 android:textStyle="bold"
                 android:visibility="gone" />
 

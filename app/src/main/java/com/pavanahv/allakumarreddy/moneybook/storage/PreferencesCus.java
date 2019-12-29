@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 
@@ -132,5 +133,40 @@ public class PreferencesCus {
 
     public boolean getMessageParserNotificationStatus() {
         return mSharedPreference.getBoolean(GlobalConstants.PREF_MSG_PARSER_SWITCH, false);
+    }
+
+    public int getTheme() {
+        return Integer.parseInt(mSharedPreference.getString(GlobalConstants.PREF_DISPLAY_THEME, "0"));
+    }
+
+    public int getColor(String pref) {
+        String res = mSharedPreference.getString(pref, null);
+        if (res == null) {
+            switch (pref) {
+                case GlobalConstants.PREF_DISPLAY_SPENT:
+                case GlobalConstants.PREF_DISPLAY_DUE_PAYMENT:
+                case GlobalConstants.PREF_DISPLAY_LOAN_PAYMENT:
+                    return context.getResources().getColor(R.color.spent);
+                case GlobalConstants.PREF_DISPLAY_EARN:
+                    return context.getResources().getColor(R.color.earn);
+                case GlobalConstants.PREF_DISPLAY_DUE:
+                    return context.getResources().getColor(R.color.due);
+                case GlobalConstants.PREF_DISPLAY_LOAN:
+                    return context.getResources().getColor(R.color.loan);
+                case GlobalConstants.PREF_DISPLAY_MONEY_TRANSFER:
+                    return context.getResources().getColor(R.color.money_transfer);
+                case GlobalConstants.PREF_DISPLAY_DAY_WISE:
+                    return context.getResources().getColor(R.color.day_wise);
+                case GlobalConstants.PREF_DISPLAY_MONTH_WISE:
+                    return context.getResources().getColor(R.color.month_wise);
+                case GlobalConstants.PREF_DISPLAY_YEAR_WISE:
+                    return context.getResources().getColor(R.color.year_wise);
+            }
+        }
+        return Integer.parseInt(res);
+    }
+
+    public void setColor(String pref, int color) {
+        mSharedPreference.edit().putString(pref, color + "").apply();
     }
 }

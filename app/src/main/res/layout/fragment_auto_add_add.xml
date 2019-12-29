@@ -27,7 +27,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Name"
                     android:textColor="@color/white" />
@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Description"
                     android:textColor="@color/white" />
@@ -63,7 +63,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Amount"
                     android:textColor="@color/white" />
@@ -82,7 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Type"
                     android:textColor="@color/white" />
@@ -99,7 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Category"
                     android:textColor="@color/white" />
@@ -116,7 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Payment Method"
                     android:textColor="@color/white" />
@@ -133,7 +133,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Frequency"
                     android:textColor="@color/white" />
@@ -150,7 +150,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@color/colorPrimary"
+                    android:background="?colorPrimary"
                     android:padding="5dp"
                     android:text="Day"
                     android:textColor="@color/white" />

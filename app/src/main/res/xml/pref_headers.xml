@@ -17,4 +17,9 @@
         android:icon="@drawable/ic_lock_screen"
         android:title="@string/pref_header_data_sync" />
 
+    <header
+        android:fragment="com.pavanahv.allakumarreddy.moneybook.Activities.SettingsActivity$DisplayPreferenceFragment"
+        android:icon="@drawable/display_theme"
+        android:title="@string/pref_header_display" />
+
 </preference-headers>

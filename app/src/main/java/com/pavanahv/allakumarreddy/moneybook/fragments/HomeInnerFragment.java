@@ -87,7 +87,6 @@ public class HomeInnerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_home_inner, container, false);
         mainView = layout.findViewById(R.id.mainView);
         mainView.setVisibility(View.GONE);
@@ -105,8 +104,8 @@ public class HomeInnerFragment extends Fragment {
 
     private void initDateView() {
         dateTv.setText(new SimpleDateFormat("dd MMM yyyy").format(curDate));
-        dateTv.setTextColor(Utils.getColor(mType, getContext()));
-        LoggerCus.d(TAG,new SimpleDateFormat("dd MMM yyyy").format(curDate));
+        dateTv.setTextColor(Utils.getColorPref(mType, pref));
+        LoggerCus.d(TAG, new SimpleDateFormat("dd MMM yyyy").format(curDate));
     }
 
     private void readBundle(Bundle args) {
