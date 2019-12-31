@@ -1,5 +1,6 @@
 package com.pavanahv.allakumarreddy.moneybook.fragments;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -155,12 +156,13 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
     }
 
     @Override
-    public void viewOnClick(String dataText) {
+    public void viewOnClick(String dataText, View finalConvertView) {
         Intent intent = new Intent(getContext(), AnalyticsActivity.class);
         intent.putExtra("name", dataText);
         intent.putExtra(GlobalConstants.CATEGORY_TYPE, mType);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+        startActivity(intent,
+                ActivityOptions.makeSceneTransitionAnimation(getActivity(), finalConvertView,
+                        getResources().getString(R.string.shared_anim_cat_item)).toBundle());
     }
 
     @Override

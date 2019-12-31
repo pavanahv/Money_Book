@@ -133,7 +133,7 @@ public class RePaymentActivity extends BaseActivity {
         Intent intent = new Intent(this, AnalyticsItemDetail.class);
         intent.putExtra("MBRecord", mbRecord);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this, view,
-                getResources().getString(R.string.shared_anim_analytics_item)).toBundle());
+                getResources().getString(R.string.shared_anim_analytics_item2)).toBundle());
     }
 
     private void initViews() {

@@ -214,9 +214,6 @@ public class BudgetDetailActivity extends BaseActivity {
                         i++;
                     }
                 }
-                LoggerCus.d(TAG, dateSet.toString());
-                for (ArrayList<Integer> catL : catLists)
-                    LoggerCus.d(TAG, catL.toString());
 
                 runOnUiThread(new Runnable() {
                     @Override

@@ -8,6 +8,14 @@
     tools:context=".Activities.MessagesActivity"
     tools:showIn="@layout/activity_messages">
 
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/no_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Click + To Add Message Parser Item"
+        android:textColor="?colorPrimary" />
+
     <ListView
         android:id="@+id/msg_list_view"
         android:layout_width="match_parent"

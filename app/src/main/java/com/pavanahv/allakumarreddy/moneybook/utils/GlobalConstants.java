@@ -90,5 +90,5 @@ public class GlobalConstants {
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";
     public static final String BACKUP_TO_GOOGLE_DRIVE = "BACKUP_TO_GOOGLE_DRIVE";
     public static final String RESTORE_FROM_GOOGLE_DRIVE = "RESOTRE_FROM_GOOGLE_DRIVE";
-    public static int graph_animate_time = 1000;
+    public static int graph_animate_time = 300;
 }

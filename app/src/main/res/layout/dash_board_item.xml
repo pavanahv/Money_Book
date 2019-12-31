@@ -156,6 +156,7 @@
 
 
                             <TextView
+                                android:transitionName="@string/shared_anim_cat_item"
                                 android:id="@+id/dashpercentagey"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"

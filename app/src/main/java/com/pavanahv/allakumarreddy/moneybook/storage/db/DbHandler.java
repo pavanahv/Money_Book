@@ -13,6 +13,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.DateConverter;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
+import com.pavanahv.allakumarreddy.moneybook.utils.SecurityUtils;
 import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import org.json.JSONArray;
@@ -22,12 +23,17 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 
 /**
@@ -421,10 +427,14 @@ public class DbHandler extends SQLiteOpenHelper {
             return false;
     }
 
-    public void addRecords(String s) {
-        deleteAllData();
+    public boolean addRecords(String s) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        /*try {
+            s = decrypt(s);
+        } catch (Exception e) {
+            LoggerCus.d(TAG, "Error while decrypting data" + e.getMessage());
+            return false;
+        }*/
         try {
             JSONObject obj = new JSONObject(s);
             JSONArray jsonArray = obj.getJSONArray(TABLE_NAME);
@@ -434,6 +444,9 @@ public class DbHandler extends SQLiteOpenHelper {
             JSONArray jsonArrayp = obj.getJSONArray(PAY_METH_TABLE_NAME);
             JSONArray jsonArrayaa = obj.getJSONArray(AA_TABLE_NAME);
             JSONArray jsonArrayb = obj.getJSONArray(BUDGET_TABLE_NAME);
+
+            deleteAllData();
+            SQLiteDatabase db = this.getWritableDatabase();
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -539,7 +552,20 @@ public class DbHandler extends SQLiteOpenHelper {
             db.close(); // Closing database connection
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
+            try {
+                deleteAllData();
+            } catch (Exception ec) {
+                LoggerCus.d(TAG, ec.getMessage());
+            }
+            return false;
         }
+        return true;
+    }
+
+    private String decrypt(String encryptedStr) throws Exception {
+        byte[] key = getKey();
+        byte[] decryptedData = SecurityUtils.decrypt(key, encryptedStr.getBytes());
+        return new String(decryptedData);
     }
 
     private void deleteAllData() {
@@ -1064,8 +1090,34 @@ public class DbHandler extends SQLiteOpenHelper {
         }
 
         db.close();
-        // return JSON string
-        return obj.toString();
+
+        String res = obj.toString();
+        /*try {
+            res = encrypt(res);
+        } catch (Exception e) {
+            LoggerCus.d(TAG, "Error while encrypting data "+e.getMessage());
+        }*/
+        return res;
+    }
+
+    private String encrypt(String jsonString) throws Exception {
+        byte[] b = jsonString.getBytes();
+
+        byte[] key = getKey();
+
+        byte[] encryptedData = SecurityUtils.encrypt(key, b);
+        return new String(encryptedData,"UTF-8");
+    }
+
+    private byte[] getKey() throws NoSuchAlgorithmException {
+        byte[] keyStart = Utils.getEmail().getBytes();
+        KeyGenerator kgen = KeyGenerator.getInstance("AES");
+        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+        sr.setSeed(keyStart);
+        kgen.init(128, sr); // 192 and 256 bits may not be available
+        SecretKey skey = kgen.generateKey();
+        byte[] key = skey.getEncoded();
+        return key;
     }
 
     public ArrayList<MBRecord> getRecordsAsList() {

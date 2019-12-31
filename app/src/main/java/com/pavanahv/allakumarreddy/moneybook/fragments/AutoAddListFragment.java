@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.pavanahv.allakumarreddy.moneybook.Adapter.AutoAddAdapter;
-import com.pavanahv.allakumarreddy.moneybook.interfaces.AutoAddAdapterInterface;
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.interfaces.AutoAddAdapterInterface;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.AutoAddRecord;
 
@@ -23,6 +23,7 @@ public class AutoAddListFragment extends Fragment {
     private DbHandler db;
     private ArrayList<AutoAddRecord> list;
     private AutoAddAdapter mAutoAddAdpter;
+    private View noData;
 
     public AutoAddListFragment() {
         // Required empty public constructor
@@ -56,6 +57,8 @@ public class AutoAddListFragment extends Fragment {
             }
         });
 
+        noData = view.findViewById(R.id.no_data);
+        noData.setVisibility(View.GONE);
         mListView = view.findViewById(R.id.lv);
         list = new ArrayList<>();
         mAutoAddAdpter = new AutoAddAdapter(list, getContext(), new AutoAddAdapterInterface() {
@@ -77,7 +80,16 @@ public class AutoAddListFragment extends Fragment {
         new Thread(() -> {
             list.clear();
             list.addAll(db.getAutoAddRecords());
-            getActivity().runOnUiThread(() -> mAutoAddAdpter.notifyDataSetChanged());
+            getActivity().runOnUiThread(() -> {
+                mAutoAddAdpter.notifyDataSetChanged();
+                if (mAutoAddAdpter.getCount() <= 0) {
+                    mListView.setVisibility(View.GONE);
+                    noData.setVisibility(View.VISIBLE);
+                } else {
+                    mListView.setVisibility(View.VISIBLE);
+                    noData.setVisibility(View.GONE);
+                }
+            });
         }).start();
     }
 

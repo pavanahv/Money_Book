@@ -37,6 +37,7 @@
                     android:layout_height="match_parent">
 
                     <TextView
+                        android:transitionName="@string/shared_anim_analytics_item"
                         android:id="@+id/desc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

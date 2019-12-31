@@ -124,4 +124,8 @@
     <string name="record_msg_parser_des">Show the records parsed by Message Parser</string>
     <string name="pref_title_diplay_theme">Theme</string>
     <string name="pref_header_display">Display</string>
+    <string name="shared_anim_reports_graph_item">shared_anim_reports_graph_item</string>
+    <string name="shared_anim_budget_item">shared_anim_budget_item</string>
+    <string name="shared_anim_analytics_item2">shared_anim_analytics_item2</string>
+    <string name="shared_anim_cat_item">shared_anim_cat_item</string>
 </resources>

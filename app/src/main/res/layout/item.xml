@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:transitionName="@string/shared_anim_analytics_item"
     android:orientation="vertical">
 
     <TextView
@@ -10,24 +9,25 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingTop="10dp"
-        android:textColor="?colorPrimary"
-        android:text="Total" />
+        android:text="Total"
+        android:textColor="?colorPrimary" />
 
     <TextView
         android:id="@+id/total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
         android:gravity="center"
         android:paddingBottom="10dp"
-        android:textStyle="bold"
+        android:text="TextView"
         android:textColor="?colorPrimaryDark"
-        android:text="TextView" />
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:transitionName="@string/shared_anim_cat_item" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="?colorPrimaryDark"/>
+        android:background="?colorPrimaryDark" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,8 +35,8 @@
         android:orientation="horizontal">
 
         <SearchView
-            android:layout_width="match_parent"
             android:id="@+id/sv"
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
         </SearchView>
@@ -44,7 +44,7 @@
     </LinearLayout>
 
     <ListView
+        android:id="@+id/analyticslv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/analyticslv"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

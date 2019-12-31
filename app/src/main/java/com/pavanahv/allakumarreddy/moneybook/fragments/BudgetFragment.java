@@ -1,6 +1,7 @@
 package com.pavanahv.allakumarreddy.moneybook.fragments;
 
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -101,8 +102,8 @@ public class BudgetFragment extends Fragment {
         list = new ArrayList<>();
         mBudgetAdapter = new BudgetAdapter(list, getContext(), new BudgetAdapterInterface() {
             @Override
-            public void onClickItem(String name) {
-                startDetailActivity(name);
+            public void onClickItem(String name, View finalConvertView) {
+                startDetailActivity(name, finalConvertView);
             }
         });
         mListView.setAdapter(mBudgetAdapter);
@@ -273,11 +274,12 @@ public class BudgetFragment extends Fragment {
         }).start();
     }
 
-    private void startDetailActivity(String name) {
+    private void startDetailActivity(String name, View view) {
         Intent intent = new Intent(getContext(), BudgetDetailActivity.class);
         intent.putExtra("name", name);
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+        startActivity(intent,
+                ActivityOptions.makeSceneTransitionAnimation(getActivity(), view,
+                        getResources().getString(R.string.shared_anim_budget_item)).toBundle());
     }
 
 }

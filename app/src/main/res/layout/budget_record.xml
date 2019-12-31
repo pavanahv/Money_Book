@@ -4,7 +4,8 @@
     android:id="@+id/record"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:transitionName="@string/shared_anim_budget_item">
 
 
     <android.support.v7.widget.CardView

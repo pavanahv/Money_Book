@@ -1,6 +1,7 @@
 package com.pavanahv.allakumarreddy.moneybook.fragments;
 
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -119,8 +120,9 @@ public class ReportsInnerFragment extends Fragment {
                 intent.putExtra("AnalyticsFilterData" + i, tempList.get(i));
             }
         }
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+        startActivity(intent,
+                ActivityOptions.makeSceneTransitionAnimation(getActivity(), childItem,
+                        getResources().getString(R.string.shared_anim_reports_graph_item)).toBundle());
     }
 
     private void showMainView() {

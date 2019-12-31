@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -57,7 +55,7 @@ public class BudgetAdapter extends ArrayAdapter<HashMap<String, String>> {
         // Check if an existing view is being reused, otherwise inflate the view
         BudgetAdapter.ViewHolder viewHolder; // view lookup cache stored in tag
 
-        final View result;
+//        final View result;
 
         if (convertView == null) {
 
@@ -74,17 +72,17 @@ public class BudgetAdapter extends ArrayAdapter<HashMap<String, String>> {
             viewHolder.avg = (TextView) convertView.findViewById(R.id.avg);
             viewHolder.expired = (ImageView) convertView.findViewById(R.id.expired);
 
-            result = convertView;
+//            result = convertView;
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (BudgetAdapter.ViewHolder) convertView.getTag();
-            result = convertView;
+//            result = convertView;
         }
 
-        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        /*Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);
-        lastPosition = position;
+        lastPosition = position;*/
 
         viewHolder.name.setText(dataModel.get("name"));
         viewHolder.limit.setText(dataModel.get("limit"));
@@ -106,9 +104,10 @@ public class BudgetAdapter extends ArrayAdapter<HashMap<String, String>> {
 
 
         // Return the completed view to render on screen
+        View finalConvertView = convertView;
         convertView.setOnClickListener(v -> {
             HashMap<String, String> mbr = getItem(position);
-            mBudgetAdapterInterface.onClickItem(mbr.get("name"));
+            mBudgetAdapterInterface.onClickItem(mbr.get("name"), finalConvertView);
         });
         return convertView;
     }

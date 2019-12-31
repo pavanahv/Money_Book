@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import com.pavanahv.allakumarreddy.moneybook.Adapter.MessageParserAdapter;
@@ -21,6 +22,7 @@ public class MessagesActivity extends BaseActivity {
     private ListView mListView;
     private ArrayList<HashMap<String, String>> list;
     private MessageParserAdapter mArrayAdapter;
+    private View noData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,8 @@ public class MessagesActivity extends BaseActivity {
     private void init() {
         db = new DbHandler(this);
         mListView = (ListView) findViewById(R.id.msg_list_view);
+        noData = findViewById(R.id.no_data);
+        noData.setVisibility(View.GONE);
         list = new ArrayList<>();
         mArrayAdapter = new MessageParserAdapter(list, this, name -> {
             Intent intent = new Intent(MessagesActivity.this, MessageDetailActivity.class);
@@ -61,6 +65,13 @@ public class MessagesActivity extends BaseActivity {
                 mArrayAdapter.clear();
                 mArrayAdapter.addAll(list);
                 mArrayAdapter.notifyDataSetChanged();
+                if (mArrayAdapter.getCount() <= 0) {
+                    noData.setVisibility(View.VISIBLE);
+                    mListView.setVisibility(View.GONE);
+                } else {
+                    noData.setVisibility(View.GONE);
+                    mListView.setVisibility(View.VISIBLE);
+                }
             });
         }).start();
     }

@@ -5,8 +5,6 @@ import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -107,7 +105,8 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
             result = convertView;
         }
 
-        convertView.setOnClickListener(v -> mDashBoardAdapterInterface.viewOnClick(dataModel.getText()));
+        View finalConvertView = convertView;
+        convertView.setOnClickListener(v -> mDashBoardAdapterInterface.viewOnClick(dataModel.getText(), finalConvertView));
 
         final PopupMenu popup = new PopupMenu(mContext, viewHolder.imageView);
         //Inflating the Popup using xml file
@@ -155,9 +154,9 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         }
 
 
-        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        /*Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);
-        lastPosition = position;
+        lastPosition = position;*/
 
         int dayColor = Utils.getDayWiseColor(mPref);
         viewHolder.mCircularProgressbarDay.setColor(dayColor);

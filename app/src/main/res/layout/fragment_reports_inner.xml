@@ -41,7 +41,6 @@
                 android:text="No Data \nPlease Add Data In Home Screen"
                 android:textAlignment="center"
                 android:textColor="?colorPrimary"
-                android:textStyle="bold"
                 android:visibility="gone" />
 
         </FrameLayout>

@@ -195,8 +195,7 @@ public class RestoreActivity extends BaseActivity {
             LoggerCus.d(TAG, content);
             try {
                 if (content != null) {
-                    importData(content);
-                    isBackupSuccess = true;
+                    isBackupSuccess = importData(content);
                 } else {
                     LoggerCus.d(TAG, "no content in drive file");
                 }
@@ -207,9 +206,10 @@ public class RestoreActivity extends BaseActivity {
         }).start();
     }
 
-    private void importData(String content) {
+    private boolean importData(String content) {
         DbHandler db = new DbHandler(this);
-        db.addRecords(content);
+        boolean res = db.addRecords(content);
+        return res;
     }
 
     private void requestPermissionForReadWriteStorage() {
@@ -230,8 +230,7 @@ public class RestoreActivity extends BaseActivity {
         new Thread(() -> {
             String content = mFileStore.readLocalFile(true);
             if (content != null) {
-                importData(content);
-                isBackupSuccess = true;
+                isBackupSuccess = importData(content);
             } else {
                 LoggerCus.d(TAG, "no content in local backup file");
             }

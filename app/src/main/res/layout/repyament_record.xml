@@ -80,6 +80,7 @@
                         app:srcCompat="@drawable/analytics_price" />
 
                     <TextView
+                        android:transitionName="@string/shared_anim_analytics_item2"
                         android:id="@+id/aprice"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

@@ -1,6 +1,7 @@
 package com.pavanahv.allakumarreddy.moneybook.fragments;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -198,9 +199,10 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     }
 
     @Override
-    public void viewOnClick(String dataText) {
-        startActivity(new Intent(getActivity(), AnalyticsActivity.class).putExtra("paymentMethod", dataText));
-        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+    public void viewOnClick(String dataText, View finalConvertView) {
+        startActivity(new Intent(getActivity(), AnalyticsActivity.class).putExtra("paymentMethod", dataText),
+                ActivityOptions.makeSceneTransitionAnimation(getActivity(), finalConvertView,
+                        getResources().getString(R.string.shared_anim_cat_item)).toBundle());
     }
 
     @Override

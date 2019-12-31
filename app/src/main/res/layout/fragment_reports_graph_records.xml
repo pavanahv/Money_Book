@@ -25,9 +25,7 @@
             android:layout_margin="5dp"
             android:padding="5dp"
             android:text="Please click on any element in list or graph"
-            android:textColor="?colorPrimary"
-            android:textSize="20dp"
-            android:textStyle="bold" />
+            android:textColor="?colorPrimary" />
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/less_data"
@@ -37,10 +35,10 @@
             android:layout_margin="5dp"
             android:padding="5dp"
             android:text="No Data"
-            android:visibility="gone"
             android:textColor="?colorPrimary"
             android:textSize="20dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <ListView
             android:id="@+id/lv"

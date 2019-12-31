@@ -63,9 +63,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:text="Click + To Add Data"
-                    android:textColor="?colorPrimary"
-                    android:textSize="20dp"
-                    android:textStyle="bold" />
+                    android:textColor="?colorPrimary" />
 
                 <ListView
                     android:id="@+id/lv"

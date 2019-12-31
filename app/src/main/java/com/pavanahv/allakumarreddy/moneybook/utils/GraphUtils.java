@@ -46,7 +46,6 @@ public class GraphUtils {
         PieData barData = new PieData(dataSet);
         barData.setHighlightEnabled(true);
         chart.setData(barData);
-        chart.animateXY(2000, 2000);
         dataSet.setColors(getColors());
         dataSet.setValueLinePart1OffsetPercentage(80.f);
         dataSet.setValueLinePart1Length(0.2f);
@@ -67,6 +66,7 @@ public class GraphUtils {
         chart.setCenterText(title);
         chart.getDescription().setEnabled(false);
         chart.setEntryLabelColor(Color.BLACK);
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
         return chart;
     }
 

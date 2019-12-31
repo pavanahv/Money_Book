@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -54,7 +52,7 @@ public class RePaymentAdapter extends ArrayAdapter<MBRecord> {
         RePaymentAdapter.ViewHolder viewHolder; // view lookup cache stored in tag
 
         final int pos = position;
-        final View result;
+//        final View result;
 
         if (convertView == null) {
 
@@ -68,20 +66,20 @@ public class RePaymentAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.category = (TextView) convertView.findViewById(R.id.acategory);
             viewHolder.paymentMethod = (TextView) convertView.findViewById(R.id.apayment_method);
 
-            result = convertView;
+//            result = convertView;
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (RePaymentAdapter.ViewHolder) convertView.getTag();
-            result = convertView;
+//            result = convertView;
         }
 
         View finalConvertView = convertView;
         convertView.setOnClickListener(v -> mRePaymentAdapterInterface.onClickItem(dataModel, finalConvertView));
 
-        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        /*Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);
-        lastPosition = position;
+        lastPosition = position;*/
 
         viewHolder.txtRs.setText("" + dataModel.getAmount());
         viewHolder.txtDate.setText(format.format(dataModel.getDate()));

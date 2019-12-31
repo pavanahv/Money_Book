@@ -1,32 +1,32 @@
 package com.pavanahv.allakumarreddy.moneybook.test;
 
-import java.util.Calendar;
+import com.pavanahv.allakumarreddy.moneybook.utils.SecurityUtils;
+
+import java.security.SecureRandom;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 public class Test {
 
-    public static void main(String args[]) {
-        Calendar cal = Calendar.getInstance();
+    public static void main(String args[]) throws Exception {
+        StringBuilder data = new StringBuilder("string");
+        for (int i = 0; i < 500; i++) {
+            data.append("STRING");
+        }
+        byte[] b = data.toString().getBytes();
 
-        cal.add(Calendar.DAY_OF_YEAR,1);
-        // Add day to week
-//        cal.add(Calendar.WEEK_OF_MONTH, 1);
-//        cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+        byte[] keyStart = "this is a keythis is a keythis is a keythis is a keythis is a keythis is a key".getBytes();
+        KeyGenerator kgen = KeyGenerator.getInstance("AES");
+        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+        sr.setSeed(keyStart);
+        kgen.init(128, sr); // 192 and 256 bits may not be available
+        SecretKey skey = kgen.generateKey();
+        byte[] key = skey.getEncoded();
 
-        // add day to month
-//        cal.add(Calendar.MONTH,1);
-//        cal.set(Calendar.DAY_OF_MONTH,23);
-
-        // select a particular date in year
-//        cal.add(Calendar.YEAR, 1);
-//        cal.set(Calendar.MONTH, 2);
-//        cal.set(Calendar.DAY_OF_MONTH, 24);
-
-        long l = cal.getTimeInMillis();
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTimeInMillis(l);
-        System.out.println(cal1.getTime());
-        System.out.println(Calendar.getInstance().getTime());
-        System.out.println(cal1.getTimeInMillis());
-        System.out.println(Calendar.getInstance().getTimeInMillis());
+        byte[] encryptedData = SecurityUtils.encrypt(key, b);
+        byte[] decryptedData = SecurityUtils.decrypt(key, encryptedData);
+        String s = new String(decryptedData);
+        System.out.println(s);
     }
 }

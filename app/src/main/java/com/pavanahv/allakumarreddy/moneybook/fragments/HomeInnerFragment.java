@@ -1,5 +1,6 @@
 package com.pavanahv.allakumarreddy.moneybook.fragments;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -39,8 +40,8 @@ public class HomeInnerFragment extends Fragment {
     private ArrayList<MBRecord> mbr;
     private HomeAdapterInterface mHomeAdapterInterface = new HomeAdapterInterface() {
         @Override
-        public void onClickItem(MBRecord mbr) {
-            startDetailActivity(mbr);
+        public void onClickItem(MBRecord mbr, View view) {
+            startDetailActivity(mbr, view);
         }
     };
     private MyAdapter mAdapter;
@@ -154,18 +155,19 @@ public class HomeInnerFragment extends Fragment {
         return total;
     }
 
-    public void startDetailActivity(MBRecord mbr) {
+    public void startDetailActivity(MBRecord mbr, View view) {
+        Intent intent = null;
         if (mType == GlobalConstants.TYPE_DUE || mType == GlobalConstants.TYPE_LOAN) {
-            Intent intent = new Intent(getActivity(), RePaymentActivity.class);
+            intent = new Intent(getActivity(), RePaymentActivity.class);
             intent.putExtra("MBRecord", mbr);
-            startActivity(intent);
         } else {
-            Intent intent = new Intent(getActivity(), AnalyticsItemDetail.class);
+            intent = new Intent(getActivity(), AnalyticsItemDetail.class);
             mbr.setType(mType);
             intent.putExtra("MBRecord", mbr);
-            startActivity(intent);
         }
-        getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+        startActivity(intent,
+                ActivityOptions.makeSceneTransitionAnimation(getActivity(), view,
+                        getResources().getString(R.string.shared_anim_analytics_item)).toBundle());
     }
 
 }

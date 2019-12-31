@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,7 +49,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         mPref = new PreferencesCus(context);
     }
 
-    private int lastPosition = -1;
+    //private int lastPosition = -1;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -60,7 +58,7 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
 
-        final View result;
+        //final View result;
 
         if (convertView == null) {
 
@@ -77,17 +75,17 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
             viewHolder.catImv = convertView.findViewById(R.id.cat_imv);
             viewHolder.payImv = convertView.findViewById(R.id.pay_imv);
 
-            result = convertView;
+            //result = convertView;
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
-            result = convertView;
+            //result = convertView;
         }
 
-        Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
+        /*Animation animation = AnimationUtils.loadAnimation(mContext, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         result.startAnimation(animation);
-        lastPosition = position;
+        lastPosition = position;*/
 
         viewHolder.txtName.setText(dataModel.getDescription());
         viewHolder.txtRs.setText("" + dataModel.getAmount());
@@ -128,11 +126,12 @@ public class MyAdapter extends ArrayAdapter<MBRecord> {
         Utils.setTint(mPref, viewHolder.imageView, dataModel.getType());
 
         // Return the completed view to render on screen
+        View finalConvertView = convertView;
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MBRecord mbr = getItem(position);
-                mHomeAdapterInterface.onClickItem(mbr);
+                mHomeAdapterInterface.onClickItem(mbr, finalConvertView);
             }
         });
         return convertView;

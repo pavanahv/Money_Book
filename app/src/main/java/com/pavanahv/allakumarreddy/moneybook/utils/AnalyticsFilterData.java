@@ -14,7 +14,7 @@ public class AnalyticsFilterData implements Serializable {
     private static final String TAG = AnalyticsFilterData.class.getSimpleName();
     public String[] mainMenuData = new String[]{"Date", "Date Interval", "Money Type", "Group By", "Sort By", "Sorting Order", "Category", "Payment Method", "View By", "Graph Type", "Saved Filters"};
     public String[] subMenuDateData = new String[]{"Current Day", "Current Month", "Current Year", "Custom", "All"};
-    public boolean[] subMenuDateDataBool = new boolean[]{false, false, false, false, true};
+    public boolean[] subMenuDateDataBool = new boolean[]{false, false, true, false, false};
     public String[] subMenuMoneyTypeData = new String[]{"Spent", "Earn", "Due", "Loan", "Money Transfer"};
     public boolean[] subMenuMoneyTypeDataBool = new boolean[]{true, false, false, false, false};
     public String[] subMenuDateIntervalData = new String[]{"Day", "Month", "Year"};
@@ -92,7 +92,7 @@ public class AnalyticsFilterData implements Serializable {
     }
 
     public void initDataAgainAfterClear() {
-        subMenuDateDataBool = new boolean[]{false, false, false, false, true};
+        subMenuDateDataBool = new boolean[]{false, false, true, false, false};
         subMenuMoneyTypeDataBool = new boolean[]{true, false, false, false, false};
         subMenuDateIntervalDataBool = new boolean[]{true, false, false};
         subMenuViewByDataBool = new boolean[]{false, true};
@@ -138,57 +138,6 @@ public class AnalyticsFilterData implements Serializable {
                 ",\n filters=" + Arrays.toString(filters) +
                 '}';
     }
-
-    /*public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(queryText);
-        sb.append("\n");
-        sb.append(sDate);
-        sb.append("\n");
-        sb.append(eDate);
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuDateData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuDateDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuMoneyTypeData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuMoneyTypeDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuDateIntervalData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuDateIntervalDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuGraphTypeData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuGraphTypeDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuGroupByData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuGroupByDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuSortByData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuSortByDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuSortingOrderData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuSortingOrderDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuCatogeoryData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuCatogeoryDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuPaymentMethodDataBool));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuFilterData));
-        sb.append("\n");
-        sb.append(Arrays.toString(subMenuFilterDataBool));
-
-        //LoggerCus.d(TAG, sb.toString());
-        return sb.toString();
-    }*/
 
     public String getParcelableJSONStringForFilter() {
 

@@ -186,13 +186,13 @@ public class MainActivity extends BaseActivity
                 startActivity(new Intent(this, AutoAddActivity.class));
                 overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
-            case R.id.action_test:
+            /*case R.id.action_test:
                 DbHandler db = new DbHandler(this);
                 db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
                 //test();
-                break;
+                break;*/
         }
         return super.onOptionsItemSelected(item);
     }
@@ -327,8 +327,13 @@ public class MainActivity extends BaseActivity
                                 }
                             }
                             DbHandler db = new DbHandler(this);
-                            db.addRecords(s.toString());
+                            boolean impRes = db.addRecords(s.toString());
                             MainActivity.this.runOnUiThread(() -> {
+                                if (impRes) {
+                                    Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+                                }
                                 showCurrentFragment();
                             });
                         } catch (FileNotFoundException e) {
