@@ -47,9 +47,9 @@
         android:title="Settings"
         app:showAsAction="never" />
 
-    <!--<item
+    <item
         android:id="@+id/action_test"
         android:orderInCategory="100"
         android:title="test"
-        app:showAsAction="never" />-->
+        app:showAsAction="never" />
 </menu>

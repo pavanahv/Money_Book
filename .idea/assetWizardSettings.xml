@@ -155,7 +155,18 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_settings_brightness_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_highlight_off_black_24dp.xml" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -188,8 +199,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="TEXT" />
-                                      <entry key="outputName" value="due_payment" />
+                                      <entry key="outputName" value="expired" />
                                     </map>
                                   </option>
                                 </PersistentState>

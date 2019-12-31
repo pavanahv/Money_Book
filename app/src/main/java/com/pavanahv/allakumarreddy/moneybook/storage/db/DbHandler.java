@@ -97,6 +97,11 @@ public class DbHandler extends SQLiteOpenHelper {
     private static final String AA_TABLE_NAME = "auto_add";
     private static final String AA_KEY_FREQUENCY = "frequency";
     private static final String AA_KEY_FREQUENCY_DATA = "frequency_data";
+    private static final String B_KEY_NAME = "name";
+    private static final String B_KEY_INTERVAL = "interval";
+    private static final String B_KEY_CAT_ARR = "cat_array";
+    private static final String B_KEY_LIMIT = "limit_amount";
+    private static final String BUDGET_TABLE_NAME = "budget";
 
     private SimpleDateFormat format;
     private final static String TAG = "DbHandler";
@@ -171,6 +176,13 @@ public class DbHandler extends SQLiteOpenHelper {
                 + AA_KEY_FREQUENCY_DATA + " TEXT,"
                 + KEY_PAYMENT_METHOD + " INTEGER)";
         db.execSQL(CREATE_AUTO_ADD_RECORDS_TABLE);
+
+        String CREATE_BUDGET_TABLE = "CREATE TABLE " + BUDGET_TABLE_NAME + "("
+                + B_KEY_NAME + " TEXT PRIMARY KEY,"
+                + B_KEY_INTERVAL + " INTEGER,"
+                + B_KEY_CAT_ARR + " TEXT,"
+                + B_KEY_LIMIT + " INTEGER)";
+        db.execSQL(CREATE_BUDGET_TABLE);
     }
 
     // Upgrading database
@@ -183,6 +195,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MT_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + PAY_METH_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AA_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + BUDGET_TABLE_NAME);
         // Create tables again
         onCreate(db);
     }
@@ -420,6 +433,7 @@ public class DbHandler extends SQLiteOpenHelper {
             JSONArray jsonArrayf = obj.getJSONArray(F_TABLE_NAME);
             JSONArray jsonArrayp = obj.getJSONArray(PAY_METH_TABLE_NAME);
             JSONArray jsonArrayaa = obj.getJSONArray(AA_TABLE_NAME);
+            JSONArray jsonArrayb = obj.getJSONArray(BUDGET_TABLE_NAME);
 
             final int len = jsonArray.length();
             for (int i = 0; i < len; i++) {
@@ -508,6 +522,20 @@ public class DbHandler extends SQLiteOpenHelper {
                 db.insert(AA_TABLE_NAME, null, values);
             }
 
+            final int lenb = jsonArrayb.length();
+            LoggerCus.d(TAG, "budget len : " + lenb);
+            for (int i = 0; i < lenb; i++) {
+                JSONObject jsonObj = jsonArrayb.getJSONObject(i);
+                ContentValues values = new ContentValues();
+                values.put(B_KEY_NAME, jsonObj.getString(B_KEY_NAME));
+                values.put(B_KEY_CAT_ARR, jsonObj.getString(B_KEY_CAT_ARR));
+                values.put(B_KEY_INTERVAL, jsonObj.getInt(B_KEY_INTERVAL));
+                values.put(B_KEY_LIMIT, jsonObj.getInt(B_KEY_LIMIT));
+
+                LoggerCus.d(TAG, "values : " + values.toString());
+                // Inserting Row
+                db.insert(BUDGET_TABLE_NAME, null, values);
+            }
             db.close(); // Closing database connection
         } catch (JSONException e) {
             LoggerCus.d(TAG, e.getMessage());
@@ -522,6 +550,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.delete(F_TABLE_NAME, null, null);
         db.delete(PAY_METH_TABLE_NAME, null, null);
         db.delete(AA_TABLE_NAME, null, null);
+        db.delete(BUDGET_TABLE_NAME, null, null);
         db.close();
     }
 
@@ -989,6 +1018,38 @@ public class DbHandler extends SQLiteOpenHelper {
             cursor.close();
         }
 
+        JSONArray jsonArrayb = new JSONArray();
+        cursor = db.rawQuery("SELECT "
+                + B_KEY_NAME + ","
+                + B_KEY_CAT_ARR + ","
+                + B_KEY_INTERVAL + ","
+                + B_KEY_LIMIT
+                + " FROM " + BUDGET_TABLE_NAME, null);
+
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            final int name = cursor.getColumnIndex(B_KEY_NAME);
+            final int arr = cursor.getColumnIndex(B_KEY_CAT_ARR);
+            final int interval = cursor.getColumnIndex(B_KEY_INTERVAL);
+            final int limit = cursor.getColumnIndex(B_KEY_LIMIT);
+
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(B_KEY_NAME, cursor.getString(name));
+                    jsonObject.put(B_KEY_CAT_ARR, cursor.getString(arr));
+                    jsonObject.put(B_KEY_INTERVAL, cursor.getInt(interval));
+                    jsonObject.put(B_KEY_LIMIT, cursor.getInt(limit));
+
+                    jsonArrayb.put(jsonObject);
+                } catch (JSONException e) {
+                    LoggerCus.d(TAG, e.getMessage());
+                }
+            }
+            cursor.close();
+        }
+
         JSONObject obj = new JSONObject();
         try {
             obj.put(TABLE_NAME, jsonArray);
@@ -997,6 +1058,7 @@ public class DbHandler extends SQLiteOpenHelper {
             obj.put(F_TABLE_NAME, jsonArrayf);
             obj.put(PAY_METH_TABLE_NAME, jsonArrayp);
             obj.put(AA_TABLE_NAME, jsonArrayaa);
+            obj.put(BUDGET_TABLE_NAME, jsonArrayb);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -1730,6 +1792,14 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public void exec() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String CREATE_BUDGET_TABLE = "CREATE TABLE " + BUDGET_TABLE_NAME + "("
+                + B_KEY_NAME + " TEXT PRIMARY KEY,"
+                + B_KEY_INTERVAL + " INTEGER,"
+                + B_KEY_CAT_ARR + " TEXT,"
+                + B_KEY_LIMIT + " INTEGER)";
+        db.execSQL(CREATE_BUDGET_TABLE);
+        db.close();
     }
 
     public boolean insertMsgRecord(String des, String amount, int type, String cate, String balLeft, String msgStr, String name, String payStr) {
@@ -2295,4 +2365,95 @@ public class DbHandler extends SQLiteOpenHelper {
             return false;
     }
 
+    public boolean addBudgetRecord(String name, int interval, String cats, int limit) {
+        ContentValues values = new ContentValues();
+        values.put(B_KEY_NAME, name);
+        values.put(B_KEY_INTERVAL, interval);
+        values.put(B_KEY_CAT_ARR, cats);
+        values.put(B_KEY_LIMIT, limit);
+        LoggerCus.d(TAG, values.toString());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Inserting Row
+        long result = db.insert(BUDGET_TABLE_NAME, null, values);
+        db.close();
+        if (result != -1)
+            return true;
+        else
+            return false;
+    }
+
+    public ArrayList<HashMap<String, String>> getBudgetRecordsAsList() {
+        ArrayList<HashMap<String, String>> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + B_KEY_NAME + ","
+                + B_KEY_INTERVAL + "," + B_KEY_CAT_ARR
+                + "," + B_KEY_LIMIT
+                + " FROM " + BUDGET_TABLE_NAME, null);
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                HashMap<String, String> map = new HashMap<>();
+                map.put("name", cursor.getString(0));
+                map.put("interval", "" + cursor.getInt(1));
+                map.put("cat", cursor.getString(2));
+                map.put("limit", "" + cursor.getInt(3));
+                list.add(map);
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return list;
+    }
+
+    public HashMap<String, String> getBudgetRecordsAsList(String name) {
+        HashMap<String, String> map = new HashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + B_KEY_NAME + ","
+                + B_KEY_INTERVAL + "," + B_KEY_CAT_ARR
+                + "," + B_KEY_LIMIT
+                + " FROM " + BUDGET_TABLE_NAME + " WHERE " +
+                B_KEY_NAME + " = '" + name + "'", null);
+
+        if (cursor != null) {
+            final int len = cursor.getCount();
+            for (int i = 0; i < len; i++) {
+                cursor.moveToPosition(i);
+                map.put("name", cursor.getString(0));
+                map.put("interval", "" + cursor.getInt(1));
+                map.put("cat", cursor.getString(2));
+                map.put("limit", "" + cursor.getInt(3));
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return map;
+    }
+
+    public boolean deleteBudgetRecord(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int res = db.delete(BUDGET_TABLE_NAME, B_KEY_NAME + " = '" + name + "'", null);
+        db.close();
+        if (res > 0)
+            return true;
+        else
+            return false;
+    }
+
+    public boolean updateBudgetRecord(String name, int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(B_KEY_LIMIT, limit);
+        int res = db.update(BUDGET_TABLE_NAME, values, B_KEY_NAME + " = '" + name + "'", null);
+        db.close();
+        if (res > 0)
+            return true;
+        else
+            return false;
+    }
 }

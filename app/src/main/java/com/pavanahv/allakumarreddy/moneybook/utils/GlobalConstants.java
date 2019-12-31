@@ -84,6 +84,7 @@ public class GlobalConstants {
     public static final String PREF_DISPLAY_DAY_WISE = "PREF_DISPLAY_DAY_WISE";
     public static final String PREF_DISPLAY_MONTH_WISE = "PREF_DISPLAY_MONTH_WISE";
     public static final String PREF_DISPLAY_YEAR_WISE = "PREF_DISPLAY_YEAR_WISE";
+    public static final String[] BUDGET_INTERVAL = new String[]{"Day", "Month", "Year"};
     public static String type[] = {"SPENT", "EARN", "DUE", "LOAN"};
     public static String fields[] = {"DESCRIPTION", "AMOUNT", "DATE"};
     public static final String ACTION_MSG_PARSE_BY_DATE = "com.example.allakumarreddy.moneybook.MessageParser.action.ParseMessagesFromContentProviderByTime";

@@ -471,13 +471,13 @@ public class Utils {
     public static ArrayList<Integer> getColors() {
         ArrayList<Integer> colors = new ArrayList<>();
 
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+
         for (int c : ColorTemplate.VORDIPLOM_COLORS)
             colors.add(c);
 
         for (int c : ColorTemplate.JOYFUL_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.COLORFUL_COLORS)
             colors.add(c);
 
         for (int c : ColorTemplate.LIBERTY_COLORS)
@@ -486,6 +486,19 @@ public class Utils {
         for (int c : ColorTemplate.PASTEL_COLORS)
             colors.add(c);
         return colors;
+    }
+
+    public static ArrayList<Integer> getColors(int len) {
+        ArrayList<Integer> colors = getColors();
+        ArrayList<Integer> res = new ArrayList<>();
+        final int max = colors.size();
+        for (int i = 0; i < len; i++) {
+            if (i >= max)
+                i = 0;
+            res.add(colors.get(i));
+        }
+        return res;
+
     }
 
     public static View drawRadarGraph(int len, String[] label, String[] data, Context context) {
@@ -814,7 +827,7 @@ public class Utils {
 
     }
 
-    private static String getNameFromEntry(String temp) {
+    public static String getNameFromEntry(String temp) {
         try {
             int ind = temp.indexOf("(");
             return temp.substring(0, ind).trim();
@@ -828,6 +841,27 @@ public class Utils {
         Calendar cal = Calendar.getInstance();
         cal.setTime(sDate);
         cal.set(Calendar.DATE, cal.getMinimum(Calendar.DATE));
+        return cal.getTime();
+    }
+
+    public static Date intializeEDateForMonth(Date eDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(eDate);
+        cal.set(Calendar.DATE, cal.getMaximum(Calendar.DATE));
+        return cal.getTime();
+    }
+
+    public static Date intializeEDateForYear(Date eDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(eDate);
+        cal.set(Calendar.MONTH, cal.getMaximum(Calendar.MONTH));
+        return cal.getTime();
+    }
+
+    public static Date intializeSDateForYear(Date sDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sDate);
+        cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
         return cal.getTime();
     }
 

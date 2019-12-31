@@ -21,10 +21,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.ExportActivity"></activity>
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.ReportGraphDetailActivity" />
+        <activity android:name=".Activities.BudgetDetailActivity"></activity>
+        <activity android:name=".Activities.BudgetAddActivity" />
+        <activity android:name=".Activities.ExportActivity" />
+        <activity android:name=".Activities.ReportGraphDetailActivity" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.WelcomeIconViewActivity"
+            android:name=".Activities.WelcomeIconViewActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,24 +35,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.AutoAddActivity"
+            android:name=".Activities.AutoAddActivity"
             android:label="@string/title_activity_auto_add"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.RePaymentActivity"
+            android:name=".Activities.RePaymentActivity"
             android:label="@string/title_activity_re_payment"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name="com.pavanahv.allakumarreddy.moneybook.Services.SmartRemainderIntentService"
+            android:name=".Services.SmartRemainderIntentService"
             android:exported="false" />
 
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.CreateSmartPinActivity" />
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.CreatePinActivity" />
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.FiltersAnalyticsActivity" />
+        <activity android:name=".Activities.CreateSmartPinActivity" />
+        <activity android:name=".Activities.CreatePinActivity" />
+        <activity android:name=".Activities.FiltersAnalyticsActivity" />
 
         <receiver
-            android:name="com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.BootUpCompleteReceiver"
+            android:name=".broadcastreceivers.BootUpCompleteReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -58,73 +60,73 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name="com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.AlarmReceiver"
+            android:name=".broadcastreceivers.AlarmReceiver"
             android:enabled="true"
             android:exported="true"
             android:process=":remote" />
         <receiver
-            android:name="com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.SmartRemainderAlarmReceiver"
+            android:name=".broadcastreceivers.SmartRemainderAlarmReceiver"
             android:enabled="true"
             android:exported="true"
             android:process=":remote" />
         <receiver
-            android:name="com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.ReportsAlarmReceiver"
+            android:name=".broadcastreceivers.ReportsAlarmReceiver"
             android:enabled="true"
             android:exported="true"
             android:process=":remote" />
         <receiver
-            android:name="com.pavanahv.allakumarreddy.moneybook.broadcastreceivers.NetworkConnectionReceiver"
+            android:name=".broadcastreceivers.NetworkConnectionReceiver"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.test.TestActivity" />
+        <activity android:name=".test.TestActivity" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.SettingsActivity"
+            android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings" />
 
         <service
-            android:name="com.pavanahv.allakumarreddy.moneybook.Services.BackupToGoogleDriveService"
+            android:name=".Services.BackupToGoogleDriveService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.AddActivity" />
+        <activity android:name=".Activities.AddActivity" />
 
         <service
-            android:name="com.pavanahv.allakumarreddy.moneybook.Services.MoneyBookIntentService"
+            android:name=".Services.MoneyBookIntentService"
             android:exported="false" />
 
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.MessageDetailActivity"
+            android:name=".Activities.MessageDetailActivity"
             android:label="@string/title_activity_message_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.MessagesActivity"
+            android:name=".Activities.MessagesActivity"
             android:label="@string/title_activity_messages"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.test.DataBaseActivity" />
+        <activity android:name=".test.DataBaseActivity" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.MessageParseActivity"
+            android:name=".Activities.MessageParseActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.MainActivity"
+            android:name=".Activities.MainActivity"
             android:configChanges="orientation|screenSize|screenLayout"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.AnalyticsActivity"
+            android:name=".Activities.AnalyticsActivity"
             android:configChanges="orientation|screenSize|screenLayout"
             android:label="@string/title_activity_analytics"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.GraphActivity"
+            android:name=".Activities.GraphActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_graph"
             android:theme="@style/FullscreenThemeRed" />
         <activity
-            android:name="com.pavanahv.allakumarreddy.moneybook.Activities.AnalyticsItemDetail"
+            android:name=".Activities.AnalyticsItemDetail"
             android:label="@string/title_activity_analytics_item_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
@@ -136,9 +138,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.GoogleDriveActivity" />
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.RestoreActivity" />
-        <activity android:name="com.pavanahv.allakumarreddy.moneybook.Activities.WelcomeActivity" />
+        <activity android:name=".Activities.GoogleDriveActivity" />
+        <activity android:name=".Activities.RestoreActivity" />
+        <activity android:name=".Activities.WelcomeActivity" />
     </application>
 
 </manifest>

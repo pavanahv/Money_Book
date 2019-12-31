@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.Services.BackupToGoogleDriveService;
 import com.pavanahv.allakumarreddy.moneybook.Services.MoneyBookIntentService;
+import com.pavanahv.allakumarreddy.moneybook.fragments.BudgetFragment;
 import com.pavanahv.allakumarreddy.moneybook.fragments.DashboardFilterFragment;
 import com.pavanahv.allakumarreddy.moneybook.fragments.DashboardFragment;
 import com.pavanahv.allakumarreddy.moneybook.fragments.HomeFragment;
@@ -71,6 +72,7 @@ public class MainActivity extends BaseActivity
     private static final int FRAGMENT_PAYMENT_METHOD = 2;
     private static final int FRAGMENT_GRAPHS = 3;
     private static final int FRAGMENT_REPORTS = 4;
+    private static final int FRAGMENT_BUDGET = 5;
     private int currentScreen = 0;
     private View mProgressBAr;
     private String bfrPermissionAction;
@@ -184,12 +186,13 @@ public class MainActivity extends BaseActivity
                 startActivity(new Intent(this, AutoAddActivity.class));
                 overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
                 break;
-            /*case R.id.action_test:
-                //db.exec();
+            case R.id.action_test:
+                DbHandler db = new DbHandler(this);
+                db.exec();
                 //startActivity(new Intent(this, DataBaseActivity.class));
                 //signIn();
-                test();
-                break;*/
+                //test();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -375,6 +378,10 @@ public class MainActivity extends BaseActivity
             case R.id.reports:
                 showFragment(FRAGMENT_REPORTS, true);
                 break;
+
+            case R.id.budget:
+                showFragment(FRAGMENT_BUDGET, true);
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -470,7 +477,23 @@ public class MainActivity extends BaseActivity
             case FRAGMENT_REPORTS:
                 showReports();
                 break;
+
+            case FRAGMENT_BUDGET:
+                showBudget();
+                break;
         }
+    }
+
+    private void showBudget() {
+        showBudgetActionBar();
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(mainLayout, new BudgetFragment());
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.commit();
+    }
+
+    private void showBudgetActionBar() {
+        getSupportActionBar().setTitle("Budget");
     }
 
     private void showProgressBar() {

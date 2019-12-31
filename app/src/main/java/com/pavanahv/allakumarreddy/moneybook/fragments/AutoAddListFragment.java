@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.pavanahv.allakumarreddy.moneybook.Adapter.AutoAddAdapter;
-import com.pavanahv.allakumarreddy.moneybook.Adapter.AutoAddAdapterInterface;
+import com.pavanahv.allakumarreddy.moneybook.interfaces.AutoAddAdapterInterface;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.AutoAddRecord;

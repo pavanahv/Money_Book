@@ -3,9 +3,15 @@ package com.pavanahv.allakumarreddy.moneybook.utils;
 import android.content.Context;
 import android.graphics.Color;
 
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -13,6 +19,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
@@ -182,4 +189,79 @@ public class GraphUtils {
         return chart;
     }
 
+    public static BarChart drawStackedBarGraph(ArrayList<String> labelList,
+                                               ArrayList<Integer>[] catMaps,
+                                               ArrayList<String> data,
+                                               Context context, String title,
+                                               float limit, String budgetString) {
+
+        BarChart chart = new BarChart(context);
+        chart.getXAxis().setDrawLabels(true);
+        chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int val = (int) (value * 100);
+                val = val % 100;
+                if (val == 0)
+                    return data.get((int) value);
+                else
+                    return "";
+            }
+        });
+        ArrayList<IBarDataSet> list = new ArrayList<>();
+        ArrayList<BarEntry> entry = new ArrayList<>();
+        final int catLen = labelList.size();
+        final int len = catMaps[0].size();
+        for (int j = 0; j < len; j++) {
+            float yVals[] = new float[catLen];
+            for (int i = 0; i < catLen; i++) {
+                yVals[i] = (float) catMaps[i].get(j);
+            }
+            entry.add(new BarEntry(Float.parseFloat(j + ""),
+                    yVals,
+                    new String[]{data.get(j), "" + j}));
+        }
+
+        String labels[] = new String[labelList.size()];
+        for (int i = 0; i < labels.length; i++)
+            labels[i] = labelList.get(i);
+
+        BarDataSet dataSet = new BarDataSet(entry, "Categories");
+        dataSet.setDrawValues(false);
+        dataSet.setColors(getColors(labels.length));
+        dataSet.setStackLabels(labels);
+        list.add(dataSet);
+
+        LimitLine ll1 = new LimitLine(limit, "Budget Limit " + budgetString);
+        ll1.setLineWidth(4f);
+        ll1.enableDashedLine(10f, 10f, 0f);
+        ll1.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        ll1.setTextSize(10f);
+        chart.getAxisLeft().addLimitLine(ll1);
+
+        BarData lineData = new BarData(list);
+        lineData.setValueTextColor(Color.WHITE);
+        chart.setData(lineData);
+        XAxis xLabels = chart.getXAxis();
+        xLabels.setPosition(XAxis.XAxisPosition.TOP);
+
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.LINE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+        CusMarkerView mv = new CusMarkerView(context, R.layout.marker_layout);
+        mv.setChartView(chart);
+        chart.setMarker(mv);
+
+        chart.animateXY(GlobalConstants.graph_animate_time, GlobalConstants.graph_animate_time);
+        chart.getDescription().setText(title);
+        chart.setDrawGridBackground(false);
+        return chart;
+    }
 }

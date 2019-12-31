@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.interfaces.AutoAddAdapterInterface;
 import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.utils.AutoAddRecord;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;

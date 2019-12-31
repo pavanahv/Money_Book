@@ -29,5 +29,10 @@
             android:icon="@drawable/reports"
             android:title="Reports" />
 
+        <item
+            android:id="@+id/budget"
+            android:icon="@drawable/budget"
+            android:title="Budget" />
+
     </group>
 </menu>
