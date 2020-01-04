@@ -3,6 +3,7 @@ package com.pavanahv.allakumarreddy.moneybook.Activities;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -65,7 +66,7 @@ public class MainActivity extends BaseActivity
     private static final int REQUEST_CODE_SIGN_IN = 200;
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_STORAGE = 1001;
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1002;
-    public static final int ADD_ACTIVITY = 1001;
+    public static final int ADD_ACTIVITY = 10021;
     private static final String LOCAL_BACKUP = "LOCAL_BACKUP";
     private static final int FRAGMENT_HOME = 0;
     private static final int FRAGMENT_CATEGORY = 1;
@@ -73,6 +74,8 @@ public class MainActivity extends BaseActivity
     private static final int FRAGMENT_GRAPHS = 3;
     private static final int FRAGMENT_REPORTS = 4;
     private static final int FRAGMENT_BUDGET = 5;
+    private static final int ADD_ACTIVITY_CAT = 10012;
+    private static final int ADD_ACTIVITY_PAY = 10013;
     private int currentScreen = 0;
     private View mProgressBAr;
     private String bfrPermissionAction;
@@ -84,6 +87,8 @@ public class MainActivity extends BaseActivity
     private CalendarView calender;
     private int currentFragmentIndex = -1;
     private PreferencesCus preferencesCus;
+    private int homeAddType = -1;
+    private int catType = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,9 +119,22 @@ public class MainActivity extends BaseActivity
             navigationView.setItemIconTintList(ColorStateList.valueOf(Color.WHITE));
         }
 
+        String version = null;
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            LoggerCus.d(TAG, "not able to get version " + e.getMessage());
+        }
+
         PreferencesCus sp = new PreferencesCus(this);
         View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
-        ((TextView) headerView.findViewById(R.id.mail)).setText(sp.getData(Utils.getEmail()));
+        TextView mail = ((TextView) headerView.findViewById(R.id.mail));
+        TextView appName = ((TextView) headerView.findViewById(R.id.app_name));
+        mail.setText(sp.getData(Utils.getEmail()));
+        if (version != null) {
+            appName.setText(appName.getText().toString() + "  v" + version);
+        }
         init();
     }
 
@@ -158,11 +176,41 @@ public class MainActivity extends BaseActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_calender:
                 showCalenderView();
                 break;
+
+            case R.id.action_item_spent:
+                startItemAddActivity(GlobalConstants.TYPE_SPENT);
+                break;
+            case R.id.action_item_earn:
+                startItemAddActivity(GlobalConstants.TYPE_EARN);
+                break;
+            case R.id.action_item_due:
+                startItemAddActivity(GlobalConstants.TYPE_DUE);
+                break;
+            case R.id.action_item_loan:
+                startItemAddActivity(GlobalConstants.TYPE_LOAN);
+                break;
+
+            case R.id.action_cat_spent:
+                startCatAddActivity(GlobalConstants.TYPE_SPENT);
+                break;
+            case R.id.action_cat_earn:
+                startCatAddActivity(GlobalConstants.TYPE_EARN);
+                break;
+            case R.id.action_cat_due:
+                startCatAddActivity(GlobalConstants.TYPE_DUE);
+                break;
+            case R.id.action_cat_loan:
+                startCatAddActivity(GlobalConstants.TYPE_LOAN);
+                break;
+
+            case R.id.action_paym:
+                startPaymentMethodActivity();
+                break;
+
             case R.id.action_backup:
                 //backup(true);
                 backupToGoogleDrive();
@@ -195,6 +243,30 @@ public class MainActivity extends BaseActivity
                 break;*/
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startPaymentMethodActivity() {
+        Intent intent = new Intent(this, AddActivity.class);
+        intent.putExtra("type", GlobalConstants.PAYMENT_METHOD_SCREEN);
+        startActivityForResult(intent, ADD_ACTIVITY_PAY);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+    }
+
+    private void startCatAddActivity(int type) {
+        Intent intent = new Intent(this, AddActivity.class);
+        intent.putExtra("type", GlobalConstants.CATERGORY_SCREEN);
+        catType = type;
+        startActivityForResult(intent, ADD_ACTIVITY_CAT);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+    }
+
+    private void startItemAddActivity(int type) {
+        Intent intent = new Intent(this, AddActivity.class);
+        intent.putExtra("type", GlobalConstants.HOME_SCREEN);
+        intent.putExtra(GlobalConstants.CATEGORY_TYPE, type);
+        homeAddType = type;
+        startActivityForResult(intent, ADD_ACTIVITY);
+        overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
     private void test() {
@@ -353,9 +425,61 @@ public class MainActivity extends BaseActivity
                 }
                 break;
 
+            case (ADD_ACTIVITY):
+                if (resultCode == Activity.RESULT_OK) {
+                    String s[] = new String[]{data.getStringExtra("fdes"),
+                            data.getStringExtra("famount"),
+                            data.getStringExtra("fcategory"),
+                            data.getStringExtra("tcategory"),
+                            data.getStringExtra("payment_method")};
+                    if ((s[0] != "") && (s[1] != "") && (s[2] != "")) {
+                        final int pos = homeAddType;
+                        MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2], s[4]);
+                        DbHandler db = new DbHandler(this);
+                        boolean res = db.addRecord(mbr, pos);
+                        if (res)
+                            Toast.makeText(this, "Successfully Added!", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(this, "Something went wrong in Adding. Please try again later", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+
+            case (ADD_ACTIVITY_CAT): {
+                if (resultCode == Activity.RESULT_OK) {
+                    String s[] = new String[]{data.getStringExtra("fdes"),
+                            data.getStringExtra("famount"),
+                            data.getStringExtra("fcategory"),
+                            data.getStringExtra("tcategory"),
+                            data.getStringExtra("payment_method")};
+                    addCategory(s[0], this.catType);
+                }
+                break;
+            }
+
+            case (ADD_ACTIVITY_PAY): {
+                if (resultCode == Activity.RESULT_OK) {
+                    String s[] = new String[]{data.getStringExtra("fdes"),
+                            data.getStringExtra("famount"),
+                            data.getStringExtra("fcategory"),
+                            data.getStringExtra("tcategory"),
+                            data.getStringExtra("payment_method")};
+                    addPaymentMethod(s[0]);
+                }
+                break;
+            }
         }
+
     }
 
+    private void addPaymentMethod(String s) {
+        DbHandler db = new DbHandler(this);
+        boolean res = db.addPaymentMethod(s);
+        if (res)
+            Toast.makeText(this, "Successfully Added!", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(this, "Something went wrong in Adding. Please try again later", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -650,4 +774,12 @@ public class MainActivity extends BaseActivity
         overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
+    private void addCategory(String name, int type) {
+        DbHandler db = new DbHandler(this);
+        boolean res = db.addCategory(name, type);
+        if (res)
+            Toast.makeText(this, "Successfully Added!", Toast.LENGTH_SHORT).show();
+        else
+            Toast.makeText(this, "Something went wrong in Adding. Please try again later", Toast.LENGTH_SHORT).show();
+    }
 }

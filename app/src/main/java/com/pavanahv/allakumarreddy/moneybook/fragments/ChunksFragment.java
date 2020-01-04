@@ -15,10 +15,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pavanahv.allakumarreddy.moneybook.R;
 import com.pavanahv.allakumarreddy.moneybook.interfaces.ChunksFragmentInteractionListener;
-import com.pavanahv.allakumarreddy.moneybook.utils.ThemeUtils;
 
 import java.util.ArrayList;
 
@@ -84,6 +84,14 @@ public class ChunksFragment extends Fragment {
             public void onClick(View v) {
                 String msgStr = msg.getText().toString();
                 String nameStr = name.getText().toString();
+                if (nameStr != null && nameStr.trim().length() <= 0) {
+                    error("Name should not be empty");
+                    return;
+                }
+                if (msgStr != null && msgStr.trim().length() <= 0) {
+                    error("Message should not be empty");
+                    return;
+                }
                 parse(msgStr, nameStr);
             }
         });
@@ -95,6 +103,10 @@ public class ChunksFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void error(String s) {
+        Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
     }
 
     private void selectText() {
@@ -176,6 +188,11 @@ public class ChunksFragment extends Fragment {
         final int len = varList.size();
         for (int j = 0; j < len; j++) {
             sb.append("" + (j + 1) + " -> " + varList.get(j) + "\n");
+        }
+
+        if (varList.size() <= 0) {
+            error("Message should contain all the changes from message to message of same format. Please refer help");
+            return;
         }
         mListener.onParse(sb.toString(), msgStr, nameStr);
         //chunks.setText(sb.toString());

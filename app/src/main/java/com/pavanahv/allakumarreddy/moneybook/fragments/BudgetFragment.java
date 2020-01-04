@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -69,6 +71,7 @@ public class BudgetFragment extends Fragment {
         super.onCreate(savedInstanceState);
         db = new DbHandler(getContext());
         sdf = new SimpleDateFormat("dd/MM/yyyy");
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -86,6 +89,12 @@ public class BudgetFragment extends Fragment {
     private void startAddActivity() {
         startActivity(new Intent(getContext(), BudgetAddActivity.class));
         getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.findItem(R.id.action_calender).setVisible(false);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void showMainView() {

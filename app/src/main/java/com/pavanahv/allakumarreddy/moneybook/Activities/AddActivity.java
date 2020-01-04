@@ -14,6 +14,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.pavanahv.allakumarreddy.moneybook.Adapter.DescriptionAdapter;
 import com.pavanahv.allakumarreddy.moneybook.R;
@@ -179,7 +180,10 @@ public class AddActivity extends BaseActivity implements android.view.View.OnCli
             categoryView.setVisibility(View.GONE);
             paymentMethodView.setVisibility(View.GONE);
         } else if (type == GlobalConstants.CATERGORY_SCREEN || type == GlobalConstants.PAYMENT_METHOD_SCREEN) {
-            autoCompleteTextView.setHint("Name Of Category");
+            if (type == GlobalConstants.CATERGORY_SCREEN)
+                autoCompleteTextView.setHint("Name Of Category");
+            else if (type == GlobalConstants.PAYMENT_METHOD_SCREEN)
+                autoCompleteTextView.setHint("Name Of Payment Method");
             findViewById(R.id.amount).setVisibility(View.GONE);
             categoryView.setVisibility(View.GONE);
             paymentMethodView.setVisibility(View.GONE);
@@ -208,6 +212,9 @@ public class AddActivity extends BaseActivity implements android.view.View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.addCus:
+                if (!check()) {
+                    return;
+                }
                 String des = autoCompleteTextView.getText().toString();
                 String amount = amtv.getText().toString();
                 String category = "", paymentMethod = "";
@@ -241,5 +248,38 @@ public class AddActivity extends BaseActivity implements android.view.View.OnCli
                 break;
         }
         finish();
+    }
+
+    private boolean check() {
+        if (autoCompleteTextView.getVisibility() == View.VISIBLE) {
+            if (autoCompleteTextView.getText().toString().trim().length() <= 0) {
+                if (type == GlobalConstants.SAVE_FILTER_SCREEN) {
+                    error("Filter name should not be empty");
+                    return false;
+                } else if (type == GlobalConstants.CATERGORY_SCREEN) {
+                    error("Category name should not be empty");
+                    return false;
+                } else if (type == GlobalConstants.PAYMENT_METHOD_SCREEN) {
+                    error("Payment Method name should not be empty");
+                    return false;
+                } else {
+                    error("Description should not be empty");
+                    return false;
+                }
+            }
+        }
+
+        if (amtv.getVisibility() == View.VISIBLE) {
+            if (amtv.getText().toString().length() <= 0) {
+                error("Amount should not be empty");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void error(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 }

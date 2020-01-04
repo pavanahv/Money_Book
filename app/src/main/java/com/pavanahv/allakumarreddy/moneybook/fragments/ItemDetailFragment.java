@@ -15,10 +15,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pavanahv.allakumarreddy.moneybook.interfaces.ChunksFragmentInteractionListener;
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.interfaces.ChunksFragmentInteractionListener;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
+import com.pavanahv.allakumarreddy.moneybook.utils.LoggerCus;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,7 @@ public class ItemDetailFragment extends Fragment {
     private View chunksListHeader;
     private EditText[] viewArr;
     private boolean firstTimeTypeSelection;
+    private boolean amountParseError = false;
 
     public String getChunkText() {
         return chunkText;
@@ -317,6 +319,17 @@ public class ItemDetailFragment extends Fragment {
             }
         }
         balLeft.setText(parseUpdateField(flist, balLeftStr));
+
+        String temps = amount.getText().toString().trim();
+        if (temps.length() > 0) {
+            try {
+                Float.parseFloat(temps);
+                amountParseError = false;
+            } catch (Exception e) {
+                amountParseError = true;
+                LoggerCus.d(TAG, "Number format exception while parsing amount in message parser" + e.getMessage());
+            }
+        }
     }
 
     private String parseUpdateField(ArrayList<String> flist, String str) {
@@ -372,10 +385,43 @@ public class ItemDetailFragment extends Fragment {
             String cateStr = catArr[cate.getSelectedItemPosition()];
             String paymStr = payArr[payMeth.getSelectedItemPosition()];
             String balLeftStr = balLeft.getText().toString();
+
+            if (desStr != null && desStr.trim().length() <= 0) {
+                error("Description should not be empty");
+                return;
+            }
+            if (amountStr != null && amountStr.trim().length() <= 0) {
+                error("Amount should not be empty");
+                return;
+            }
+
+            int countTemps = 0;
+            int countTempe = 0;
+            String temps = amountStr.trim();
+            for (int i = 0; i < temps.length(); i++) {
+                if (temps.charAt(i) == '{')
+                    countTemps++;
+                if (temps.charAt(i) == '}')
+                    countTempe++;
+            }
+            if (countTempe != 2 || countTemps != 2) {
+                error("Amount should contain only parsed number. ex. {{3}} which should contain number in above list. For more info pls check help");
+                return;
+            }
+
             mListener.saveFields(desStr, amountStr, typeInt, cateStr, balLeftStr, paymStr);
         } else {
-            mListener.saveEverything();
+            if (amountParseError) {
+                error("Amount should be number. Please go back to edit fields. For more information please checkout help");
+                return;
+            } else {
+                mListener.saveEverything();
+            }
         }
+    }
+
+    private void error(String s) {
+        Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
     }
 
     @Override

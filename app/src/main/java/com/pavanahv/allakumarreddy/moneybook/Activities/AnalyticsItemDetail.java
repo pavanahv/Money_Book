@@ -82,7 +82,7 @@ public class AnalyticsItemDetail extends BaseActivity {
             case R.id.action_analytics_detail_delete:
                 int result = db.deleteRecord(mbrOld);
                 if (result > 0)
-                    Toast.makeText(AnalyticsItemDetail.this, "Deleted Successfully " + result + " !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AnalyticsItemDetail.this, "Deleted Successfully !", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(AnalyticsItemDetail.this, "Deletion Error !", Toast.LENGTH_SHORT).show();
                 finish();
@@ -95,8 +95,9 @@ public class AnalyticsItemDetail extends BaseActivity {
 
             case R.id.action_analytics_detail_save:
                 if (isEditable) {
-                    save();
-                    finish();
+                    boolean resultSave = save();
+                    if (resultSave)
+                        finish();
                 } else {
                     Toast.makeText(this, "No Chnages To Save", Toast.LENGTH_SHORT).show();
                 }
@@ -287,13 +288,17 @@ public class AnalyticsItemDetail extends BaseActivity {
 
 
     public void save(View view) {
-        save();
-        finish();
+        boolean resultSave = save();
+        if (resultSave)
+            finish();
     }
 
-    private void save() {
+    private boolean save() {
         try {
             boolean result = false;
+            if (!checkFields()) {
+                return false;
+            }
             if (mType == GlobalConstants.TYPE_MONEY_TRANSFER) {
                 MBRecord mbrNew = new MBRecord(catArr[tcate.getSelectedItemPosition()],
                         Integer.parseInt(amount.getText().toString()),
@@ -311,8 +316,45 @@ public class AnalyticsItemDetail extends BaseActivity {
                 Toast.makeText(this, "Updated Successfully !", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(this, "Updation Error !", Toast.LENGTH_SHORT).show();
+            return result;
         } catch (ParseException e) {
             LoggerCus.d("analyticsdetailactivity", e.getMessage());
+            Toast.makeText(this, "Updation Error !", Toast.LENGTH_SHORT).show();
         }
+        return false;
+    }
+
+    private boolean checkFields() {
+        if (des.getVisibility() == View.VISIBLE) {
+            if (des.getText().toString().trim().length() <= 0) {
+                error("Description should not be empty");
+                return false;
+            }
+        }
+
+        if (amount.getVisibility() == View.VISIBLE) {
+            if (amount.getText().toString().trim().length() <= 0) {
+                error("Amount should not be empty");
+                return false;
+            }
+        }
+
+        if (date.getVisibility() == View.VISIBLE) {
+            if (date.getText().toString().trim().length() <= 0) {
+                error("Date should not be empty");
+                return false;
+            }
+            try {
+                format.parse(date.getText().toString().trim());
+            } catch (Exception e) {
+                error("Wrong date format. format should be dd/mm/yyyy ex. 21/02/2020");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void error(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 }

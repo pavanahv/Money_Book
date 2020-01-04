@@ -222,16 +222,13 @@ public class Utils {
             int millsec = 1000 * 60 * 60;
             switch (freq) {
                 case 0:
-                    millsec *= 6;
-                    break;
-                case 1:
-                    millsec *= 12;
-                    break;
-                case 2:
                     millsec *= 24;
                     break;
-                case 3:
+                case 1:
                     millsec *= 24 * 7;
+                    break;
+                case 2:
+                    millsec *= 30 * 24 * 7;
                     break;
             }
             Calendar cal = Calendar.getInstance();

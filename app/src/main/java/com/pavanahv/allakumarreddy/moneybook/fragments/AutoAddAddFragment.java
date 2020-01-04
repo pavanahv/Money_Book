@@ -310,15 +310,13 @@ public class AutoAddAddFragment extends Fragment {
     }
 
     private void saveClicked() {
-        boolean res = saveData();
-        if (res) {
-            Toast.makeText(getContext(), "Successfully Saved !", Toast.LENGTH_SHORT).show();
-            mListener.onSave();
-        } else
-            Toast.makeText(getContext(), "Something went wrong. Please try again", Toast.LENGTH_SHORT).show();
+        saveData();
     }
 
     private boolean saveData() {
+        if (!checkFields()) {
+            return false;
+        }
         AutoAddRecord autoAddRecord = new AutoAddRecord();
         autoAddRecord.setName(name.getText().toString());
         autoAddRecord.setDesciption(des.getText().toString());
@@ -349,7 +347,35 @@ public class AutoAddAddFragment extends Fragment {
                 break;
 
         }
-        return db.addAutoAddRecord(autoAddRecord);
+
+        boolean res = db.addAutoAddRecord(autoAddRecord);
+        if (res) {
+            Toast.makeText(getContext(), "Successfully Saved !", Toast.LENGTH_SHORT).show();
+            mListener.onSave();
+        } else
+            Toast.makeText(getContext(), "Something went wrong. Please try again", Toast.LENGTH_SHORT).show();
+        return res;
+    }
+
+    private boolean checkFields() {
+
+        if (name.getText().toString().trim().length() <= 0) {
+            error("Name should not be empty!");
+            return false;
+        }
+        if (des.getText().toString().trim().length() <= 0) {
+            error("Description should not be empty!");
+            return false;
+        }
+        if (amount.getText().toString().trim().length() <= 0) {
+            error("Amount should not be empty!");
+            return false;
+        }
+        return true;
+    }
+
+    private void error(String s) {
+        Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
     }
 
     private void initFreqData(int type) {

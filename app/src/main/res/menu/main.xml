@@ -4,23 +4,90 @@
 
     <item
         android:id="@+id/action_calender"
+        android:icon="@drawable/calender"
         android:orderInCategory="100"
         android:title="Calender"
-        android:icon="@drawable/calender"
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_new"
+        android:icon="@drawable/ic_add_noti"
+        android:orderInCategory="100"
+        android:title="New"
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:icon="@drawable/action_item"
+                android:orderInCategory="100"
+                android:title="Item">
+
+                <menu>
+                    <item
+                        android:id="@+id/action_item_spent"
+                        android:orderInCategory="100"
+                        android:title="Spent Item" />
+                    <item
+                        android:id="@+id/action_item_earn"
+                        android:orderInCategory="100"
+                        android:title="Earn Item" />
+                    <item
+                        android:id="@+id/action_item_due"
+                        android:orderInCategory="100"
+                        android:title="Due Item" />
+                    <item
+                        android:id="@+id/action_item_loan"
+                        android:orderInCategory="100"
+                        android:title="Loan Item" />
+                </menu>
+
+            </item>
+
+            <item
+                android:icon="@drawable/action_cat"
+                android:orderInCategory="100"
+                android:title="Category">
+                <menu>
+                    <item
+                        android:id="@+id/action_cat_spent"
+                        android:orderInCategory="100"
+                        android:title="Spent Category" />
+                    <item
+                        android:id="@+id/action_cat_earn"
+                        android:orderInCategory="100"
+                        android:title="Earn Category" />
+                    <item
+                        android:id="@+id/action_cat_due"
+                        android:orderInCategory="100"
+                        android:title="Due Category" />
+                    <item
+                        android:id="@+id/action_cat_loan"
+                        android:orderInCategory="100"
+                        android:title="Loan Category" />
+                </menu>
+            </item>
+
+            <item
+                android:id="@+id/action_paym"
+                android:icon="@drawable/ic_payment_method"
+                android:iconTint="?colorPrimary"
+                android:orderInCategory="100"
+                android:title="Payment Method" />
+        </menu>
+    </item>
+
+    <item
         android:id="@+id/action_analytics"
+        android:icon="@drawable/icon_analytics"
         android:orderInCategory="100"
         android:title="Analytics"
-        android:icon="@drawable/icon_analytics"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_backup"
+        android:icon="@drawable/icon_backup"
         android:orderInCategory="100"
         android:title="@string/action_backup"
-        android:icon="@drawable/icon_backup"
         app:showAsAction="ifRoom" />
 
     <!--<item

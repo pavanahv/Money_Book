@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ import com.pavanahv.allakumarreddy.moneybook.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.pavanahv.allakumarreddy.moneybook.utils.AnimationUtils.revealAnimation;
@@ -52,6 +54,7 @@ public class HomeInnerFragment extends Fragment {
     private Date curDate;
     private PreferencesCus pref;
     private TextView dateTv;
+    private boolean isResumed = false;
 
     public HomeInnerFragment() {
         // Required empty public constructor
@@ -99,8 +102,32 @@ public class HomeInnerFragment extends Fragment {
         mListView.setAdapter(mAdapter);
         mTotalTextView = layout.findViewById(R.id.total_tv);
         dateTv = (TextView) layout.findViewById(R.id.date_text);
+        ((ImageButton) layout.findViewById(R.id.prev)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setDate(false);
+            }
+        });
+        ((ImageButton) layout.findViewById(R.id.next)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setDate(true);
+            }
+        });
         initDateView();
         return layout;
+    }
+
+    private void setDate(boolean isNext) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(curDate);
+        if (isNext)
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+        else
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+        pref.setCurrentDate(cal.getTimeInMillis());
+        initDate();
+        updataUI();
     }
 
     private void initDateView() {
@@ -116,8 +143,19 @@ public class HomeInnerFragment extends Fragment {
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            if (isResumed) {
+                updataUI();
+            }
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        isResumed = true;
         updataUI();
     }
 

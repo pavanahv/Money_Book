@@ -117,6 +117,11 @@ public class ExportActivity extends BaseActivity {
             indexChecked[i] = checkBox[i].isChecked();
         }
 
+        boolean result = checkFields();
+        if (!result) {
+            error("Atleast one field needs to be checked");
+            return;
+        }
         showProgress();
         new Thread(() -> {
             rowHeader = new String[]{"S.NO", "Description", "Amount", "Date",
@@ -156,6 +161,22 @@ public class ExportActivity extends BaseActivity {
                 }
             });
         }).start();
+    }
+
+    private void error(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean checkFields() {
+        int len = indexChecked.length;
+        boolean result = false;
+        for (int i = 0; i < len; i++) {
+            if (indexChecked[i]) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     private void storeDataAsHTML() {

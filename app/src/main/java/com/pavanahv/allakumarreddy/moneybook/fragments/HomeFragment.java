@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import com.pavanahv.allakumarreddy.moneybook.Activities.AddActivity;
 import com.pavanahv.allakumarreddy.moneybook.Adapter.HomeViewPagerAdapter;
 import com.pavanahv.allakumarreddy.moneybook.R;
+import com.pavanahv.allakumarreddy.moneybook.storage.PreferencesCus;
 import com.pavanahv.allakumarreddy.moneybook.storage.db.DbHandler;
 import com.pavanahv.allakumarreddy.moneybook.utils.GlobalConstants;
 import com.pavanahv.allakumarreddy.moneybook.utils.MBRecord;
@@ -87,12 +88,20 @@ public class HomeFragment extends Fragment {
                         final int pos = mHomeViewPager.getCurrentItem();
                         MBRecord mbr = new MBRecord(s[0], Integer.parseInt(s[1]), new Date(), s[2], s[4]);
                         DbHandler db = new DbHandler(getContext());
+                        Date tempDate = getDatePref();
+                        if (tempDate != null) {
+                            mbr.setDate(tempDate);
+                        }
                         db.addRecord(mbr, pos);
                     }
                 }
                 break;
             }
         }
+    }
+
+    private Date getDatePref() {
+        return new PreferencesCus(getContext()).getCurrentDate();
     }
 
 }

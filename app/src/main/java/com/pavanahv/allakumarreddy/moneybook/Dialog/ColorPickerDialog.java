@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -223,7 +224,7 @@ public class ColorPickerDialog extends Dialog {
         setContentView(R.layout.color_picker);
         FrameLayout mainView = (FrameLayout) findViewById(R.id.mainView);
         mainView.addView(new ColorPickerView(getContext(), l, mInitialColor),
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT
-                        , FrameLayout.LayoutParams.WRAP_CONTENT));
+                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT
+                        , FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER));
     }
 }

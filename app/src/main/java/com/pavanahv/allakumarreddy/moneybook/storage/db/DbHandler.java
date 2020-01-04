@@ -280,13 +280,18 @@ public class DbHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public void addCategory(String name, int type) {
+    public boolean addCategory(String name, int type) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, name.toLowerCase());
         values.put(KEY_CAT_TYPE, type);
-        db.insert(CAT_TABLE_NAME, null, values);
+        long res = db.insert(CAT_TABLE_NAME, null, values);
         db.close();
+        if (res != -1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean addRecord(MBRecord mbr, int type) {
@@ -688,7 +693,9 @@ public class DbHandler extends SQLiteOpenHelper {
 
         String des = mbr.getDescription();
         if (mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT ||
-                mbr.getType() == GlobalConstants.TYPE_DUE_PAYMENT) {
+                mbr.getType() == GlobalConstants.TYPE_LOAN_PAYMENT ||
+                mbr.getType() == GlobalConstants.TYPE_DUE ||
+                mbr.getType() == GlobalConstants.TYPE_LOAN) {
             if (mbr.getmRefIdForLoanDue() != null) {
                 deleteRePaymentHistory(mbr);
                 des += "{{" + mbr.getmRefIdForLoanDue() + "}}";
@@ -1106,7 +1113,7 @@ public class DbHandler extends SQLiteOpenHelper {
         byte[] key = getKey();
 
         byte[] encryptedData = SecurityUtils.encrypt(key, b);
-        return new String(encryptedData,"UTF-8");
+        return new String(encryptedData, "UTF-8");
     }
 
     private byte[] getKey() throws NoSuchAlgorithmException {
@@ -2190,12 +2197,17 @@ public class DbHandler extends SQLiteOpenHelper {
         return n;
     }
 
-    public void addPaymentMethod(String name) {
+    public boolean addPaymentMethod(String name) {
         ContentValues values = new ContentValues();
         values.put(KEY_PAY_METH_NAME, name.toLowerCase());
         SQLiteDatabase db = this.getWritableDatabase();
-        db.insert(PAY_METH_TABLE_NAME, null, values);
+        long res = db.insert(PAY_METH_TABLE_NAME, null, values);
         db.close();
+        if (res != -1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public ArrayList<MBRecord> getRePaymentRecords(int type, String refId) {

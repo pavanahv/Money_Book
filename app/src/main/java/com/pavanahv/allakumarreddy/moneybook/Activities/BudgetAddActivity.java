@@ -170,7 +170,7 @@ public class BudgetAddActivity extends BaseActivity {
         String temp = "";
         if (!isEdit) {
             // checking name
-            temp = name.getText().toString();
+            temp = name.getText().toString().trim();
             if (!(temp != null && temp.length() > 0)) {
                 error("Name Should Not Be Null");
                 return false;
@@ -191,7 +191,7 @@ public class BudgetAddActivity extends BaseActivity {
         }
 
         // checking limit amount
-        temp = limtAmt.getText().toString();
+        temp = limtAmt.getText().toString().trim();
         if (!(temp != null && temp.length() > 0 && Integer.parseInt(temp) > 0)) {
             error("Limit Should Not Be Null And Should Be Greater Than 0");
             return false;

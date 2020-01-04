@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="backup_to_google_drive"
         android:summary="@string/pref_description_social_recommendations"
         android:title="@string/pref_title_social_recommendations" />
@@ -42,7 +42,7 @@
         android:title="@string/pref_title_file_date_google_drive" />
 
     <ListPreference
-        android:defaultValue="3"
+        android:defaultValue="2"
         android:dependency="backup_to_google_drive"
         android:entries="@array/pref_backup_to_google_drive_list_titles"
         android:entryValues="@array/pref_backup_to_google_drive_list_values"
