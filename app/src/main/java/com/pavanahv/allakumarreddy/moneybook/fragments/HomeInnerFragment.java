@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 import static com.pavanahv.allakumarreddy.moneybook.utils.AnimationUtils.revealAnimation;
+import static com.pavanahv.allakumarreddy.moneybook.utils.Utils.addItem;
 
 
 public class HomeInnerFragment extends Fragment {
@@ -55,6 +60,10 @@ public class HomeInnerFragment extends Fragment {
     private PreferencesCus pref;
     private TextView dateTv;
     private boolean isResumed = false;
+    private ImageButton prev;
+    private ImageButton next;
+    private boolean userVisible = false;
+    private boolean isVisit;
 
     public HomeInnerFragment() {
         // Required empty public constructor
@@ -79,6 +88,8 @@ public class HomeInnerFragment extends Fragment {
         mDbHandler = new DbHandler(getContext());
         mbr = new ArrayList<>();
         mAdapter = new MyAdapter(mbr, getContext(), mType, mHomeAdapterInterface);
+
+        isVisit = pref.isVisit(TAG);
     }
 
     private void initDate() {
@@ -102,13 +113,15 @@ public class HomeInnerFragment extends Fragment {
         mListView.setAdapter(mAdapter);
         mTotalTextView = layout.findViewById(R.id.total_tv);
         dateTv = (TextView) layout.findViewById(R.id.date_text);
-        ((ImageButton) layout.findViewById(R.id.prev)).setOnClickListener(new View.OnClickListener() {
+        prev = ((ImageButton) layout.findViewById(R.id.prev));
+        prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setDate(false);
             }
         });
-        ((ImageButton) layout.findViewById(R.id.next)).setOnClickListener(new View.OnClickListener() {
+        next = ((ImageButton) layout.findViewById(R.id.next));
+        next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setDate(true);
@@ -146,6 +159,7 @@ public class HomeInnerFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
+            userVisible = true;
             if (isResumed) {
                 updataUI();
             }
@@ -178,12 +192,43 @@ public class HomeInnerFragment extends Fragment {
                     mListView.setVisibility(View.VISIBLE);
                 }
                 showMainView();
+                presentShowcaseSequence();
             });
         }).start();
     }
 
     private void showMainView() {
         revealAnimation(progress, mainView, getView());
+    }
+
+    private void presentShowcaseSequence() {
+
+        if (!userVisible)
+            return;
+
+        if (!isVisit) {
+            isVisit = true;
+            pref.setVisit(TAG, true);
+            ShowcaseConfig config = new ShowcaseConfig();
+            MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), TAG);
+            sequence.setConfig(config);
+            FragmentActivity activity = getActivity();
+            addItem(sequence, dateTv, "All the expenses shown below belongs to this date", activity);
+            addItem(sequence, mTotalTextView, "Total amount of all the records mentioned below", activity);
+            addItem(sequence, prev, "Used to go to previous date", activity);
+            addItem(sequence, next, "Used to go to next date", activity);
+            View calenderMenu = getActivity().findViewById(R.id.action_calender);
+            View newMenu = getActivity().findViewById(R.id.action_new);
+            View anallyticsMenu = getActivity().findViewById(R.id.action_analytics);
+            View backupMenu = getActivity().findViewById(R.id.action_backup);
+            View fab = getActivity().findViewById(R.id.fab);
+            addItem(sequence, calenderMenu, "Navigate to particular date using calender", activity);
+            addItem(sequence, newMenu, "Select to Add new Item, Category, Payment method", activity);
+            addItem(sequence, anallyticsMenu, "Click to go to analytics", activity);
+            addItem(sequence, backupMenu, "Click to backup to google drive", activity);
+            addItem(sequence, fab, "Click to add new item", activity);
+            sequence.start();
+        }
     }
 
     private int getTotalAmount() {

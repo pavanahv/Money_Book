@@ -346,6 +346,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
 
             bindPreferenceSummaryToValue(findPreference(GlobalConstants.PREF_DISPLAY_THEME));
+            bindPreferenceSummaryToValueBool(findPreference(GlobalConstants.PREF_LEFT_BAL));
             String colorPrefArr[] = new String[]{
                     GlobalConstants.PREF_DISPLAY_SPENT,
                     GlobalConstants.PREF_DISPLAY_EARN,

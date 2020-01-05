@@ -37,6 +37,8 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     // View lookup cache
     private static class ViewHolder {
+        TextView leftBal;
+        View leftOutBalView;
         CircularProgressBar mCircularProgressbarDay;
         TextView mPercentDay;
         TextView mPriceDay;
@@ -55,13 +57,17 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
 
     }
 
-    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context, DashBoardAdapterInterface dashBoardAdapterInterface, int type) {
+    public DashBoardAdapter(ArrayList<DashBoardRecord> data, Context context,
+                            DashBoardAdapterInterface dashBoardAdapterInterface, boolean isPaymentMethod) {
         super(context, R.layout.dash_board_item, data);
         this.dataSet = data;
         this.mContext = context;
         this.db = new DbHandler(mContext);
         mDashBoardAdapterInterface = dashBoardAdapterInterface;
-        this.type = type;
+        if (isPaymentMethod)
+            this.type = 2;
+        else
+            this.type = 1;
         mPref = new PreferencesCus(context);
     }
 
@@ -97,6 +103,8 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
             viewHolder.imageButton = (FrameLayout) convertView.findViewById(R.id.ib);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.ibtn);
             viewHolder.mTextHead = (TextView) convertView.findViewById(R.id.dashhead);
+            viewHolder.leftOutBalView = convertView.findViewById(R.id.left_bal_view);
+            viewHolder.leftBal = (TextView) convertView.findViewById(R.id.left_bal);
             result = convertView;
 
             convertView.setTag(viewHolder);
@@ -189,6 +197,17 @@ public class DashBoardAdapter extends ArrayAdapter<DashBoardRecord> {
         viewHolder.mPriceYear.setText(Utils.getFormattedNumber(dataModel.getYear()));
 
         viewHolder.mTextHead.setText(dataModel.getText());
+
+        if (type == 1) {
+            viewHolder.leftOutBalView.setVisibility(View.GONE);
+        } else {
+            if (mPref.getMessageParserLeftOutBal()) {
+                viewHolder.leftOutBalView.setVisibility(View.VISIBLE);
+                viewHolder.leftBal.setText(Utils.getFormattedNumber(dataModel.getBalanceLeft()));
+            } else {
+                viewHolder.leftOutBalView.setVisibility(View.GONE);
+            }
+        }
         // Return the completed view to render on screen
         return convertView;
     }

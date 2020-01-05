@@ -3,8 +3,10 @@ package com.pavanahv.allakumarreddy.moneybook.fragments;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +27,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 import static com.pavanahv.allakumarreddy.moneybook.utils.AnimationUtils.revealAnimation;
+import static com.pavanahv.allakumarreddy.moneybook.utils.Utils.addItem;
 
 public class DashBoardInnerFragment extends Fragment implements DashBoardAdapterInterface {
 
@@ -44,6 +50,9 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
     private View progress;
     private int mType = -1;
     private PreferencesCus mPref;
+    private boolean userVisible = false;
+    private boolean isResumed = false;
+    private boolean isVisit = false;
 
     public DashBoardInnerFragment() {
 
@@ -64,6 +73,7 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
         mPref = new PreferencesCus(getContext());
         setHasOptionsMenu(true);
         readBundle(getArguments());
+        isVisit = mPref.isVisit(TAG);
     }
 
     private void readBundle(Bundle args) {
@@ -97,6 +107,23 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            userVisible = true;
+            if (isResumed) {
+                dashBoardUIData();
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        isResumed = false;
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initViewData();
@@ -110,7 +137,7 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
         initColors();
 
         dbr = new ArrayList<>();
-        dashBoardAdapter = new DashBoardAdapter(dbr, getContext(), this, mType);
+        dashBoardAdapter = new DashBoardAdapter(dbr, getContext(), this, false);
         dashBoardList.setAdapter(dashBoardAdapter);
     }
 
@@ -129,7 +156,43 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
     @Override
     public void onResume() {
         super.onResume();
+        isResumed = true;
         dashBoardUIData();
+    }
+
+    private void presentShowcaseSequence() {
+
+
+        if (!userVisible)
+            return;
+
+        if (!isVisit) {
+            isVisit = true;
+            new Handler().postDelayed(() -> {
+                mPref.setVisit(TAG, true);
+                ShowcaseConfig config = new ShowcaseConfig();
+                MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), TAG);
+                sequence.setConfig(config);
+                FragmentActivity activity = getActivity();
+                addItem(sequence, totalD, "Total expenses for current day", activity);
+                addItem(sequence, totalM, "Total expenses for current month", activity);
+                addItem(sequence, totalY, "Total expenses for current year", activity);
+                View fab = getActivity().findViewById(R.id.fab);
+                addItem(sequence, fab, "Click to add new category", activity);
+
+                View childView = dashBoardList.getChildAt(0);
+                if (childView != null) {
+                    View day = childView.findViewById(R.id.day);
+                    View month = childView.findViewById(R.id.month);
+                    View year = childView.findViewById(R.id.year);
+
+                    addItem(sequence, day, "Category expenses percentage over total expenses per current day ", activity);
+                    addItem(sequence, month, "Category expenses percentage over total expenses per current month", activity);
+                    addItem(sequence, year, "Category expenses percentage over total expenses per current year", activity);
+                }
+                sequence.start();
+            }, 500);
+        }
     }
 
     public void dashBoardUIData() {
@@ -147,6 +210,7 @@ public class DashBoardInnerFragment extends Fragment implements DashBoardAdapter
                 dashBoardAdapter.notifyDataSetChanged();
                 initColors();
                 showMainView();
+                presentShowcaseSequence();
             });
         }).start();
     }

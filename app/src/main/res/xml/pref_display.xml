@@ -7,6 +7,12 @@
         android:key="display_theme"
         android:title="@string/pref_title_diplay_theme" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="PREF_LEFT_BAL"
+        android:summary="Enable to show left out balance parsed from message parser"
+        android:title="Payment Method Left Out Balance" />
+
     <Preference
         android:key="PREF_DISPLAY_SPENT"
         android:title="Spent Color" />

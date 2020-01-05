@@ -5,9 +5,11 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,7 +36,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 import static com.pavanahv.allakumarreddy.moneybook.utils.AnimationUtils.revealAnimation;
+import static com.pavanahv.allakumarreddy.moneybook.utils.Utils.addItem;
 
 
 public class PaymentMethodFragment extends Fragment implements DashBoardAdapterInterface {
@@ -57,6 +63,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
     private View mainView;
     private View progress;
     private PreferencesCus mPref;
+    private boolean isVisit = false;
 
     public PaymentMethodFragment() {
         // Required empty public constructor
@@ -73,6 +80,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         db = new DbHandler(getActivity());
         mPref = new PreferencesCus(getContext());
         setHasOptionsMenu(true);
+        isVisit = mPref.isVisit(TAG);
     }
 
     @Override
@@ -137,6 +145,37 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         getActivity().overridePendingTransition(R.anim.move_right_in_activity, R.anim.move_left_out_activity);
     }
 
+    private void presentShowcaseSequence() {
+
+        if (!isVisit) {
+            isVisit = true;
+            new Handler().postDelayed(() -> {
+                mPref.setVisit(TAG, true);
+                ShowcaseConfig config = new ShowcaseConfig();
+                MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(getActivity(), TAG);
+                sequence.setConfig(config);
+                FragmentActivity activity = getActivity();
+                addItem(sequence, totalD, "Total expenses for current day", activity);
+                addItem(sequence, totalM, "Total expenses for current month", activity);
+                addItem(sequence, totalY, "Total expenses for current year", activity);
+                View fab = getActivity().findViewById(R.id.fab);
+                addItem(sequence, fab, "Click to add new Payment Method", activity);
+
+                View childView = dashBoardList.getChildAt(0);
+                if (childView != null) {
+                    View day = childView.findViewById(R.id.day);
+                    View month = childView.findViewById(R.id.month);
+                    View year = childView.findViewById(R.id.year);
+
+                    addItem(sequence, day, "Payment Method Usage percentage over total expenses per current day ", activity);
+                    addItem(sequence, month, "Payment Method Usage percentage over total expenses per current month", activity);
+                    addItem(sequence, year, "Payment Method Usage percentage over total expenses per current year", activity);
+                }
+                sequence.start();
+            }, 500);
+        }
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -149,7 +188,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
         dateY.setText(new SimpleDateFormat("yyyy").format(new Date()));
 
         dbr = new ArrayList<>();
-        dashBoardAdapter = new DashBoardAdapter(dbr, getActivity(), this, 2);
+        dashBoardAdapter = new DashBoardAdapter(dbr, getActivity(), this, true);
         dashBoardList.setAdapter(dashBoardAdapter);
     }
 
@@ -190,6 +229,7 @@ public class PaymentMethodFragment extends Fragment implements DashBoardAdapterI
                 mDashUIUpdateInterface.switchScreen();
                 initColors();
                 showMainView();
+                presentShowcaseSequence();
             });
         }).start();
     }

@@ -169,4 +169,16 @@ public class PreferencesCus {
     public void setColor(String pref, int color) {
         mSharedPreference.edit().putString(pref, color + "").apply();
     }
+
+    public boolean isVisit(String className) {
+        return mSharedPreference.getBoolean(className, false);
+    }
+
+    public void setVisit(String className, boolean value) {
+        mSharedPreference.edit().putBoolean(className, value).apply();
+    }
+
+    public boolean getMessageParserLeftOutBal() {
+        return mSharedPreference.getBoolean(GlobalConstants.PREF_LEFT_BAL, false);
+    }
 }

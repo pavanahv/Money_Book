@@ -785,68 +785,71 @@ public class DbHandler extends SQLiteOpenHelper {
 
     public ArrayList<MBRecord> getRecords(String date, int type) {
 
-        LoggerCus.d(TAG, date);
-        DateConverter dc = null;
-        dc = new DateConverter(date);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(dc.getdDate());
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        Date temp1 = cal.getTime();
-        cal.set(Calendar.AM_PM, Calendar.PM);
-        cal.set(Calendar.HOUR, 11);
-        Date temp2 = cal.getTime();
-
         ArrayList<MBRecord> mbr = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
+        try {
+            DateConverter dc = null;
+            dc = new DateConverter(date);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dc.getdDate());
+            cal.set(Calendar.AM_PM, Calendar.AM);
+            cal.set(Calendar.HOUR, 0);
+            Date temp1 = cal.getTime();
+            cal.set(Calendar.AM_PM, Calendar.PM);
+            cal.set(Calendar.HOUR, 11);
+            Date temp2 = cal.getTime();
 
-        Cursor cursor = null;
-        String query = "";
-        if (type == GlobalConstants.TYPE_DUE) {
-            query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
-                    + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
-                    + "," + KEY_TYPE
-                    + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
-                    + " AND " + KEY_DATE + " <= " + temp2.getTime()
-                    + " AND (" + KEY_TYPE + "=" + type + " OR "
-                    + KEY_TYPE + " = " + GlobalConstants.TYPE_DUE_PAYMENT + ")";
-        } else if (type == GlobalConstants.TYPE_LOAN) {
-            query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
-                    + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
-                    + "," + KEY_TYPE
-                    + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
-                    + " AND " + KEY_DATE + " <= " + temp2.getTime()
-                    + " AND (" + KEY_TYPE + "=" + type + " OR "
-                    + KEY_TYPE + " = " + GlobalConstants.TYPE_LOAN_PAYMENT + ")";
-        } else {
-            query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
-                    + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
-                    + "," + KEY_TYPE
-                    + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
-                    + " AND " + KEY_DATE + " <= " + temp2.getTime()
-                    + " AND " + KEY_TYPE + "=" + type;
-        }
-        LoggerCus.d(TAG, query);
-        cursor = db.rawQuery(query, null);
-        if (cursor != null) {
-            final int len = cursor.getCount();
-            for (int i = 0; i < len; i++) {
-                cursor.moveToPosition(i);
-                MBRecord mbrTemp = new MBRecord(cursor.getString(0),
-                        Integer.parseInt(cursor.getString(1)),
-                        new Date(cursor.getLong(2)), cursor.getInt(5),
-                        cursor.getString(3),
-                        cursor.getString(4));
-                if (type == GlobalConstants.TYPE_DUE ||
-                        type == GlobalConstants.TYPE_LOAN ||
-                        type == GlobalConstants.TYPE_DUE_PAYMENT ||
-                        type == GlobalConstants.TYPE_LOAN_PAYMENT) {
-                    Utils.addRefIdForLoanDueFromDes(mbrTemp);
-                }
-                LoggerCus.d(TAG, mbrTemp.toString());
-                mbr.add(mbrTemp);
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor cursor = null;
+            String query = "";
+            if (type == GlobalConstants.TYPE_DUE) {
+                query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                        + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                        + "," + KEY_TYPE
+                        + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
+                        + " AND " + KEY_DATE + " <= " + temp2.getTime()
+                        + " AND (" + KEY_TYPE + "=" + type + " OR "
+                        + KEY_TYPE + " = " + GlobalConstants.TYPE_DUE_PAYMENT + ")";
+            } else if (type == GlobalConstants.TYPE_LOAN) {
+                query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                        + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                        + "," + KEY_TYPE
+                        + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
+                        + " AND " + KEY_DATE + " <= " + temp2.getTime()
+                        + " AND (" + KEY_TYPE + "=" + type + " OR "
+                        + KEY_TYPE + " = " + GlobalConstants.TYPE_LOAN_PAYMENT + ")";
+            } else {
+                query = "SELECT " + KEY_DESCRIPTION + "," + KEY_AMOUNT + ","
+                        + KEY_DATE + "," + getSQLQueryForCat() + "," + getSQLQueryForPayMeth()
+                        + "," + KEY_TYPE
+                        + " FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + temp1.getTime()
+                        + " AND " + KEY_DATE + " <= " + temp2.getTime()
+                        + " AND " + KEY_TYPE + "=" + type;
             }
-            cursor.close();
+            LoggerCus.d(TAG, query);
+            cursor = db.rawQuery(query, null);
+            if (cursor != null) {
+                final int len = cursor.getCount();
+                for (int i = 0; i < len; i++) {
+                    cursor.moveToPosition(i);
+                    MBRecord mbrTemp = new MBRecord(cursor.getString(0),
+                            Integer.parseInt(cursor.getString(1)),
+                            new Date(cursor.getLong(2)), cursor.getInt(5),
+                            cursor.getString(3),
+                            cursor.getString(4));
+                    if (type == GlobalConstants.TYPE_DUE ||
+                            type == GlobalConstants.TYPE_LOAN ||
+                            type == GlobalConstants.TYPE_DUE_PAYMENT ||
+                            type == GlobalConstants.TYPE_LOAN_PAYMENT) {
+                        Utils.addRefIdForLoanDueFromDes(mbrTemp);
+                    }
+                    LoggerCus.d(TAG, mbrTemp.toString());
+                    mbr.add(mbrTemp);
+                }
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LoggerCus.d(TAG, e.getMessage());
         }
         return mbr;
     }
@@ -1615,102 +1618,117 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public int getTotalMoneyInCurrentMonth(int type) {
-        Date sDate = new Date();
-        Date eDate = new Date();
-
-        sDate = intializeSDateForDay(sDate);
-        eDate = intializeEDateForDay(eDate);
-
-        sDate.setDate(1);
-        int tempMon = eDate.getMonth() + 1;
-        eDate.setMonth(tempMon);
-        eDate.setDate(0);
-        //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
         int result = 0;
-        if ((cursor != null) && (cursor.getCount() > 0)) {
-            cursor.moveToPosition(0);
-            String temp = cursor.getString(0);
-            if (temp != null)
-                result = Integer.parseInt(temp);
-            else
-                result = 0;
-            cursor.close();
+        try {
+            Date sDate = new Date();
+            Date eDate = new Date();
+
+            sDate = intializeSDateForDay(sDate);
+            eDate = intializeEDateForDay(eDate);
+
+            sDate.setDate(1);
+            int tempMon = eDate.getMonth() + 1;
+            eDate.setMonth(tempMon);
+            eDate.setDate(0);
+            //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = null;
+            cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+            if ((cursor != null) && (cursor.getCount() > 0)) {
+                cursor.moveToPosition(0);
+                String temp = cursor.getString(0);
+                if (temp != null)
+                    result = Integer.parseInt(temp);
+                else
+                    result = 0;
+                cursor.close();
+            }
+            db.close();
+        } catch (Exception e) {
+            LoggerCus.d(TAG, e.getMessage());
         }
-        db.close();
         return result;
     }
 
     public int getTotalMoneyInCurrentDay(int type) {
-
-        Date sDate = new Date();
-        Date eDate = new Date();
-
-        sDate = intializeSDateForDay(sDate);
-        eDate = intializeEDateForDay(eDate);
-        //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
         int result = 0;
-        if ((cursor != null) && (cursor.getCount() > 0)) {
-            cursor.moveToPosition(0);
-            String temp = cursor.getString(0);
-            if (temp != null)
-                result = Integer.parseInt(temp);
-            else
-                result = 0;
-            cursor.close();
+        try {
+            Date sDate = new Date();
+            Date eDate = new Date();
+
+            sDate = intializeSDateForDay(sDate);
+            eDate = intializeEDateForDay(eDate);
+            //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = null;
+            cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+            if ((cursor != null) && (cursor.getCount() > 0)) {
+                cursor.moveToPosition(0);
+                String temp = cursor.getString(0);
+                if (temp != null)
+                    result = Integer.parseInt(temp);
+                else
+                    result = 0;
+                cursor.close();
+            }
+            db.close();
+        } catch (Exception e) {
+            LoggerCus.d(TAG, e.getMessage());
         }
-        db.close();
         return result;
     }
 
     public int getTotalMoneyInCurrentYear(int type) {
-        Date sDate = new Date();
-        Date eDate = new Date();
-
-        sDate = intializeSDateForDay(sDate);
-        eDate = intializeEDateForDay(eDate);
-
-        sDate.setDate(1);
-        int tempMon = eDate.getMonth() + 1;
-        eDate.setMonth(tempMon);
-        eDate.setDate(0);
-
-        sDate.setMonth(0);
-        eDate.setYear(eDate.getYear() + 1);
-        eDate.setMonth(0);
-        eDate.setDate(0);
-        //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
         int result = 0;
-        if ((cursor != null) && (cursor.getCount() > 0)) {
-            cursor.moveToPosition(0);
-            String temp = cursor.getString(0);
-            if (temp != null)
-                result = Integer.parseInt(temp);
-            else
-                result = 0;
-            cursor.close();
+        try {
+            Date sDate = new Date();
+            Date eDate = new Date();
+
+            sDate = intializeSDateForDay(sDate);
+            eDate = intializeEDateForDay(eDate);
+
+            sDate.setDate(1);
+            int tempMon = eDate.getMonth() + 1;
+            eDate.setMonth(tempMon);
+            eDate.setDate(0);
+
+            sDate.setMonth(0);
+            eDate.setYear(eDate.getYear() + 1);
+            eDate.setMonth(0);
+            eDate.setDate(0);
+            //LoggerCus.d(TAG, sDate.toString() + " " + eDate.toString());
+
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = null;
+            cursor = db.rawQuery("SELECT sum(" + KEY_AMOUNT + ") FROM " + TABLE_NAME + " where " + KEY_DATE + " >= " + sDate.getTime() + " AND " + KEY_DATE + " <= " + eDate.getTime() + " AND " + KEY_TYPE + "=" + type, null);
+            if ((cursor != null) && (cursor.getCount() > 0)) {
+                cursor.moveToPosition(0);
+                String temp = cursor.getString(0);
+                if (temp != null)
+                    result = Integer.parseInt(temp);
+                else
+                    result = 0;
+                cursor.close();
+            }
+            db.close();
+        } catch (Exception e) {
+            LoggerCus.d(TAG, e.getMessage());
         }
-        db.close();
         return result;
     }
 
     public ArrayList<DashBoardRecord> getDashBoardRecords(int type) {
         ArrayList<DashBoardRecord> dbr = new ArrayList<>();
-        String cols[] = getCategeories(type);
-        final int len = cols.length;
-        for (int i = 0; i < len; i++) {
-            dbr.add(getDashBoardRecord(cols[i], type));
+        try {
+            String cols[] = getCategeories(type);
+            final int len = cols.length;
+            for (int i = 0; i < len; i++) {
+                dbr.add(getDashBoardRecord(cols[i], type));
+            }
+        } catch (Exception e) {
+            LoggerCus.d(TAG, e.getMessage());
         }
         return dbr;
     }

@@ -1,6 +1,7 @@
 package com.pavanahv.allakumarreddy.moneybook.utils;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -71,6 +72,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeSet;
+
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 /**
  * Created by alla.kumarreddy on 09-Apr-18.
@@ -239,6 +243,18 @@ public class Utils {
             am.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), millsec, pi); // Millisec * Second * Minute
             Toast.makeText(context, "Backup Frequency Set Successfully!", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public static void addItem(MaterialShowcaseSequence sequence, View target, String content,
+                               Activity activity) {
+        sequence.addSequenceItem(
+                new MaterialShowcaseView.Builder(activity)
+                        .setTarget(target)
+                        .setDismissText("GOT IT")
+                        .setContentText(content)
+                        .withOvalShape()
+                        .build()
+        );
     }
 
     public static void cancelAlarmForGoogleDriveBackup(Context context) {

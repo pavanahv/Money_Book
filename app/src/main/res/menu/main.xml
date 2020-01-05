@@ -88,7 +88,7 @@
         android:icon="@drawable/icon_backup"
         android:orderInCategory="100"
         android:title="@string/action_backup"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <!--<item
         android:id="@+id/action_import"
