@@ -21,7 +21,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.BudgetDetailActivity"></activity>
+        <activity
+            android:name=".Activities.InfoActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Activities.BudgetDetailActivity" />
         <activity android:name=".Activities.BudgetAddActivity" />
         <activity android:name=".Activities.ExportActivity" />
         <activity android:name=".Activities.ReportGraphDetailActivity" />
